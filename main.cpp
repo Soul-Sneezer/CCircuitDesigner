@@ -192,7 +192,7 @@ public:
     {
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Source& st)
+    friend std::ostream& operator<<(std::ostream& os, const Source& el)
     {
         return os;
     }
@@ -226,7 +226,7 @@ public:
 
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Circuit& st)
+    friend std::ostream& operator<<(std::ostream& os, const Circuit& el)
     {
         return os;
     }
