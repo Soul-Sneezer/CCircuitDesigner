@@ -1,57 +1,262 @@
 #include <iostream>
-#include <array>
+#include <vector>
 
-#include <Helper.h>
+class CircuitElement
+{
+private:
+    int powerIn;
+    int powerOut;
+public:
+    CircuitElement()
+    {
+        this->powerIn = 0;
+        this->powerOut = 0;
+    }
+
+    CircuitElement(int value)
+    {
+        this->powerIn = value;
+        this->powerOut = value;
+    }
+
+    CircuitElement(int in, int out)
+    {
+        this->powerIn = in;
+        this->powerOut = out;
+    }
+
+    CircuitElement(const CircuitElement& element)
+    {
+        this->powerIn = element.powerIn;
+        this->powerOut = element.powerOut;
+    }
+
+    ~CircuitElement()
+    {
+    }
+
+    int getPowerOut() { return this->powerOut; };
+
+    friend std::ostream& operator<<(std::ostream& os, const CircuitElement& el)
+    {
+        os << "Power in: "<<el.powerIn <<"    Power out: " <<el.powerOut <<"\n";
+        return os;        
+    }
+
+    CircuitElement& operator=(const CircuitElement& element)
+    {
+        this->powerIn = element.powerIn;
+        this->powerOut = element.powerOut;
+
+        return *this;
+    }
+
+    virtual void changeValue()
+    {
+    }
+};
+
+class Transistor : CircuitElement
+{
+private:
+    int threshold;
+public:
+    Transistor()
+    {
+        this->threshold = 0;
+    }
+
+    Transistor(int threshold) 
+    {
+        this->threshold = threshold;
+    }
+
+    Transistor(const Transistor& transistor)
+    {
+        this->threshold = transistor.threshold;
+    }
+
+    ~Transistor()
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Transistor& el)
+    {
+        os<<"Threshold value: "<<el.threshold<<"\n";
+        return os;
+    }
+
+    Transistor& operator=(const Transistor& transistor)
+    {
+        this->threshold = transistor.threshold;
+        return *this;
+    }
+};
+
+class Resistor : CircuitElement
+{
+private:
+    int resistance;
+public:
+    Resistor()
+    {
+    }
+
+    Resistor(int resistance) 
+    {
+        this->resistance = resistance;
+    }
+
+    Resistor(const Resistor& r)
+    {
+        this->resistance = r.resistance;
+    }
+
+    ~Resistor()
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Resistor& el)
+    {
+        os<<"Resistance: "<<el.resistance<<"\n";
+        return os;
+    }
+
+    Resistor& operator=(const Resistor& resistor)
+    {
+        this->resistance = resistor.resistance;
+        return *this;
+    }
+};
+
+class Cable : CircuitElement
+{
+private:
+    std::pair<int, int> start;
+    std::pair<int, int> end;
+
+    bool reverse;
+public:
+    Cable()
+    {
+    }
+
+    Cable(std::pair<int, int> start, std::pair<int, int> end) 
+    {
+        this->start = start;
+        this->end = end;
+    }
+
+    Cable(const Cable& c)
+    {
+
+    }
+
+    ~Cable()
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Cable& el)
+    {
+        
+        return os;
+    }
+
+    Cable& operator=(const Cable& cable)
+    {
+        this->start = cable.start;
+        this->end = cable.end;
+        this->reverse = cable.reverse;
+
+        return *this;
+    }
+};
+
+class Source : CircuitElement
+{
+private:
+public:
+    Source()
+    {
+    }
+    
+    Source(int power)  : CircuitElement(power)
+    {
+    }
+
+    Source(const Source& s)
+    {
+    }
+
+    ~Source()
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Source& st)
+    {
+        return os;
+    }
+
+    Source& operator=(const Source& source)
+    {
+        return *this;
+    }
+};
+
+class Circuit
+{
+private:
+    int powerIn;
+    int powerOut;
+
+    std::vector<CircuitElement> elements; // not suitable for a circuit, replace soon
+public:
+    Circuit()
+    {
+
+    }
+
+    Circuit(const Circuit& circuit)
+    {
+        this->elements = circuit.elements;
+    }
+
+    ~Circuit()
+    {
+
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Circuit& st)
+    {
+        return os;
+    }
+
+    Circuit& operator=(const Circuit& circuit)
+    {
+        this->elements = circuit.elements;
+
+        return *this;
+    }
+    
+    std::vector<CircuitElement>& getElements() { return this->elements; };
+
+    void addElemToCircuit(CircuitElement* element)
+    {
+        getElements().push_back(*element);
+    }
+
+    void removeElemFromCircuit(const int index)
+    {
+        std::vector<CircuitElement>& v = getElements();
+        v.erase(v.begin() + index);
+    }
+
+    int output()
+    {
+        
+        return 0;
+    }
+};
 
 int main() {
-    std::cout << "Hello, world!\n";
-    std::array<int, 100> v{};
-    int nr;
-    std::cout << "Introduceți nr: ";
-    /////////////////////////////////////////////////////////////////////////
-    /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
-    /// dați exemple de date de intrare folosind fișierul tastatura.txt
-    /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
-    /// (în formatul impus de voi) astfel încât execuția programului să se încheie.
-    /// De asemenea, trebuie să adăugați în acest fișier date de intrare
-    /// pentru cât mai multe ramuri de execuție.
-    /// Dorim să facem acest lucru pentru a automatiza testarea codului, fără să
-    /// mai pierdem timp de fiecare dată să introducem de la zero aceleași date de intrare.
-    ///
-    /// Pe GitHub Actions (bife), fișierul tastatura.txt este folosit
-    /// pentru a simula date introduse de la tastatură.
-    /// Bifele verifică dacă programul are erori de compilare, erori de memorie și memory leaks.
-    ///
-    /// Dacă nu puneți în tastatura.txt suficiente date de intrare, îmi rezerv dreptul să vă
-    /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
-    /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
-    /// program care merg (și să le evitați pe cele care nu merg).
-    ///
-    /////////////////////////////////////////////////////////////////////////
-    std::cin >> nr;
-    /////////////////////////////////////////////////////////////////////////
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "v[" << i << "] = ";
-        std::cin >> v[i];
-    }
-    std::cout << "\n\n";
-    std::cout << "Am citit de la tastatură " << nr << " elemente:\n";
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "- " << v[i] << "\n";
-    }
-    ///////////////////////////////////////////////////////////////////////////
-    /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
-    /// alt fișier propriu cu ce alt nume doriți.
-    /// Exemplu:
-    /// std::ifstream fis("date.txt");
-    /// for(int i = 0; i < nr2; ++i)
-    ///     fis >> v2[i];
-    ///
-    ///////////////////////////////////////////////////////////////////////////
-    ///                Exemplu de utilizare cod generat                     ///
-    ///////////////////////////////////////////////////////////////////////////
-    Helper helper;
-    helper.help();
-    ///////////////////////////////////////////////////////////////////////////
-    return 0;
 }
