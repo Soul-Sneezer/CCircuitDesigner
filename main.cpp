@@ -306,14 +306,10 @@ class Source : CircuitElement
 {
 private:
 public:
-    Source()
+    Source() : CircuitElement()
     {
     }
     
-    Source(const Source& s)
-    {
-    }
-
     explicit Source(const int resistance = 0, const bool reverse = false, \
             const int voltage = 0, const int power = 0, const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
             const pair<int, int> start = std::make_pair(0,0), const pair<int, int> end = std::make_pair(0,0), const int temperature = 273)
@@ -326,24 +322,19 @@ public:
         this->out = out;
 
         this->position = start;
-        this->end = end;
-
         this->temperature = temperature;
     }
 
-    explicit Source(const Cable& c)
+    explicit Source(const Source& s)
     {
-        this->power = c.power;
-        this->voltage = c.voltage;
+        this->power = s.power;
+        this->voltage = s.voltage;
         
-        this->in = c.in;
-        this->out = c.out;
+        this->in = s.in;
+        this->out = s.out;
 
-        this->position = c.position;
-        this->end = c.end;
-
-        this->temperature = c.temperature;
-        this->position = c.position;
+        this->position = s.position;
+        this->temperature = s.temperature;
     }
 
     ~Source()
@@ -355,9 +346,17 @@ public:
         return os;
     }
 
-    Source& operator=(const Source& source)
+    Source& operator=(const Source& s)
     {
+        this->power = s.power;
+        this->voltage = s.voltage;
         
+        this->in = s.in;
+        this->out = s.out;
+
+        this->position = s.position;
+        this->temperature = s.temperature;
+
 
         return *this;
     }
@@ -367,26 +366,52 @@ public:
 class Battery
 {
     private:
+        std::pair<int, int> position;
+        int capacity;
+        int voltage;
+        CircuitElement* out;
     public:
     Battery()
     {
+        this->position = std::make_pair(0, 0);
+        this->capacity = 0;
+        this->voltage = 0;
+        this->out = NULL;
     }
 
-    Baterry(const Battery& b)
+    explicit Battery(const int voltage = 0, const int capacity = 0, \ 
+            const CircuitElement* out = NULL, const std::pair<int, int> position = std::make_pair(0,0))
     {
+        this->voltage = voltage;
+        this->capacity = capacity;
+        this->out = out;
+        this->position = position;
+    }
+
+    explicit Battery(const Battery& b)
+    {
+        this->position = b.position;
+        this->capacity = b.capacity;
+        this->voltage = b.voltage;
+        this->out = b.out;
     }
 
     ~Battery()
     {
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Source& el)
+    friend std::ostream& operator<<(std::ostream& os, const Battery& el)
     {
         return os;
     }
 
-    Source& operator=(const Source& source)
+    Baterry& operator=(const Battery& b)
     {
+        this->position = b.position;
+        this->capacity = b.capacity;
+        this->voltage = b.voltage;
+        this->out = b.out;
+
         return *this;
     }
 };
