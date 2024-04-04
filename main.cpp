@@ -6,8 +6,8 @@ class CircuitElement
 private:
     std::pair<int, int> position;
 
-    int voltageIn;
-    int voltageOut;
+    int voltage;
+    int power;
     int temperature; // useless for now
 
     CircuitElement* in; // prev element(may be NULL)
@@ -15,46 +15,61 @@ private:
 public:
     CircuitElement()
     {
-        this->voltageIn = 0;
-        this->voltageOut = 0;
+        position.first = 0;
+        position.second = 0;
+        this->voltage = 0;
+        this->power = 0;
+        this->temperature = 273;
         this->in = NULL;
         this->out = NULL;
     }
-
-    CircuitElement(int value)
+    
+    explicit CircuitElement(const int voltage = 0, const int power = 0, \
+            const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
+            const pair<int, int> position = std::make_pair(0, 0), const int temperature = 273)
     {
-        this->voltageIn = value;
-        this->voltageOut = value;
+        this->voltage = voltage;
+        this->power = power;
+        this->temperature = temperature;
+        this->in = in;
+        this->out = out;
+        this->position = position;
     }
 
-    CircuitElement(int in, int out)
+    explicit CircuitElement(const CircuitElement& element)
     {
-        this->voltageIn = in;
-        this->voltageOut = out;
-    }
-
-    CircuitElement(const CircuitElement& element)
-    {
-        this->voltageIn = element.powerIn;
-        this->voltageOut = element.powerOut;
+        this->position= element.position;
+        this->voltage = element.voltage;
+        this->power = element.power;
+        this->temperature = element.temperature;
+        this->in = element.in;
+        this->out = element.out;
     }
 
     ~CircuitElement()
     {
     }
 
-    int getPowerOut() { return this->voltageOut; };
+    int getVoltage() { return this->voltage; };
+    int getPower() { return this->power; };
+    int getTemperature() { return this->temperature; };
+    CircuitElement* getPrev() { return this->in; };
+    CircuitElement* getNext() { return this->out; };
 
     friend std::ostream& operator<<(std::ostream& os, const CircuitElement& el)
     {
-        os << "Power in: "<<el.voltageIn <<"    Power out: " <<el.powerOut <<"\n";
+        os << "Voltage: "<<el.voltage <<"    Power: " <<el.power <<"    Temperature: "<<el.temperature<<"\n";
         return os;        
     }
 
     CircuitElement& operator=(const CircuitElement& element)
     {
-        this->voltageIn = element.powerIn;
-        this->voltageOut = element.powerOut;
+        this->position = element.position;
+        this->voltage = element.voltage;
+        this->power = element.power;
+        this->temperature = element.temperature;
+        this->in = element.in;
+        this->out = element.out;
 
         return *this;
     }
@@ -69,19 +84,35 @@ class Transistor : CircuitElement
 private:
     int threshold;
 public:
-    Transistor()
+    Transistor() 
     {
         this->threshold = 0;
     }
 
-    Transistor(int threshold) 
+    explicit Transistor(const int threshold = 0, const int voltage = 0, const int power = 0, \
+            const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
+            const pair<int, int> position = std::make_pair(0, 0), const int temperature = 273)
     {
         this->threshold = threshold;
+        this->voltage = voltage;
+        this->power = power;
+        this->in = in;
+        this->out = out;
+        this->position = position;
+        this->temperature = temperature;
     }
 
-    Transistor(const Transistor& transistor)
+    explicit Transistor(const Transistor& transistor)
     {
         this->threshold = transistor.threshold;
+        this->voltage = transistor.voltage;
+        this->power = transistor.power;
+        
+        this->in = transistor.in;
+        this->out = transistor.out;
+
+        this->temperature = transistor.temperature;
+        this->position = transistor.position;
     }
 
     ~Transistor()
@@ -97,6 +128,15 @@ public:
     Transistor& operator=(const Transistor& transistor)
     {
         this->threshold = transistor.threshold;
+        this->voltage = transistor.voltage;
+        this->power = transistor.power;
+
+        this->in = transistor.in;
+        this->out = transistor.out;
+
+        this->temperature = transistor.temperature;
+        this->position = transistor.position;
+
         return *this;
     }
 };
@@ -115,18 +155,39 @@ public:
         this->tolerance = 0;
     }
 
-    Resistor(int resistance) 
+    explicit Resistor(const int resistance = 0, const int powerDissipation = 0, const tolerance = 0, \
+            const voltage = 0, const power = 0, const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
+            const pair<int, int> position = std::make_pair(0,0), const int temperature = 273)
     {
         this->resistance = resistance;
-        this->powerDissipation = 0;
-        this->tolerance = 0;
+        this->powerDissipation = powerDissipation;
+        this->tolerance = tolerance;
+
+        this->voltage = voltage;
+        
+        this->power = power;
+        this->in = in;
+        this->out = out;
+        
+        this->temperature = temperature;
+        this->position = position;
+
     }
 
-    Resistor(const Resistor& r)
+    explicit Resistor(const Resistor& r)
     {
         this->resistance = r.resistance;
         this->powerDissipation = r.powerDissipation;
-        this->tolerance = tolerance;
+        this->tolerance = r.tolerance;
+
+        this->voltage = r.voltage;
+        
+        this->power = r.power;
+        this->in = r.in;
+        this->out = r.out;
+        
+        this->temperature = r.temperature;
+        this->position = r.position;
     }
 
     ~Resistor()
@@ -139,11 +200,22 @@ public:
         return os; 
     }
 
-    Resistor& operator=(const Resistor& resistor)
+    Resistor& operator=(const Resistor& r)
     {
-        this->resistance = resistor.resistance;
-        this->powerDissipation = resistor.powerDissipation;
-        this->tolerance = resistor.tolerance;
+        this->resistance = r.resistance;
+        this->powerDissipation = r.powerDissipation;
+        this->tolerance = r.tolerance;
+
+        this->voltage = r.voltage;
+        this->power = r.power;
+        
+        this->in = r.in;
+        this->out = r.out;
+        
+        this->temperature = r.temperature;
+        this->position = r.position;
+            
+
         return *this;
     }
 };
@@ -151,7 +223,6 @@ public:
 class Cable : CircuitElement
 {
 private:
-    std::pair<int, int> start;
     std::pair<int, int> end;
 
     int resistance;
@@ -159,28 +230,46 @@ private:
 public:
     Cable()
     {
-        this->start.first = 0;
-        this->start.second = 0;
-
-        this->end.first = 0;
-        this->end.second = 0;
+        this->end = std::make_pair(0,0);
 
         this->resistance = 0;
-        this->reverse = 0;
+        this->reverse = false;
     }
 
-    Cable(std::pair<int, int> start, std::pair<int, int> end) 
+    explicit Cable(const int resistance = 0, const bool reverse = false, \
+            const int voltage = 0, const int power = 0, const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
+            const pair<int, int> start = std::make_pair(0,0), const pair<int, int> end = std::make_pair(0,0), const int temperature = 273)
     {
-        this->start = start;
+        this->resistance = resistance;
+        this->reverse = reverse;
+
+        this->voltage = voltage;
+        this->power = power;
+
+        this->in = in;
+        this->out = out;
+
+        this->position = start;
         this->end = end;
+
+        this->temperature = temperature;
     }
 
-    Cable(const Cable& c)
+    explicit Cable(const Cable& c)
     {
-        this->start = c.start;
+        this->position = c.position;
         this->end = c.end;
+        
         this->resistance = c.resistance;
         this->reverse = c.reverse;
+        
+        this->power = c.power;
+        this->voltage = c.voltage;
+        
+        this->temperature = c.temperature;
+   
+        this->in = c.in;
+        this->out = c.out;
     }
 
     ~Cable()
@@ -195,10 +284,19 @@ public:
 
     Cable& operator=(const Cable& cable)
     {
-        this->start = cable.start;
+        this->position = cable.position;
         this->end = cable.end;
+        
         this->reverse = cable.reverse;
         this->resistance = cable.resistance;
+        
+        this->voltage = cable.voltage;
+        this->power = cable.power;
+        
+        this->temperature = cable.temperature;
+
+        this->in = cable.in;
+        this->out = cable.out;
 
         return *this;
     }
@@ -212,12 +310,40 @@ public:
     {
     }
     
-    Source(int voltage)  : CircuitElement(voltage)
+    Source(const Source& s)
     {
     }
 
-    Source(const Source& s)
+    explicit Source(const int resistance = 0, const bool reverse = false, \
+            const int voltage = 0, const int power = 0, const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
+            const pair<int, int> start = std::make_pair(0,0), const pair<int, int> end = std::make_pair(0,0), const int temperature = 273)
     {
+
+        this->voltage = voltage;
+        this->power = power;
+
+        this->in = in;
+        this->out = out;
+
+        this->position = start;
+        this->end = end;
+
+        this->temperature = temperature;
+    }
+
+    explicit Source(const Cable& c)
+    {
+        this->power = c.power;
+        this->voltage = c.voltage;
+        
+        this->in = c.in;
+        this->out = c.out;
+
+        this->position = c.position;
+        this->end = c.end;
+
+        this->temperature = c.temperature;
+        this->position = c.position;
     }
 
     ~Source()
@@ -231,6 +357,8 @@ public:
 
     Source& operator=(const Source& source)
     {
+        
+
         return *this;
     }
 };
@@ -261,7 +389,7 @@ class Battery
     {
         return *this;
     }
-}
+};
 
 class Circuit
 {
