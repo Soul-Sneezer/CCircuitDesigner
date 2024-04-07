@@ -1,16 +1,17 @@
 #include <iostream>
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 class CircuitElement
 {
-private:
+protected:
     std::pair<int, int> position;
 
     int voltage;
     int power;
     int temperature; // useless for now
 
-    CircuitElement* in; // prev element(may be NULL)
+    CircuitElement* in; // prev element
     CircuitElement* out; // next element
 public:
     CircuitElement()
@@ -24,9 +25,9 @@ public:
         this->out = NULL;
     }
     
-    explicit CircuitElement(const int voltage = 0, const int power = 0, \
-            const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
-            const pair<int, int> position = std::make_pair(0, 0), const int temperature = 273)
+    explicit CircuitElement(const int voltage, const int power = 0, \
+            CircuitElement* in = NULL, CircuitElement* out = NULL, \
+            const std::pair<int, int> position = std::make_pair(0, 0), const int temperature = 273)
     {
         this->voltage = voltage;
         this->power = power;
@@ -36,7 +37,7 @@ public:
         this->position = position;
     }
 
-    explicit CircuitElement(const CircuitElement& element)
+    explicit CircuitElement(CircuitElement& element)
     {
         this->position= element.position;
         this->voltage = element.voltage;
@@ -49,20 +50,21 @@ public:
     ~CircuitElement()
     {
     }
-
+    
+    std::pair<int, int> getPosition() { return this->position; };
     int getVoltage() { return this->voltage; };
     int getPower() { return this->power; };
     int getTemperature() { return this->temperature; };
-    CircuitElement* getPrev() { return this->in; };
-    CircuitElement* getNext() { return this->out; };
+    CircuitElement* getIn() { return this->in; };
+    CircuitElement* getOut() { return this->out; };
 
-    friend std::ostream& operator<<(std::ostream& os, const CircuitElement& el)
+    friend std::ostream& operator<<(std::ostream& os, CircuitElement& el)
     {
         os << "Voltage: "<<el.voltage <<"    Power: " <<el.power <<"    Temperature: "<<el.temperature<<"\n";
         return os;        
     }
 
-    CircuitElement& operator=(const CircuitElement& element)
+    CircuitElement& operator=(CircuitElement& element)
     {
         this->position = element.position;
         this->voltage = element.voltage;
@@ -79,21 +81,62 @@ public:
     }
 };
 
-class Transistor : CircuitElement
+class CableNode : public CircuitElement
 {
 private:
+    std::vector<CircuitElement*> in;
+    std::vector<CircuitElement*> out;
+public:
+    CableNode()   
+    {
+    }
+
+    explicit CableNode(std::vector<CircuitElement*>& in, std::vector<CircuitElement*>& out)
+    {
+       this->in = in; 
+       this->out = out;
+    }
+
+    ~CableNode()
+    {
+        
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, CableNode& el)
+    {
+        return os;        
+    }
+
+    std::vector<CircuitElement*> getIn() { return this->in; };
+    std::vector<CircuitElement*> getOut() { return this->out; };
+
+    CableNode& operator=(CableNode& element)
+    {
+        this->in = element.getIn();
+        this->out = element.getOut();
+
+        return *this;
+    }
+};
+
+class Transistor : public CircuitElement
+{
+private:
+    int thresholdVoltage;
     int threshold;
 public:
     Transistor() 
     {
         this->threshold = 0;
+        this->thresholdVoltage = 0;
     }
 
-    explicit Transistor(const int threshold = 0, const int voltage = 0, const int power = 0, \
-            const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
-            const pair<int, int> position = std::make_pair(0, 0), const int temperature = 273)
+    explicit Transistor(const int threshold, const int voltage = 0, const int power = 0, \
+            CircuitElement* in = NULL, CircuitElement* out = NULL, const int thresholdVoltage = 0, \
+            const std::pair<int, int> position = std::make_pair(0, 0), const int temperature = 273)
     {
         this->threshold = threshold;
+        this->thresholdVoltage = thresholdVoltage;
         this->voltage = voltage;
         this->power = power;
         this->in = in;
@@ -105,6 +148,7 @@ public:
     explicit Transistor(const Transistor& transistor)
     {
         this->threshold = transistor.threshold;
+        this->thresholdVoltage = transistor.thresholdVoltage;
         this->voltage = transistor.voltage;
         this->power = transistor.power;
         
@@ -121,27 +165,32 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Transistor& el)
     {
-        os<<"Threshold value: "<<el.threshold<<"\n";
+        os<<"Threshold value: "<<el.threshold<<"    Threshold voltage: "<<el.thresholdVoltage<<"\n";
+        os << "Voltage: "<<el.voltage <<"    Power: " <<el.power <<"    Temperature: "<<el.temperature<<"\n";
+
         return os;
     }
 
-    Transistor& operator=(const Transistor& transistor)
+    int getThreshold() { return this->threshold; };
+    int getThresholdVoltage() { return this->thresholdVoltage; };
+
+    Transistor& operator=(Transistor& transistor)
     {
-        this->threshold = transistor.threshold;
-        this->voltage = transistor.voltage;
-        this->power = transistor.power;
+        this->threshold = transistor.getThreshold();
+        this->voltage = transistor.getVoltage();
+        this->power = transistor.getPower();
 
-        this->in = transistor.in;
-        this->out = transistor.out;
+        this->in = transistor.getIn();
+        this->out = transistor.getOut();
 
-        this->temperature = transistor.temperature;
-        this->position = transistor.position;
+        this->temperature = transistor.getTemperature();
+        this->position = transistor.getPosition();
 
         return *this;
     }
 };
 
-class Resistor : CircuitElement
+class Resistor : public CircuitElement
 {
 private:
     int resistance;
@@ -155,9 +204,9 @@ public:
         this->tolerance = 0;
     }
 
-    explicit Resistor(const int resistance = 0, const int powerDissipation = 0, const tolerance = 0, \
-            const voltage = 0, const power = 0, const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
-            const pair<int, int> position = std::make_pair(0,0), const int temperature = 273)
+    explicit Resistor(const int resistance = 0, const int powerDissipation = 0, const int tolerance = 0, \
+            const int voltage = 0, const int power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
+            const std::pair<int, int> position = std::make_pair(0,0), const int temperature = 273)
     {
         this->resistance = resistance;
         this->powerDissipation = powerDissipation;
@@ -197,30 +246,36 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Resistor& el)
     {
         os<<"Resistance: "<<el.resistance<<"    Power that can be safely dissipated: "<<el.powerDissipation<<"   Tolerance: "<<el.tolerance<<"\n";
+        os << "Voltage: "<<el.voltage <<"    Power: " <<el.power <<"    Temperature: "<<el.temperature<<"\n";
+
         return os; 
     }
 
-    Resistor& operator=(const Resistor& r)
-    {
-        this->resistance = r.resistance;
-        this->powerDissipation = r.powerDissipation;
-        this->tolerance = r.tolerance;
+    int getResistance() { return this->resistance; };
+    int getPowerDissipation() { return this->powerDissipation; };
+    int getTolerance() { return this->tolerance; };
 
-        this->voltage = r.voltage;
-        this->power = r.power;
+    Resistor& operator=(Resistor& r)
+    {
+        this->resistance = r.getResistance();
+        this->powerDissipation = r.getPowerDissipation();
+        this->tolerance = r.getTolerance();
+
+        this->voltage = r.getVoltage();
+        this->power = r.getPower();
         
-        this->in = r.in;
-        this->out = r.out;
+        this->in = r.getIn();
+        this->out = r.getOut();
         
-        this->temperature = r.temperature;
-        this->position = r.position;
+        this->temperature = r.getTemperature();
+        this->position = r.getPosition();
             
 
         return *this;
     }
 };
 
-class Cable : CircuitElement
+class Cable : public CircuitElement
 {
 private:
     std::pair<int, int> end;
@@ -236,9 +291,8 @@ public:
         this->reverse = false;
     }
 
-    explicit Cable(const int resistance = 0, const bool reverse = false, \
-            const int voltage = 0, const int power = 0, const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
-            const pair<int, int> start = std::make_pair(0,0), const pair<int, int> end = std::make_pair(0,0), const int temperature = 273)
+    explicit Cable(const int voltage, const int power = 0, CircuitElement* in = NULL,CircuitElement* out = NULL, \
+            const std::pair<int, int> start = std::make_pair(0,0), const std::pair<int, int> end = std::make_pair(0,0), const int resistance = 0, const bool reverse = false, const int temperature = 273)
     {
         this->resistance = resistance;
         this->reverse = reverse;
@@ -278,63 +332,45 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Cable& el)
     {
-        
+        os <<"Resistance: "<<el.resistance<<"   Voltage: "<<el.voltage<<"    Power: " <<el.power<<"    Temperature: "<<el.temperature<<"\n";
+
         return os;
     }
 
-    Cable& operator=(const Cable& cable)
-    {
-        this->position = cable.position;
-        this->end = cable.end;
-        
-        this->reverse = cable.reverse;
-        this->resistance = cable.resistance;
-        
-        this->voltage = cable.voltage;
-        this->power = cable.power;
-        
-        this->temperature = cable.temperature;
+    std::pair<int, int> getEnd() { return this->end; };
+    int getResistance() { return this->resistance; };
+    bool getFlowDirection() { return this->reverse; };
 
-        this->in = cable.in;
-        this->out = cable.out;
+    Cable& operator=(Cable& cable)
+    {
+        this->position = cable.getPosition();
+        this->end = cable.getEnd();
+        
+        this->reverse = cable.getFlowDirection();
+        this->resistance = cable.getResistance();
+        
+        this->voltage = cable.getVoltage();
+        this->power = cable.getPower();
+        
+        this->temperature = cable.getTemperature();
+
+        this->in = cable.getIn();
+        this->out = cable.getOut();
 
         return *this;
     }
 };
 
-class Source : CircuitElement
+class Source : public CircuitElement
 {
 private:
 public:
-    Source() : CircuitElement()
+    Source()
     {
-    }
-    
-    explicit Source(const int resistance = 0, const bool reverse = false, \
-            const int voltage = 0, const int power = 0, const CircuitElement* in = NULL, const CircuitElement* out = NULL, \
-            const pair<int, int> start = std::make_pair(0,0), const pair<int, int> end = std::make_pair(0,0), const int temperature = 273)
-    {
-
-        this->voltage = voltage;
-        this->power = power;
-
-        this->in = in;
-        this->out = out;
-
-        this->position = start;
-        this->temperature = temperature;
     }
 
     explicit Source(const Source& s)
     {
-        this->power = s.power;
-        this->voltage = s.voltage;
-        
-        this->in = s.in;
-        this->out = s.out;
-
-        this->position = s.position;
-        this->temperature = s.temperature;
     }
 
     ~Source()
@@ -343,19 +379,21 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Source& el)
     {
+        os <<"Voltage: "<<el.voltage <<"    Power: " <<el.power <<"    Temperature: "<<el.temperature<<"\n";
+
         return os;
     }
 
-    Source& operator=(const Source& s)
+    Source& operator=(Source& s)
     {
-        this->power = s.power;
-        this->voltage = s.voltage;
+        this->power = s.getPower();
+        this->voltage = s.getVoltage();
         
-        this->in = s.in;
-        this->out = s.out;
+        this->in = s.getIn();
+        this->out = s.getOut();
 
-        this->position = s.position;
-        this->temperature = s.temperature;
+        this->position = s.getPosition();
+        this->temperature = s.getTemperature();
 
 
         return *this;
@@ -379,8 +417,8 @@ class Battery
         this->out = NULL;
     }
 
-    explicit Battery(const int voltage = 0, const int capacity = 0, \ 
-            const CircuitElement* out = NULL, const std::pair<int, int> position = std::make_pair(0,0))
+    explicit Battery(const int voltage = 0, const int capacity = 0, \
+        CircuitElement* out = NULL, const std::pair<int, int> position = std::make_pair(0,0))
     {
         this->voltage = voltage;
         this->capacity = capacity;
@@ -402,15 +440,21 @@ class Battery
 
     friend std::ostream& operator<<(std::ostream& os, const Battery& el)
     {
+        os<<"Capacity: "<<el.capacity<<" Voltage: "<<el.voltage<<"\n";
         return os;
     }
 
-    Baterry& operator=(const Battery& b)
+    std::pair<int, int> getPosition() { return this->position; };
+    CircuitElement* getOut() { return this->out; };
+    int getCapacity() { return this->capacity; };
+    int getVoltage() { return this->voltage; };
+
+    Battery& operator=(Battery& b)
     {
-        this->position = b.position;
-        this->capacity = b.capacity;
-        this->voltage = b.voltage;
-        this->out = b.out;
+        this->position = b.getPosition();
+        this->capacity = b.getCapacity();
+        this->voltage = b.getVoltage();
+        this->out = b.getOut();
 
         return *this;
     }
@@ -448,16 +492,25 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Circuit& el)
     {
+        os<<"Voltage in: "<<el.voltageIn<<"  Voltage out: "<<el.voltageOut<<"\n";
         return os;
     }
 
-    Circuit& operator=(const Circuit& circuit)
+    CircuitElement* getIn() { return this->in; };
+    CircuitElement* getOut() { return this->out; };
+    int getVoltageIn() { return this->voltageIn; };
+    int getVoltageOut() { return this->voltageOut; };
+
+    Circuit& operator=(Circuit& circuit)
     {
+        this->in = circuit.getIn();
+        this->out = circuit.getOut();
+        this->voltageIn = circuit.getVoltageIn();
+        this->voltageOut = circuit.getVoltageOut();
+        
         return *this;
     }
-    
-    std::vector<CircuitElement>& getElements() { return this->elements; };
-
+   
     void addElemToCircuit(CircuitElement* element)
     {
     }
@@ -469,16 +522,14 @@ public:
 
     void removeElemFromCircuit(const int index)
     {
-        std::vector<CircuitElement>& v = getElements();
-        v.erase(v.begin() + index);
     }
-
-    int output()
+    
+    void run()
     {
-        
-        return 0;
     }
 };
 
-int main() {
+int main() 
+{
+
 }
