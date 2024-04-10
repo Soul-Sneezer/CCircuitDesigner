@@ -1,6 +1,5 @@
-#include <iostream>
-#include <vector>
-#include <SFML/Graphics.hpp>
+#define OLC_PGE_APPLICATION
+#include "olcPixelGameEngine.h"
 
 class CircuitElement
 {
@@ -84,8 +83,8 @@ public:
 class CableNode : public CircuitElement
 {
 private:
-    std::vector<CircuitElement*> in;
-    std::vector<CircuitElement*> out;
+    std::vector<CircuitElement*> inputs;
+    std::vector<CircuitElement*> outputs;
 public:
     CableNode()   
     {
@@ -93,8 +92,8 @@ public:
 
     explicit CableNode(std::vector<CircuitElement*>& in, std::vector<CircuitElement*>& out)
     {
-       this->in = in; 
-       this->out = out;
+       this->inputs = in; 
+       this->outputs = out;
     }
 
     ~CableNode()
@@ -104,16 +103,17 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, CableNode& el)
     {
+        os<<"Cable node\n";
         return os;        
     }
 
-    std::vector<CircuitElement*> getIn() { return this->in; };
-    std::vector<CircuitElement*> getOut() { return this->out; };
+    std::vector<CircuitElement*> getIn() { return this->inputs; };
+    std::vector<CircuitElement*> getOut() { return this->outputs; };
 
     CableNode& operator=(CableNode& element)
     {
-        this->in = element.getIn();
-        this->out = element.getOut();
+        this->inputs = element.getIn();
+        this->outputs = element.getOut();
 
         return *this;
     }
@@ -443,7 +443,6 @@ class Battery
         os<<"Capacity: "<<el.capacity<<" Voltage: "<<el.voltage<<"\n";
         return os;
     }
-
     std::pair<int, int> getPosition() { return this->position; };
     CircuitElement* getOut() { return this->out; };
     int getCapacity() { return this->capacity; };
@@ -529,6 +528,32 @@ public:
     }
 };
 
+
+
+class Sim : public olc::PixelGameEngine
+{
+public:
+	Sim()
+	{
+		sAppName = "Circuit Simulator";
+	}
+
+public:
+	bool OnUserCreate() override
+	{
+		// Called once at the start, so create things here
+		return true;
+	}
+
+	bool OnUserUpdate(float fElapsedTime) override
+	{
+		// called once per frame
+		for (int x = 0; x < ScreenWidth(); x++)
+			for (int y = 0; y < ScreenHeight(); y++)
+				Draw(x, y, olc::Pixel(rand() % 255, rand() % 255, rand()% 255));	
+		return true;
+	}
+};
 int main() 
 {
 

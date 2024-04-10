@@ -95,7 +95,8 @@ endfunction()
 
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${PROJECT_NAME} main.cpp
-        generated/src/Helper.cpp)
+    olcPixelGameEngine.h    
+    generated/src/Helper.cpp)
 
 ###############################################################################
 
@@ -144,3 +145,7 @@ install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 if(APPLE)
     install(FILES launcher.command DESTINATION bin)
 endif()
+
+include(./CMakeFiles/PGE.cmake)
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -std=c++11 -lGL -lglut -lGLU")
+SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -g -std=c++11 -lGL -lglut -lGLU")
