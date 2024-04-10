@@ -39,7 +39,7 @@ public:
         this->position = position;
     }
 
-    explicit CircuitElement(const CircuitElement& element)
+    CircuitElement(const CircuitElement& element)
     {
         this->position= element.position;
         this->voltage = element.voltage;
@@ -98,6 +98,12 @@ public:
        this->inputs = in; 
        this->outputs = out;
     }
+    
+    CableNode(const CableNode& node)
+    {
+        this->inputs = node.inputs;
+        this->outputs = node.outputs;
+    }
 
     ~CableNode()
     {
@@ -148,7 +154,7 @@ public:
         this->temperature = temperature;
     }
 
-    explicit Transistor(const Transistor& transistor)
+    Transistor(const Transistor& transistor)
     {
         this->threshold = transistor.threshold;
         this->thresholdVoltage = transistor.thresholdVoltage;
@@ -226,7 +232,7 @@ public:
 
     }
 
-    explicit Resistor(const Resistor& r)
+    Resistor(const Resistor& r)
     {
         this->resistance = r.resistance;
         this->powerDissipation = r.powerDissipation;
@@ -288,6 +294,12 @@ class Switch
     {
         open = false;
         active = false; // determines if the switch is drawn or not
+    }
+
+    Switch(const Switch& s)
+    {
+        this->open = s.open;
+        this->active = s.active;
     }
 
     ~Switch()
@@ -361,7 +373,7 @@ public:
         this->length = length;
     }
 
-    explicit Cable(const Cable& c)
+    Cable(const Cable& c)
     {
         this->position = c.position;
         this->end = c.end;
@@ -424,7 +436,7 @@ public:
     {
     }
 
-    explicit Source(const Source& s)
+    Source(const Source& s)
     {
     }
 
@@ -477,9 +489,10 @@ class Battery : public CircuitElement
         this->out = out;
         this->position = position;
         this->capacity = capacity;
+        this->temperature = temperature;
     }
 
-    explicit Battery(const Battery& b)
+    Battery(const Battery& b)
     {
         this->position = b.position;
         this->capacity = b.capacity;
