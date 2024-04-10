@@ -39,7 +39,7 @@ public:
         this->position = position;
     }
 
-    explicit CircuitElement(CircuitElement& element)
+    explicit CircuitElement(const CircuitElement& element)
     {
         this->position= element.position;
         this->voltage = element.voltage;
@@ -60,13 +60,13 @@ public:
     CircuitElement* getIn() { return this->in; };
     CircuitElement* getOut() { return this->out; };
 
-    friend std::ostream& operator<<(std::ostream& os, CircuitElement& el)
+    friend std::ostream& operator<<(std::ostream& os, const CircuitElement& el)
     {
         os << "Voltage: "<<el.voltage <<"    Power: " <<el.power <<"    Temperature: "<<el.temperature<<"\n";
         return os;        
     }
 
-    CircuitElement& operator=(CircuitElement& element)
+    CircuitElement& operator=(const CircuitElement& element)
     {
         this->position = element.position;
         this->voltage = element.voltage;
@@ -93,7 +93,7 @@ public:
     {
     }
 
-    explicit CableNode(std::vector<CircuitElement*>& in, std::vector<CircuitElement*>& out)
+    explicit CableNode(const std::vector<CircuitElement*>& in, const std::vector<CircuitElement*>& out)
     {
        this->inputs = in; 
        this->outputs = out;
@@ -331,19 +331,19 @@ private:
     std::pair<int, int> end;
     int resistance;
     bool reverse;
-
+    int length;
     Switch circuitSwitch;
 public:
     Cable()
     {
         this->end = std::make_pair(0,0);
-
+        this->length = 0;
         this->resistance = 0;
         this->reverse = false;
     }
 
     explicit Cable(const int voltage, const int power = 0, CircuitElement* in = NULL,CircuitElement* out = NULL, \
-            const std::pair<int, int> start = std::make_pair(0,0), const std::pair<int, int> end = std::make_pair(0,0), const int resistance = 0, const bool reverse = false, const int temperature = 273)
+            const std::pair<int, int> start = std::make_pair(0,0), const std::pair<int, int> end = std::make_pair(0,0), const int resistance = 0, const bool reverse = false, const int length = 0, const int temperature = 273)
     {
         this->resistance = resistance;
         this->reverse = reverse;
@@ -372,7 +372,8 @@ public:
         this->voltage = c.voltage;
         
         this->temperature = c.temperature;
-   
+        this->length = c.length;
+
         this->in = c.in;
         this->out = c.out;
     }
@@ -392,7 +393,7 @@ public:
     int getResistance() { return this->resistance; };
     Switch getSwitch() { return this->circuitSwitch; };
     bool getFlowDirection() { return this->reverse; };
-
+    int getLength() { return this->length; };
     Cable& operator=(Cable& cable)
     {
         this->position = cable.getPosition();
@@ -405,6 +406,7 @@ public:
         this->power = cable.getPower();
         
         this->temperature = cable.getTemperature();
+        this->length = cable.getLength();
 
         this->in = cable.getIn();
         this->out = cable.getOut();
@@ -597,5 +599,19 @@ public:
 */
 int main() 
 {
+    Cable cable;
+    Switch circuit_switch = cable.getSwitch();
+    circuit_switch.activate();
+    circuit_switch.deactivate();
+    circuit_switch.isActive();
+    circuit_switch.isOpen();
+    circuit_switch.openSwitch();
+    circuit_switch.closeSwitch();
+    Circuit circuit;
+    circuit.run();
 
+
+    Transistor transistor;
+    transistor.getThreshold();
+    transistor.getThresholdVoltage();
 }
