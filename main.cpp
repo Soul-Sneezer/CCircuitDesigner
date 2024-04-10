@@ -1,5 +1,8 @@
-#define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
+#include <iostream>
+#include <vector>
+
+//#define OLC_PGE_APPLICATION
+//#include "olcPixelGameEngine.h"
 
 class CircuitElement
 {
@@ -275,13 +278,61 @@ public:
     }
 };
 
+class Switch
+{
+    private:
+        bool open;
+        bool active;
+    public:
+    Switch()
+    {
+        open = false;
+        active = false; // determines if the switch is drawn or not
+    }
+
+    ~Switch()
+    {
+    }
+    
+    bool isOpen()
+    {
+        return open;
+    }
+
+    bool isActive()
+    {
+        return active;
+    }
+
+    void activate()
+    {
+        this->active = true;
+    }
+
+    void deactivate()
+    {
+        this->active = false;
+    }
+
+    void openSwitch()
+    {
+        this->open = true;
+    }
+
+    void closeSwitch()
+    {
+        this->open = false;
+    }
+};
+
 class Cable : public CircuitElement
 {
 private:
     std::pair<int, int> end;
-
     int resistance;
     bool reverse;
+
+    Switch circuitSwitch;
 public:
     Cable()
     {
@@ -339,6 +390,7 @@ public:
 
     std::pair<int, int> getEnd() { return this->end; };
     int getResistance() { return this->resistance; };
+    Switch getSwitch() { return this->circuitSwitch; };
     bool getFlowDirection() { return this->reverse; };
 
     Cable& operator=(Cable& cable)
@@ -401,29 +453,27 @@ public:
 };
 
 
-class Battery
+class Battery : public CircuitElement
 {
     private:
-        std::pair<int, int> position;
         int capacity;
-        int voltage;
-        CircuitElement* out;
     public:
     Battery()
     {
-        this->position = std::make_pair(0, 0);
         this->capacity = 0;
-        this->voltage = 0;
-        this->out = NULL;
     }
 
-    explicit Battery(const int voltage = 0, const int capacity = 0, \
-        CircuitElement* out = NULL, const std::pair<int, int> position = std::make_pair(0,0))
+    explicit Battery(const int voltage, const int power = 0, \
+        CircuitElement* in = NULL, CircuitElement* out = NULL, \
+        const std::pair<int, int> position = std::make_pair(0,0), \
+        const int temperature = 273, const int capacity = 0)
     {
         this->voltage = voltage;
-        this->capacity = capacity;
+        this->power = 0;
+        this->in = in;
         this->out = out;
         this->position = position;
+        this->capacity = capacity;
     }
 
     explicit Battery(const Battery& b)
@@ -432,6 +482,9 @@ class Battery
         this->capacity = b.capacity;
         this->voltage = b.voltage;
         this->out = b.out;
+        this->in = b.in;
+        this->power = b.power;
+        this->temperature = b.temperature;
     }
 
     ~Battery()
@@ -443,10 +496,7 @@ class Battery
         os<<"Capacity: "<<el.capacity<<" Voltage: "<<el.voltage<<"\n";
         return os;
     }
-    std::pair<int, int> getPosition() { return this->position; };
-    CircuitElement* getOut() { return this->out; };
     int getCapacity() { return this->capacity; };
-    int getVoltage() { return this->voltage; };
 
     Battery& operator=(Battery& b)
     {
@@ -454,6 +504,9 @@ class Battery
         this->capacity = b.getCapacity();
         this->voltage = b.getVoltage();
         this->out = b.getOut();
+        this->in = b.getIn();
+        this->temperature = b.getTemperature();
+        this->power = b.getPower();
 
         return *this;
     }
@@ -464,7 +517,7 @@ class Circuit
 private:
     int voltageIn;
     int voltageOut;
-
+    std::vector<CircuitElement*> elements;
     CircuitElement* in;
     CircuitElement* out;
 public:
@@ -510,26 +563,13 @@ public:
         return *this;
     }
    
-    void addElemToCircuit(CircuitElement* element)
-    {
-    }
-
-    void newInputElem(CircuitElement* element)
-    {
-        this->in = element;
-    }
-
-    void removeElemFromCircuit(const int index)
-    {
-    }
-    
     void run()
     {
     }
 };
 
 
-
+/*
 class Sim : public olc::PixelGameEngine
 {
 public:
@@ -554,6 +594,7 @@ public:
 		return true;
 	}
 };
+*/
 int main() 
 {
 
