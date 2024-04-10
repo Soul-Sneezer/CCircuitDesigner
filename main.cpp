@@ -358,6 +358,7 @@ public:
         this->end = end;
 
         this->temperature = temperature;
+        this->length = length;
     }
 
     explicit Cable(const Cable& c)
@@ -600,6 +601,7 @@ public:
 int main() 
 {
     Cable cable;
+    cable.changeValue();
     Switch circuit_switch = cable.getSwitch();
     circuit_switch.activate();
     circuit_switch.deactivate();
