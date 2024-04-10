@@ -99,7 +99,7 @@ public:
        this->outputs = out;
     }
     
-    CableNode(const CableNode& node)
+    CableNode(const CableNode& node) : CircuitElement(node)
     {
         this->inputs = node.inputs;
         this->outputs = node.outputs;
@@ -112,7 +112,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, CableNode& el)
     {
-        os<<"Cable node\n";
+        os<<el.inputs.size()<<" "<<el.outputs.size();
         return os;        
     }
 
@@ -154,7 +154,7 @@ public:
         this->temperature = temperature;
     }
 
-    Transistor(const Transistor& transistor)
+    Transistor(const Transistor& transistor) : CircuitElement(transistor)
     {
         this->threshold = transistor.threshold;
         this->thresholdVoltage = transistor.thresholdVoltage;
@@ -232,7 +232,7 @@ public:
 
     }
 
-    Resistor(const Resistor& r)
+    Resistor(const Resistor& r) : CircuitElement(r)
     {
         this->resistance = r.resistance;
         this->powerDissipation = r.powerDissipation;
@@ -296,7 +296,7 @@ class Switch
         active = false; // determines if the switch is drawn or not
     }
 
-    Switch(const Switch& s)
+    Switch(const Switch& s) 
     {
         this->open = s.open;
         this->active = s.active;
@@ -373,7 +373,7 @@ public:
         this->length = length;
     }
 
-    Cable(const Cable& c)
+    Cable(const Cable& c) : CircuitElement(c)
     {
         this->position = c.position;
         this->end = c.end;
@@ -435,11 +435,11 @@ public:
     Source()
     {
     }
-
-    Source(const Source& s)
+/*
+    Source(const Source& s) : CircuitElement(s)
     {
     }
-
+*/
     ~Source()
     {
     }
@@ -451,7 +451,7 @@ public:
         return os;
     }
 
-    Source& operator=(Source& s)
+    Source& operator=(Source& s) 
     {
         this->power = s.getPower();
         this->voltage = s.getVoltage();
@@ -484,7 +484,7 @@ class Battery : public CircuitElement
         const int temperature = 273, const int capacity = 0)
     {
         this->voltage = voltage;
-        this->power = 0;
+        this->power = power;
         this->in = in;
         this->out = out;
         this->position = position;
@@ -492,7 +492,7 @@ class Battery : public CircuitElement
         this->temperature = temperature;
     }
 
-    Battery(const Battery& b)
+    Battery(const Battery& b) : CircuitElement(b)
     {
         this->position = b.position;
         this->capacity = b.capacity;
