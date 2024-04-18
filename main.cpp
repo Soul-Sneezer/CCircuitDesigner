@@ -1,17 +1,14 @@
-#include <iostream>
-#include <vector>
-
-//#define OLC_PGE_APPLICATION
-//#include "olcPixelGameEngine.h"
+#define OLC_PGE_APPLICATION
+#include "olcPixelGameEngine.h"
 
 class CircuitElement
 {
 protected:
-    std::pair<int, int> position;
+    std::pair<int32_t, int32_t> position;
 
-    int voltage;
-    int power;
-    int temperature; // useless for now
+    int32_t voltage;
+    int32_t power;
+    uint32_t temperature; // useless for now
 
     CircuitElement* in; // prev element
     CircuitElement* out; // next element
@@ -27,9 +24,9 @@ public:
         this->out = NULL;
     }
     
-    explicit CircuitElement(const int voltage, const int power = 0, \
+    explicit CircuitElement(const int32_t voltage, const int32_t power = 0, \
             CircuitElement* in = NULL, CircuitElement* out = NULL, \
-            const std::pair<int, int> position = std::make_pair(0, 0), const int temperature = 273)
+            const std::pair<int32_t, int32_t> position = std::make_pair(0, 0), const int32_t temperature = 273)
     {
         this->voltage = voltage;
         this->power = power;
@@ -53,10 +50,10 @@ public:
     {
     }
     
-    std::pair<int, int> getPosition() { return this->position; };
-    int getVoltage() { return this->voltage; };
-    int getPower() { return this->power; };
-    int getTemperature() { return this->temperature; };
+    std::pair<int32_t, int32_t> getPosition() { return this->position; };
+    int32_t getVoltage() { return this->voltage; };
+    int32_t getPower() { return this->power; };
+    int32_t getTemperature() { return this->temperature; };
     CircuitElement* getIn() { return this->in; };
     CircuitElement* getOut() { return this->out; };
 
@@ -131,8 +128,8 @@ public:
 class Transistor : public CircuitElement
 {
 private:
-    int thresholdVoltage;
-    int threshold;
+    int32_t thresholdVoltage;
+    int32_t threshold;
 public:
     Transistor() 
     {
@@ -140,9 +137,9 @@ public:
         this->thresholdVoltage = 0;
     }
 
-    explicit Transistor(const int threshold, const int voltage = 0, const int power = 0, \
-            CircuitElement* in = NULL, CircuitElement* out = NULL, const int thresholdVoltage = 0, \
-            const std::pair<int, int> position = std::make_pair(0, 0), const int temperature = 273)
+    explicit Transistor(const int32_t threshold, const int32_t voltage = 0, const int32_t power = 0, \
+            CircuitElement* in = NULL, CircuitElement* out = NULL, const int32_t thresholdVoltage = 0, \
+            const std::pair<int32_t, int32_t> position = std::make_pair(0, 0), const int32_t temperature = 273)
     {
         this->threshold = threshold;
         this->thresholdVoltage = thresholdVoltage;
@@ -180,8 +177,8 @@ public:
         return os;
     }
 
-    int getThreshold() { return this->threshold; };
-    int getThresholdVoltage() { return this->thresholdVoltage; };
+    int32_t getThreshold() { return this->threshold; };
+    int32_t getThresholdVoltage() { return this->thresholdVoltage; };
 
     Transistor& operator=(Transistor& transistor)
     {
@@ -202,9 +199,9 @@ public:
 class Resistor : public CircuitElement
 {
 private:
-    int resistance;
-    int powerDissipation;
-    int tolerance;
+    int32_t resistance;
+    int32_t powerDissipation;
+    int32_t tolerance;
 public:
     Resistor()
     {
@@ -213,9 +210,9 @@ public:
         this->tolerance = 0;
     }
 
-    explicit Resistor(const int resistance = 0, const int powerDissipation = 0, const int tolerance = 0, \
-            const int voltage = 0, const int power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
-            const std::pair<int, int> position = std::make_pair(0,0), const int temperature = 273)
+    explicit Resistor(const int32_t resistance = 0, const int32_t powerDissipation = 0, const int32_t tolerance = 0, \
+            const int32_t voltage = 0, const int32_t power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
+            const std::pair<int32_t, int32_t> position = std::make_pair(0,0), const int32_t temperature = 273)
     {
         this->resistance = resistance;
         this->powerDissipation = powerDissipation;
@@ -260,9 +257,9 @@ public:
         return os; 
     }
 
-    int getResistance() { return this->resistance; };
-    int getPowerDissipation() { return this->powerDissipation; };
-    int getTolerance() { return this->tolerance; };
+    int32_t getResistance() { return this->resistance; };
+    int32_t getPowerDissipation() { return this->powerDissipation; };
+    int32_t getTolerance() { return this->tolerance; };
 
     Resistor& operator=(Resistor& r)
     {
@@ -340,10 +337,10 @@ class Switch
 class Cable : public CircuitElement
 {
 private:
-    std::pair<int, int> end;
-    int resistance;
+    std::pair<int32_t, int32_t> end;
+    int32_t resistance;
     bool reverse;
-    int length;
+    int32_t length;
     Switch circuitSwitch;
 public:
     Cable()
@@ -354,8 +351,8 @@ public:
         this->reverse = false;
     }
 
-    explicit Cable(const int voltage, const int power = 0, CircuitElement* in = NULL,CircuitElement* out = NULL, \
-            const std::pair<int, int> start = std::make_pair(0,0), const std::pair<int, int> end = std::make_pair(0,0), const int resistance = 0, const bool reverse = false, const int length = 0, const int temperature = 273)
+    explicit Cable(const int32_t voltage, const int32_t power = 0, CircuitElement* in = NULL,CircuitElement* out = NULL, \
+            const std::pair<int32_t, int32_t> start = std::make_pair(0,0), const std::pair<int32_t, int32_t> end = std::make_pair(0,0), const int32_t resistance = 0, const bool reverse = false, const int32_t length = 0, const uint32_t temperature = 273)
     {
         this->resistance = resistance;
         this->reverse = reverse;
@@ -402,11 +399,11 @@ public:
         return os;
     }
 
-    std::pair<int, int> getEnd() { return this->end; };
-    int getResistance() { return this->resistance; };
+    std::pair<int32_t, int32_t> getEnd() { return this->end; };
+    int32_t getResistance() { return this->resistance; };
     Switch getSwitch() { return this->circuitSwitch; };
     bool getFlowDirection() { return this->reverse; };
-    int getLength() { return this->length; };
+    int32_t getLength() { return this->length; };
     Cable& operator=(Cable& cable)
     {
         this->position = cable.getPosition();
@@ -471,17 +468,17 @@ public:
 class Battery : public CircuitElement
 {
     private:
-        int capacity;
+        int32_t capacity;
     public:
     Battery()
     {
         this->capacity = 0;
     }
 
-    explicit Battery(const int voltage, const int power = 0, \
+    explicit Battery(const int32_t voltage, const int32_t power = 0, \
         CircuitElement* in = NULL, CircuitElement* out = NULL, \
-        const std::pair<int, int> position = std::make_pair(0,0), \
-        const int temperature = 273, const int capacity = 0)
+        const std::pair<int32_t, int32_t> position = std::make_pair(0,0), \
+        const int32_t temperature = 273, const int32_t capacity = 0)
     {
         this->voltage = voltage;
         this->power = power;
@@ -512,7 +509,7 @@ class Battery : public CircuitElement
         os<<"Capacity: "<<el.capacity<<" Voltage: "<<el.voltage<<"\n";
         return os;
     }
-    int getCapacity() { return this->capacity; };
+    int32_t getCapacity() { return this->capacity; };
 
     Battery& operator=(Battery& b)
     {
@@ -531,8 +528,8 @@ class Battery : public CircuitElement
 class Circuit
 {
 private:
-    int voltageIn;
-    int voltageOut;
+    int32_t voltageIn;
+    int32_t voltageOut;
     std::vector<CircuitElement*> elements;
     CircuitElement* in;
     CircuitElement* out;
@@ -566,8 +563,8 @@ public:
 
     CircuitElement* getIn() { return this->in; };
     CircuitElement* getOut() { return this->out; };
-    int getVoltageIn() { return this->voltageIn; };
-    int getVoltageOut() { return this->voltageOut; };
+    int32_t getVoltageIn() { return this->voltageIn; };
+    int32_t getVoltageOut() { return this->voltageOut; };
 
     Circuit& operator=(Circuit& circuit)
     {
@@ -584,10 +581,30 @@ public:
     }
 };
 
-
-/*
 class Sim : public olc::PixelGameEngine
 {
+private:
+    bool mainMenuActive;
+    bool editMenuActive;
+    bool removeMenuActive;
+    bool addMenuActive;
+    bool modifyMenuActive;
+    int32_t menuOffsetX;
+    int32_t menuOffsetY;
+
+    void resetOffset()
+    {
+        menuOffsetX = 0;
+        menuOffsetY = 0;
+    }
+
+    void pressEntry(const int posX, const int posY, std::string key, std::string action)
+    {
+        DrawString(posX, posY, "Press ");
+        DrawString(posX + 45, posY, key, olc::GREEN);
+        DrawString(posX + 50, posY, " to ");
+        DrawString(posX + 80, posY, action);
+    }
 public:
 	Sim()
 	{
@@ -597,22 +614,102 @@ public:
 public:
 	bool OnUserCreate() override
 	{
-		// Called once at the start, so create things here
+    mainMenuActive = true;
+    editMenuActive = false;
+    addMenuActive = false;
+    removeMenuActive = false;
+    modifyMenuActive = false;
+    menuOffsetX = 0;
+    menuOffsetY = 0;
 		return true;
 	}
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		// called once per frame
-		for (int x = 0; x < ScreenWidth(); x++)
-			for (int y = 0; y < ScreenHeight(); y++)
-				Draw(x, y, olc::Pixel(rand() % 255, rand() % 255, rand()% 255));	
+    Clear(olc::BLACK);
+    if(mainMenuActive)
+    {
+        DrawRect(50 + menuOffsetX, 50 + menuOffsetY, 500, 200, olc::WHITE);
+        DrawString(70 + menuOffsetX, 70 + menuOffsetY, "CCircuit Designer - Commands", olc::WHITE, 2);
+        DrawString(70 + menuOffsetX, 90 + menuOffsetY, "Press");
+        DrawString(115 + menuOffsetX, 90 + menuOffsetY, "ESC", olc::GREEN);
+        DrawString(145 + menuOffsetX, 90 + menuOffsetY, "to open/close this window");
+        pressEntry(70 + menuOffsetX, 110 + menuOffsetY, "Q", "open edit menu");
+        pressEntry(70 + menuOffsetX, 130 + menuOffsetY, "R", "start/stop simulation");
+        pressEntry(70 + menuOffsetX, 150 + menuOffsetY, "W", "move window up");
+        pressEntry(70 + menuOffsetX, 160 + menuOffsetY, "S", "move window down");
+        pressEntry(70 + menuOffsetX, 170 + menuOffsetY, "A", "move window left");
+        pressEntry(70 + menuOffsetX, 180 + menuOffsetY, "D", "move window right");
+    }
+    if(addMenuActive)
+    {
+        DrawRect(50 + menuOffsetX, 50 + menuOffsetY, 500, 200, olc::WHITE);
+        DrawString(70 + menuOffsetX, 70 + menuOffsetY, "Edit circuit", olc::WHITE, 2);
+        pressEntry(70 + menuOffsetX, 90 + menuOffsetY, "Q", "go back to edit menu");
+        pressEntry(70 + menuOffsetX, 110 + menuOffsetY, "1", "add cable");
+        pressEntry(70 + menuOffsetX, 130 + menuOffsetY, "2", "add cable node");
+        pressEntry(70 + menuOffsetX, 150 + menuOffsetY, "3", "add resistor");
+        pressEntry(70 + menuOffsetX, 170 + menuOffsetY, "4", "add transistor");
+        pressEntry(70 + menuOffsetX, 190 + menuOffsetY, "5", "add source");
+        pressEntry(70 + menuOffsetX, 210 + menuOffsetY, "6", "add battery");
+
+    }
+    if(editMenuActive)
+    {
+        DrawRect(50 + menuOffsetX, 50 + menuOffsetY, 500, 200, olc::WHITE);
+        DrawString(70 + menuOffsetX, 70 + menuOffsetY, "Edit circuit", olc::WHITE, 2);
+        DrawString(70 + menuOffsetX, 90 + menuOffsetY, "Press");
+        DrawString(115 + menuOffsetX, 90 + menuOffsetY, "Q", olc::GREEN);
+        DrawString(126 + menuOffsetX, 90 + menuOffsetY, "to open/close this window");
+        pressEntry(70 + menuOffsetX, 110 + menuOffsetY, "1","add elements to circuit");
+        pressEntry(70 + menuOffsetX, 130 + menuOffsetY, "2","remove elements from circuit");
+        pressEntry(70 + menuOffsetX, 150 + menuOffsetY, "3","edit elements in circuit");
+        if(GetKey(olc::K1).bPressed)
+        {
+            addMenuActive = true;
+            editMenuActive = false;
+        }
+        if(GetKey(olc::K2).bPressed)
+        {
+            removeMenuActive = true;
+            editMenuActive = false;
+        }
+        if(GetKey(olc::K3).bPressed)
+        {
+            modifyMenuActive = true;
+            editMenuActive = false;
+        }
+    }
+    if(GetKey(olc::ESCAPE).bPressed)
+    {
+        mainMenuActive = !mainMenuActive;
+        editMenuActive = false;
+        addMenuActive = false;
+        resetOffset();
+    }
+    if(GetKey(olc::Q).bPressed)
+    {
+        editMenuActive = !editMenuActive;
+        mainMenuActive = false;
+        addMenuActive = false;
+        resetOffset();
+    }
+    if(GetKey(olc::W).bHeld)
+        menuOffsetY--;
+    if(GetKey(olc::S).bHeld)
+        menuOffsetY++;
+    if(GetKey(olc::A).bHeld)
+        menuOffsetX--;
+    if(GetKey(olc::D).bHeld)
+        menuOffsetX++;
+
 		return true;
 	}
 };
-*/
+
 int main() 
 {
+    /*
     Cable cable;
     cable.changeValue();
     Switch circuit_switch = cable.getSwitch();
@@ -629,4 +726,9 @@ int main()
     Transistor transistor;
     transistor.getThreshold();
     transistor.getThresholdVoltage();
+*/
+
+    Sim sim;
+    if(sim.Construct(1280, 720, 1, 1))
+        sim.Start();
 }
