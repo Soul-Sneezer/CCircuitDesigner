@@ -1,10 +1,20 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 
+enum ElementType 
+{
+    ELEM_CABLE,
+    ELEM_NODE,
+    ELEM_RESISTOR,
+    ELEM_TRANSISTOR,
+    ELEM_SOURCE,
+    ELEM_BATTERY
+}; 
+
 class CircuitElement
 {
 protected:
-    std::pair<int32_t, int32_t> position;
+    std::pair<uint32_t, uint32_t> position;
 
     int32_t voltage;
     int32_t power;
@@ -15,35 +25,41 @@ protected:
 public:
     CircuitElement()
     {
-        position.first = 0;
-        position.second = 0;
+        position = std::make_pair(0, 0);
         this->voltage = 0;
         this->power = 0;
-        this->temperature = 273;
         this->in = NULL;
         this->out = NULL;
+        this->temperature = 273;
+
     }
     
-    explicit CircuitElement(const int32_t voltage, const int32_t power = 0, \
+    explicit CircuitElement(const uint32_t posX, const uint32_t posY, const int32_t voltage, const int32_t power = 0, \
             CircuitElement* in = NULL, CircuitElement* out = NULL, \
-            const std::pair<int32_t, int32_t> position = std::make_pair(0, 0), const int32_t temperature = 273)
+            const uint32_t temperature = 273)
     {
+        this->position = std::make_pair(posX, posY);
+
         this->voltage = voltage;
         this->power = power;
-        this->temperature = temperature;
+        
         this->in = in;
         this->out = out;
-        this->position = position;
+        
+        this->temperature = temperature;
     }
 
     CircuitElement(const CircuitElement& element)
     {
         this->position= element.position;
+        
         this->voltage = element.voltage;
         this->power = element.power;
-        this->temperature = element.temperature;
+        
         this->in = element.in;
         this->out = element.out;
+        
+        this->temperature = element.temperature;
     }
 
     ~CircuitElement()
@@ -66,18 +82,19 @@ public:
     CircuitElement& operator=(const CircuitElement& element)
     {
         this->position = element.position;
+        
         this->voltage = element.voltage;
         this->power = element.power;
-        this->temperature = element.temperature;
+                
         this->in = element.in;
         this->out = element.out;
+
+        this->temperature = element.temperature;
 
         return *this;
     }
 
-    virtual void changeValue()
-    {
-    }
+    virtual void changeValue(int32_t value) = 0;
 };
 
 class CableNode : public CircuitElement
@@ -89,15 +106,17 @@ public:
     CableNode()   
     {
     }
-
-    explicit CableNode(const std::vector<CircuitElement*>& in, const std::vector<CircuitElement*>& out)
+   
+    explicit CableNode(const uint32_t posX, const uint32_t posY, const std::vector<CircuitElement*>& in , const std::vector<CircuitElement*>& out)
     {
-       this->inputs = in; 
-       this->outputs = out;
+        this->position = std::make_pair(posX, posY);
+        this->inputs = in; 
+        this->outputs = out;
     }
     
     CableNode(const CableNode& node) : CircuitElement(node)
     {
+        this->position = node.position;
         this->inputs = node.inputs;
         this->outputs = node.outputs;
     }
@@ -118,10 +137,15 @@ public:
 
     CableNode& operator=(CableNode& element)
     {
+        this->position = element.getPosition();
         this->inputs = element.getIn();
         this->outputs = element.getOut();
 
         return *this;
+    }
+
+    void changeValue(int32_t value)
+    {
     }
 };
 
@@ -137,32 +161,38 @@ public:
         this->thresholdVoltage = 0;
     }
 
-    explicit Transistor(const int32_t threshold, const int32_t voltage = 0, const int32_t power = 0, \
-            CircuitElement* in = NULL, CircuitElement* out = NULL, const int32_t thresholdVoltage = 0, \
-            const std::pair<int32_t, int32_t> position = std::make_pair(0, 0), const int32_t temperature = 273)
+    explicit Transistor(const uint32_t posX, const uint32_t posY, const int32_t voltage = 0, const int32_t power = 0, \
+            CircuitElement* in = NULL, CircuitElement* out = NULL,\ 
+            const int32_t thresholdVoltage = 0, const uint32_t temperature = 273)
     {
-        this->threshold = threshold;
-        this->thresholdVoltage = thresholdVoltage;
+        this->position = std::make_pair(posX, posY);
+
         this->voltage = voltage;
         this->power = power;
+        
         this->in = in;
         this->out = out;
-        this->position = position;
+        
+        this->threshold = threshold;
+        this->thresholdVoltage = thresholdVoltage;
+
         this->temperature = temperature;
     }
 
     Transistor(const Transistor& transistor) : CircuitElement(transistor)
     {
-        this->threshold = transistor.threshold;
-        this->thresholdVoltage = transistor.thresholdVoltage;
+        this->position = transistor.position;
+
         this->voltage = transistor.voltage;
         this->power = transistor.power;
         
         this->in = transistor.in;
         this->out = transistor.out;
+        
+        this->threshold = transistor.threshold;
+        this->thresholdVoltage = transistor.thresholdVoltage;
 
         this->temperature = transistor.temperature;
-        this->position = transistor.position;
     }
 
     ~Transistor()
@@ -182,17 +212,22 @@ public:
 
     Transistor& operator=(Transistor& transistor)
     {
-        this->threshold = transistor.getThreshold();
+        this->position = transistor.getPosition();
+
         this->voltage = transistor.getVoltage();
         this->power = transistor.getPower();
 
         this->in = transistor.getIn();
         this->out = transistor.getOut();
 
+        this->threshold = transistor.getThreshold();
         this->temperature = transistor.getTemperature();
-        this->position = transistor.getPosition();
-
+       
         return *this;
+    }
+
+    void changeValue(int32_t value)
+    {
     }
 };
 
@@ -210,40 +245,42 @@ public:
         this->tolerance = 0;
     }
 
-    explicit Resistor(const int32_t resistance = 0, const int32_t powerDissipation = 0, const int32_t tolerance = 0, \
+    explicit Resistor(const uint32_t posX, const uint32_t posY,\ 
             const int32_t voltage = 0, const int32_t power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
-            const std::pair<int32_t, int32_t> position = std::make_pair(0,0), const int32_t temperature = 273)
+            const int32_t resistance = 0, const int32_t powerDissipation = 0, const int32_t tolerance = 0, const uint32_t temperature = 273)
     {
+        this->position = std::make_pair(posX, posY);
+
+        this->voltage = voltage;
+        this->power = power;
+
+        this->in = in;
+        this->out = out;
+
         this->resistance = resistance;
         this->powerDissipation = powerDissipation;
         this->tolerance = tolerance;
 
-        this->voltage = voltage;
-        
-        this->power = power;
-        this->in = in;
-        this->out = out;
-        
         this->temperature = temperature;
-        this->position = position;
-
+       
     }
 
     Resistor(const Resistor& r) : CircuitElement(r)
     {
+        this->position = r.position;
+
+        this->voltage = r.voltage;
+        this->power = r.power;
+        
+        this->in = r.in;
+        this->out = r.out;
+        
         this->resistance = r.resistance;
         this->powerDissipation = r.powerDissipation;
         this->tolerance = r.tolerance;
 
-        this->voltage = r.voltage;
-        
-        this->power = r.power;
-        this->in = r.in;
-        this->out = r.out;
-        
         this->temperature = r.temperature;
-        this->position = r.position;
-    }
+           }
 
     ~Resistor()
     {
@@ -263,9 +300,7 @@ public:
 
     Resistor& operator=(Resistor& r)
     {
-        this->resistance = r.getResistance();
-        this->powerDissipation = r.getPowerDissipation();
-        this->tolerance = r.getTolerance();
+        this->position = r.getPosition();
 
         this->voltage = r.getVoltage();
         this->power = r.getPower();
@@ -273,11 +308,18 @@ public:
         this->in = r.getIn();
         this->out = r.getOut();
         
+        this->resistance = r.getResistance();
+        this->powerDissipation = r.getPowerDissipation();
+        this->tolerance = r.getTolerance();
+
         this->temperature = r.getTemperature();
-        this->position = r.getPosition();
-            
+                 
 
         return *this;
+    }
+
+    void changeValue(int32_t value)
+    {
     }
 };
 
@@ -337,7 +379,7 @@ class Switch
 class Cable : public CircuitElement
 {
 private:
-    std::pair<int32_t, int32_t> end;
+    std::pair<uint32_t, uint32_t> end;
     int32_t resistance;
     bool reverse;
     int32_t length;
@@ -351,11 +393,13 @@ public:
         this->reverse = false;
     }
 
-    explicit Cable(const int32_t voltage, const int32_t power = 0, CircuitElement* in = NULL,CircuitElement* out = NULL, \
-            const std::pair<int32_t, int32_t> start = std::make_pair(0,0), const std::pair<int32_t, int32_t> end = std::make_pair(0,0), const int32_t resistance = 0, const bool reverse = false, const int32_t length = 0, const uint32_t temperature = 273)
+    explicit Cable(const uint32_t posX, const uint32_t posY, const std::pair<uint32_t, uint32_t> end = std::make_pair(0, 0), \
+            const int32_t voltage = 0, const int32_t power = 0, \
+            CircuitElement* in = NULL,CircuitElement* out = NULL, \
+            const int32_t resistance = 0, const bool reverse = false, const int32_t length = 0, const uint32_t temperature = 273)
     {
-        this->resistance = resistance;
-        this->reverse = reverse;
+        this->position = std::make_pair(posX, posY);
+        this->end = end;
 
         this->voltage = voltage;
         this->power = power;
@@ -363,8 +407,8 @@ public:
         this->in = in;
         this->out = out;
 
-        this->position = start;
-        this->end = end;
+        this->resistance = resistance;
+        this->reverse = reverse;
 
         this->temperature = temperature;
         this->length = length;
@@ -374,18 +418,18 @@ public:
     {
         this->position = c.position;
         this->end = c.end;
-        
-        this->resistance = c.resistance;
-        this->reverse = c.reverse;
-        
-        this->power = c.power;
+    
         this->voltage = c.voltage;
-        
-        this->temperature = c.temperature;
-        this->length = c.length;
+        this->power = c.power;
 
         this->in = c.in;
         this->out = c.out;
+
+        this->resistance = c.resistance;
+        this->reverse = c.reverse;
+                
+        this->temperature = c.temperature;
+        this->length = c.length;
     }
 
     ~Cable()
@@ -408,20 +452,24 @@ public:
     {
         this->position = cable.getPosition();
         this->end = cable.getEnd();
-        
-        this->reverse = cable.getFlowDirection();
-        this->resistance = cable.getResistance();
-        
+       
         this->voltage = cable.getVoltage();
         this->power = cable.getPower();
         
-        this->temperature = cable.getTemperature();
-        this->length = cable.getLength();
-
         this->in = cable.getIn();
         this->out = cable.getOut();
 
+        this->reverse = cable.getFlowDirection();
+        this->resistance = cable.getResistance();
+                
+        this->temperature = cable.getTemperature();
+        this->length = cable.getLength();
+
         return *this;
+    }
+
+    void changeValue(int32_t value)
+    {
     }
 };
 
@@ -432,11 +480,26 @@ public:
     Source()
     {
     }
-/*
+    
+    Source(uint32_t posX, uint32_t posY, int32_t voltage = 0, int32_t power = 0, \
+            CircuitElement* in = NULL, CircuitElement* out = NULL,\
+            uint32_t temperature = 273)
+    {
+        this->position = std::make_pair(posX, posY);
+        
+        this->voltage = voltage;
+        this->power = power;
+        
+        this->in = in;
+        this->out = out;
+        
+        this->temperature = temperature;
+    }
+
     Source(const Source& s) : CircuitElement(s)
     {
     }
-*/
+
     ~Source()
     {
     }
@@ -450,17 +513,21 @@ public:
 
     Source& operator=(Source& s) 
     {
+        this->position = s.getPosition();
+
         this->power = s.getPower();
         this->voltage = s.getVoltage();
         
         this->in = s.getIn();
         this->out = s.getOut();
 
-        this->position = s.getPosition();
         this->temperature = s.getTemperature();
 
-
         return *this;
+    }
+
+    void changeValue(int32_t value)
+    {
     }
 };
 
@@ -468,23 +535,25 @@ public:
 class Battery : public CircuitElement
 {
     private:
-        int32_t capacity;
+        uint32_t capacity;
     public:
     Battery()
     {
         this->capacity = 0;
     }
 
-    explicit Battery(const int32_t voltage, const int32_t power = 0, \
+    explicit Battery(const uint32_t posX, const uint32_t posY, const int32_t voltage, const int32_t power = 0, \
         CircuitElement* in = NULL, CircuitElement* out = NULL, \
-        const std::pair<int32_t, int32_t> position = std::make_pair(0,0), \
-        const int32_t temperature = 273, const int32_t capacity = 0)
+        const uint32_t capacity = 0, const uint32_t temperature = 273)
     {
+        this->position = std::make_pair(posX, posY);
+
         this->voltage = voltage;
         this->power = power;
+        
         this->in = in;
         this->out = out;
-        this->position = position;
+        
         this->capacity = capacity;
         this->temperature = temperature;
     }
@@ -492,11 +561,14 @@ class Battery : public CircuitElement
     Battery(const Battery& b) : CircuitElement(b)
     {
         this->position = b.position;
-        this->capacity = b.capacity;
+        
         this->voltage = b.voltage;
+        this->power = b.power;
+
         this->out = b.out;
         this->in = b.in;
-        this->power = b.power;
+        
+        this->capacity = b.capacity;
         this->temperature = b.temperature;
     }
 
@@ -514,14 +586,21 @@ class Battery : public CircuitElement
     Battery& operator=(Battery& b)
     {
         this->position = b.getPosition();
-        this->capacity = b.getCapacity();
+        
         this->voltage = b.getVoltage();
+        this->power = b.getPower();
+        
         this->out = b.getOut();
         this->in = b.getIn();
+        
+        this->capacity = b.getCapacity();
         this->temperature = b.getTemperature();
-        this->power = b.getPower();
 
         return *this;
+    }
+
+    void changeValue(int32_t value)
+    {
     }
 };
 
@@ -598,12 +677,41 @@ private:
         menuOffsetY = 0;
     }
 
-    void pressEntry(const int posX, const int posY, std::string key, std::string action)
+    void pressEntry(const int32_t posX, const int posY, std::string key, std::string action)
     {
         DrawString(posX, posY, "Press ");
         DrawString(posX + 45, posY, key, olc::GREEN);
         DrawString(posX + 50, posY, " to ");
         DrawString(posX + 80, posY, action);
+    }
+
+    void addElement(ElementType type)
+    {
+        CircuitElement* element;
+        switch(type)
+        {
+            case ELEM_CABLE:
+                element = new Cable();
+                break;
+            case ELEM_NODE:
+                element = new CableNode();
+                break;
+            case ELEM_RESISTOR:
+                element = new Resistor();
+                break;
+            case ELEM_TRANSISTOR:
+                element = new Transistor();
+                break;
+            case ELEM_SOURCE:
+                element = new Source();
+                break;
+            case ELEM_BATTERY:
+                element = new Battery();
+                break;
+            default:
+                std::cout<<"Element invalid.\n";
+                return;
+        }
     }
 public:
 	Sim()
@@ -653,6 +761,30 @@ public:
         pressEntry(70 + menuOffsetX, 190 + menuOffsetY, "5", "add source");
         pressEntry(70 + menuOffsetX, 210 + menuOffsetY, "6", "add battery");
 
+        if(GetKey(olc::K1).bPressed)
+        {
+            addElement(ELEM_CABLE);
+        }
+        else if(GetKey(olc::K2).bPressed)
+        {
+            addElement(ELEM_NODE);
+        }
+        else if(GetKey(olc::K3).bPressed)
+        {
+            addElement(ELEM_RESISTOR);
+        }
+        else if(GetKey(olc::K4).bPressed)
+        {
+            addElement(ELEM_TRANSISTOR);
+        }
+        else if(GetKey(olc::K5).bPressed)
+        {
+            addElement(ELEM_SOURCE);
+        }
+        else if(GetKey(olc::K6).bPressed)
+        {
+            addElement(ELEM_BATTERY);
+        }
     }
     if(editMenuActive)
     {
