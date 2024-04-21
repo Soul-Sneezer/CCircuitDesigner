@@ -15,8 +15,7 @@ enum ElementType
 class CircuitElement
 {
 protected:
-    std::pair<int32_t, int32_t> position;
-
+    olc::vi2d position;
     int32_t voltage;
     int32_t power;
     uint32_t temperature; // useless for now
@@ -26,20 +25,19 @@ protected:
 public:
     CircuitElement()
     {
-        position = std::make_pair(0, 0);
+        position = {0, 0};
         this->voltage = 0;
         this->power = 0;
         this->in = NULL;
         this->out = NULL;
         this->temperature = 273;
-
     }
     
     explicit CircuitElement(const int32_t posX, const int32_t posY, const int32_t voltage, const int32_t power = 0, \
             CircuitElement* in = NULL, CircuitElement* out = NULL, \
             const uint32_t temperature = 273)
     {
-        this->position = std::make_pair(posX, posY);
+        this->position = {posX, posY};
 
         this->voltage = voltage;
         this->power = power;
@@ -67,7 +65,7 @@ public:
     {
     }
     
-    std::pair<int32_t, int32_t> getPosition() { return this->position; };
+    olc::vi2d getPosition() { return this->position; };
     int32_t getVoltage() { return this->voltage; };
     int32_t getPower() { return this->power; };
     int32_t getTemperature() { return this->temperature; };
@@ -96,7 +94,7 @@ public:
     }
 
     virtual void changeValue(int32_t value) = 0;
-    virtual void DrawYourself(olc::PixelGameEngine *pge) = 0;
+    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f) = 0;
 };
 
 class CableNode : public CircuitElement
@@ -111,7 +109,7 @@ public:
    
     explicit CableNode(const int32_t posX, const int32_t posY)
     {
-        this->position = std::make_pair(posX, posY);
+        this->position = {posX, posY};
     }
     
     CableNode(const CableNode& node) : CircuitElement(node)
@@ -148,8 +146,9 @@ public:
     {
     }
 
-    virtual void DrawYourself(olc::PixelGameEngine *pge)
+    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f)
     {
+        pge->DrawCircle(this->position.x, this->position.y, scale);
     }
 };
 
@@ -169,7 +168,7 @@ public:
             CircuitElement* in = NULL, CircuitElement* out = NULL,\ 
             const int32_t thresholdVoltage = 0, const uint32_t temperature = 273)
     {
-        this->position = std::make_pair(posX, posY);
+        this->position = {posX, posY};
 
         this->voltage = voltage;
         this->power = power;
@@ -234,8 +233,9 @@ public:
     {
     }
 
-    virtual void DrawYourself(olc::PixelGameEngine *pge)
+    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f)
     {
+        pge->DrawCircle(this->position.x, this->position.y, 10);
     }
 };
 
@@ -257,7 +257,7 @@ public:
             const int32_t voltage = 0, const int32_t power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
             const int32_t resistance = 0, const int32_t powerDissipation = 0, const int32_t tolerance = 0, const uint32_t temperature = 273)
     {
-        this->position = std::make_pair(posX, posY);
+        this->position = {posX, posY};
 
         this->voltage = voltage;
         this->power = power;
@@ -270,7 +270,6 @@ public:
         this->tolerance = tolerance;
 
         this->temperature = temperature;
-       
     }
 
     Resistor(const Resistor& r) : CircuitElement(r)
@@ -288,7 +287,7 @@ public:
         this->tolerance = r.tolerance;
 
         this->temperature = r.temperature;
-           }
+    }
 
     ~Resistor()
     {
@@ -329,8 +328,9 @@ public:
     void changeValue(int32_t value)
     {
     }
-    virtual void DrawYourself(olc::PixelGameEngine *pge)
+    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f)
     {
+        pge->DrawCircle(this->position.x, this->position.y, scale);
     }
 };
 
@@ -383,6 +383,7 @@ class Switch
 
     void closeSwitch()
     {
+    std::string drawing[8];
         this->open = false;
     }
 };
@@ -390,7 +391,7 @@ class Switch
 class Cable : public CircuitElement
 {
 private:
-    std::pair<uint32_t, uint32_t> end;
+    olc::vi2d end;
     int32_t resistance;
     bool reverse;
     int32_t length;
@@ -398,18 +399,18 @@ private:
 public:
     Cable()
     {
-        this->end = std::make_pair(0,0);
+        this->end = {0,0};
         this->length = 0;
         this->resistance = 0;
         this->reverse = false;
     }
 
-    explicit Cable(const int32_t posX, const int32_t posY, const std::pair<uint32_t, uint32_t> end = std::make_pair(0, 0), \
+    explicit Cable(const int32_t posX, const int32_t posY, const olc::vi2d end = {0, 0}, \
             const int32_t voltage = 0, const int32_t power = 0, \
             CircuitElement* in = NULL,CircuitElement* out = NULL, \
             const int32_t resistance = 0, const bool reverse = false, const int32_t length = 0, const uint32_t temperature = 273)
     {
-        this->position = std::make_pair(posX, posY);
+        this->position = {posX, posY};
         this->end = end;
 
         this->voltage = voltage;
@@ -454,7 +455,7 @@ public:
         return os;
     }
 
-    std::pair<int32_t, int32_t> getEnd() { return this->end; };
+    olc::vi2d getEnd() { return this->end; };
     int32_t getResistance() { return this->resistance; };
     Switch getSwitch() { return this->circuitSwitch; };
     bool getFlowDirection() { return this->reverse; };
@@ -482,8 +483,9 @@ public:
     void changeValue(int32_t value)
     {
     }
-    virtual void DrawYourself(olc::PixelGameEngine *pge)
+    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale)
     {
+        pge->DrawCircle(this->position.x, this->position.y, scale);
     }
 };
 
@@ -499,7 +501,7 @@ public:
             CircuitElement* in = NULL, CircuitElement* out = NULL,\
             uint32_t temperature = 273)
     {
-        this->position = std::make_pair(posX, posY);
+        this->position = {posX, posY};
         
         this->voltage = voltage;
         this->power = power;
@@ -543,8 +545,9 @@ public:
     void changeValue(int32_t value)
     {
     }
-    virtual void DrawYourself(olc::PixelGameEngine *pge)
+    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale)
     {
+        pge->DrawCircle(this->position.x, this->position.y, scale);
     }
 };
 
@@ -563,7 +566,7 @@ class Battery : public CircuitElement
         CircuitElement* in = NULL, CircuitElement* out = NULL, \
         const uint32_t capacity = 0, const uint32_t temperature = 273)
     {
-        this->position = std::make_pair(posX, posY);
+        this->position = {posX, posY};
 
         this->voltage = voltage;
         this->power = power;
@@ -619,8 +622,9 @@ class Battery : public CircuitElement
     void changeValue(int32_t value)
     {
     }
-    virtual void DrawYourself(olc::PixelGameEngine *pge)
+    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f)
     {
+        pge->DrawCircle(this->position.x, this->position.y, scale);
     }
 };
 
@@ -678,50 +682,52 @@ public:
 class Sim : public olc::PixelGameEngine
 {
 private:
-    bool mainMenuActive;
-    bool editMenuActive;
-    bool removeMenuActive;
-    bool addMenuActive;
-    bool modifyMenuActive;
-    bool addElement;
+    bool mainMenuActive = false;
+    bool editMenuActive = false;
+    bool removeMenuActive = false;
+    bool addMenuActive = false;
+    bool modifyMenuActive = false;
+    bool addElement = false;
 
-    int32_t menuOffsetX;
-    int32_t menuOffsetY;
+    olc::vi2d menuOffset = {0, 0};
+    olc::vf2d worldOffset = {0.0f, 0.0f};
     
-    CircuitElement* tempElement;
-    ElementType tempType;
-    int32_t tempX;
-    int32_t tempY;
+    float scale = 10.0f;
 
+    olc::vf2d mousePos;
+    olc::vf2d startPan;
+
+    CircuitElement* tempElement = NULL;
+    ElementType tempType = ELEM_UNASSIGNED;
+    olc::vi2d tempPos;
+        
     Circuit circuit;
 
     void resetOffset()
     {
-        menuOffsetX = 0;
-        menuOffsetY = 0;
+        menuOffset = {0,0};
     }
 
-    void pressEntry(const int32_t posX, const int posY, std::string key, std::string action)
+    void pressEntry(olc::vi2d pos, std::string key, std::string action)
     {
-        DrawString(posX, posY, "Press ");
-        DrawString(posX + 45, posY, key, olc::GREEN);
-        DrawString(posX + 50, posY, " to ");
-        DrawString(posX + 80, posY, action);
+        DrawString(pos.x     , pos.y, "Press ");
+        DrawString(pos.x + 45, pos.y, key, olc::GREEN);
+        DrawString(pos.x + 50, pos.y, " to ");
+        DrawString(pos.x + 80, pos.y, action);
     }
-    void pressEntry(const int32_t posX, const int posY, std::string key1, std::string key2, std::string action)
+    void pressEntry(olc::vi2d pos, std::string key1, std::string key2, std::string action)
     {
-        DrawString(posX, posY, "Press ");
-        DrawString(posX + 45, posY, key1, olc::GREEN);
-        DrawString(posX + 85, posY, ", ");
-        DrawString(posX + 95, posY, key2, olc::GREEN);
-        DrawString(posX + 100, posY, " to ");
-        DrawString(posX + 130, posY, action);
+        DrawString(pos.x   , pos.y, "Press ");
+        DrawString(pos.x + 45, pos.y, key1, olc::GREEN);
+        DrawString(pos.x + 85, pos.y, ", ");
+        DrawString(pos.x + 95, pos.y, key2, olc::GREEN);
+        DrawString(pos.x + 100, pos.y, " to ");
+        DrawString(pos.x + 130, pos.y, action);
     }
    
     void drawElement(CircuitElement* element)
     {
-        std::pair<int32_t, int32_t> position = element->getPosition();
-        DrawCircle(position.first, position.second, 50);
+        element->drawYourself(this, scale);
     }
 
     void drawCircuit()
@@ -734,8 +740,20 @@ private:
 
     void resetTempCoord()
     {
-        tempX = GetScreenSize().x / 2;
-        tempY = GetScreenSize().y / 2;
+        tempPos.x = GetScreenSize().x / 2;
+        tempPos.y = GetScreenSize().y / 2;
+    }
+
+    void WorldToScreen(olc::vf2d& v, int& screenX, int& screenY)
+    {
+        screenX = (int)((v.x - worldOffset.x) * scale);
+        screenY = (int)((v.y - worldOffset.y) * scale);
+    }
+
+    void ScreenToWorld(int screenX, int screenY, olc::vf2d& v)
+    {
+        v.x = (float)(screenX) / scale + worldOffset.x;
+        v.y = (float)(screenY) / scale + worldOffset.y;
     }
 public:
 	Sim()
@@ -746,52 +764,104 @@ public:
 public:
 	bool OnUserCreate() override
 	{
-    mainMenuActive = true;
-    editMenuActive = false;
-    addMenuActive = false;
-    removeMenuActive = false;
-    modifyMenuActive = false;
-    addElement = false;
+    worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
+    worldOffset.y = (float)(-GetScreenSize().y / 2) / scale;
 
-    tempElement = NULL;
-    tempType = ELEM_UNASSIGNED;
+    mainMenuActive = true;
     resetTempCoord();
 
-    menuOffsetX = 0;
-    menuOffsetY = 0;
- 
 		return true;
 	}
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
+    mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+
     Clear(olc::BLACK);
     drawCircuit();
+
+    if(addElement)
+    {
+        editMenuActive = false;
+        mainMenuActive = false;
+        addMenuActive = false;
+        removeMenuActive = false;
+        modifyMenuActive = false;
+
+        if(GetKey(olc::ENTER).bPressed) // add element to circuit
+        {
+            CircuitElement* element;
+            switch(tempType)
+            {
+                case ELEM_CABLE:
+                    element = new Cable(tempPos.x, tempPos.y);
+                    break;
+                case ELEM_NODE:
+                    element = new CableNode(tempPos.x, tempPos.y);
+                    break;
+                case ELEM_RESISTOR:
+                    element = new Resistor(tempPos.x, tempPos.y);
+                    break;
+                case ELEM_TRANSISTOR:
+                    element = new Transistor(tempPos.x, tempPos.y);
+                    break;
+                case ELEM_SOURCE:
+                    element = new Source(tempPos.x, tempPos.y);
+                    break;
+                case ELEM_BATTERY:
+                    element = new Battery(tempPos.x, tempPos.y);
+                    break;
+                default:
+                    return false;
+            }
+            circuit.addElementToCircuit(element);
+        }
+        DrawCircle(tempPos.x, tempPos.y, scale);
+        if(GetKey(olc::W).bHeld)
+        {
+            tempPos.y -= (int)(std::sqrt(scale));
+        }
+        if(GetKey(olc::S).bHeld)
+        {
+            tempPos.y += (int)(std::sqrt(scale));
+        }
+        if(GetKey(olc::A).bHeld)
+        {
+            tempPos.x -= (int)(std::sqrt(scale));
+        }
+        if(GetKey(olc::D).bHeld)
+        {
+            tempPos.x += (int)(std::sqrt(scale));
+        }
+    }
+
     if(mainMenuActive)
     {
-        DrawRect(50 + menuOffsetX, 50 + menuOffsetY, 500, 200, olc::WHITE);
-        DrawString(70 + menuOffsetX, 70 + menuOffsetY, "CCircuit Designer - Commands", olc::WHITE, 2);
-        DrawString(70 + menuOffsetX, 90 + menuOffsetY, "Press");
-        DrawString(115 + menuOffsetX, 90 + menuOffsetY, "ESC", olc::GREEN);
-        DrawString(145 + menuOffsetX, 90 + menuOffsetY, "to open/close this window");
-        pressEntry(70 + menuOffsetX, 110 + menuOffsetY, "Q", "open edit menu");
-        pressEntry(70 + menuOffsetX, 130 + menuOffsetY, "R", "start/stop simulation");
-        pressEntry(70 + menuOffsetX, 150 + menuOffsetY, "SHIFT", "W", "move window up");
-        pressEntry(70 + menuOffsetX, 160 + menuOffsetY, "SHIFT", "S", "move window down");
-        pressEntry(70 + menuOffsetX, 170 + menuOffsetY, "SHIFT", "A", "move window left");
-        pressEntry(70 + menuOffsetX, 180 + menuOffsetY, "SHIFT", "D", "move window right");
+        FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
+        DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
+        DrawString(70 + menuOffset.x, 70 + menuOffset.y, "CCircuit Designer - Commands", olc::WHITE, 2);
+        DrawString(70 + menuOffset.x, 90 + menuOffset.y, "Press");
+        DrawString(115 + menuOffset.x, 90 + menuOffset.y, "ESC", olc::GREEN);
+        DrawString(145 + menuOffset.x, 90 + menuOffset.y, "to open/close this window");
+        pressEntry({70 + menuOffset.x, 110 + menuOffset.y}, "Q", "open edit menu");
+        pressEntry({70 + menuOffset.x, 130 + menuOffset.y}, "R", "start/stop simulation");
+        pressEntry({70 + menuOffset.x, 150 + menuOffset.y}, "SHIFT", "W", "move window up");
+        pressEntry({70 + menuOffset.x, 160 + menuOffset.y}, "SHIFT", "S", "move window down");
+        pressEntry({70 + menuOffset.x, 170 + menuOffset.y}, "SHIFT", "A", "move window left");
+        pressEntry({70 + menuOffset.x, 180 + menuOffset.y}, "SHIFT", "D", "move window right");
     }
     if(addMenuActive)
     {
-        DrawRect(50 + menuOffsetX, 50 + menuOffsetY, 500, 200, olc::WHITE);
-        DrawString(70 + menuOffsetX, 70 + menuOffsetY, "Edit circuit", olc::WHITE, 2);
-        pressEntry(70 + menuOffsetX, 90 + menuOffsetY, "Q", "go back to edit menu");
-        pressEntry(70 + menuOffsetX, 110 + menuOffsetY, "1", "add cable");
-        pressEntry(70 + menuOffsetX, 130 + menuOffsetY, "2", "add cable node");
-        pressEntry(70 + menuOffsetX, 150 + menuOffsetY, "3", "add resistor");
-        pressEntry(70 + menuOffsetX, 170 + menuOffsetY, "4", "add transistor");
-        pressEntry(70 + menuOffsetX, 190 + menuOffsetY, "5", "add source");
-        pressEntry(70 + menuOffsetX, 210 + menuOffsetY, "6", "add battery");
+        FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
+        DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
+        DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Edit circuit", olc::WHITE, 2);
+        pressEntry({70 + menuOffset.x, 90 + menuOffset.y}, "Q", "go back to edit menu");
+        pressEntry({70 + menuOffset.x, 110 + menuOffset.y}, "1", "add cable");
+        pressEntry({70 + menuOffset.x, 130 + menuOffset.y}, "2", "add cable node");
+        pressEntry({70 + menuOffset.x, 150 + menuOffset.y}, "3", "add resistor");
+        pressEntry({70 + menuOffset.x, 170 + menuOffset.y}, "4", "add transistor");
+        pressEntry({70 + menuOffset.x, 190 + menuOffset.y}, "5", "add source");
+        pressEntry({70 + menuOffset.x, 210 + menuOffset.y}, "6", "add battery");
 
         if(GetKey(olc::K1).bPressed)
         {
@@ -830,39 +900,16 @@ public:
             resetTempCoord();
         }
     }
-    if(addElement)
-    {
-        editMenuActive = false;
-        mainMenuActive = false;
-        addMenuActive = false;
-        removeMenuActive = false;
-        modifyMenuActive = false;
-
-        if(GetKey(olc::ENTER).bPressed) // add element to circuit
-        {
-        }
-
-        if(GetKey(olc::W).bPressed)
-        {
-        }
-        if(GetKey(olc::S).bPressed)
-        {
-        }
-        if(GetKey(olc::A).bPressed)
-        {
-        }
-        if(GetKey(olc::D).bPressed)
-        {
-        }
-    }
+    
     if(editMenuActive)
     {
-        DrawRect(50 + menuOffsetX, 50 + menuOffsetY, 500, 200, olc::WHITE);
-        DrawString(70 + menuOffsetX, 70 + menuOffsetY, "Edit circuit", olc::WHITE, 2);
-        pressEntry(70 + menuOffsetX, 90 + menuOffsetY, "Q", "open/close this window");
-        pressEntry(70 + menuOffsetX, 110 + menuOffsetY, "1","add elements to circuit");
-        pressEntry(70 + menuOffsetX, 130 + menuOffsetY, "2","remove elements from circuit");
-        pressEntry(70 + menuOffsetX, 150 + menuOffsetY, "3","edit elements in circuit");
+        FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
+        DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
+        DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Edit circuit", olc::WHITE, 2);
+        pressEntry({70 + menuOffset.x, 90 + menuOffset.y}, "Q", "open/close this window");
+        pressEntry({70 + menuOffset.x, 110 + menuOffset.y}, "1","add elements to circuit");
+        pressEntry({70 + menuOffset.x, 130 + menuOffset.y}, "2","remove elements from circuit");
+        pressEntry({70 + menuOffset.x, 150 + menuOffset.y}, "3","edit elements in circuit");
         if(GetKey(olc::K1).bPressed)
         {
             addMenuActive = true;
@@ -895,16 +942,40 @@ public:
         addMenuActive = false;
         resetOffset();
     }
-    if(GetKey(olc::SHIFT).bHeld && GetKey(olc::W).bHeld)
-        menuOffsetY--;
-    if(GetKey(olc::SHIFT).bHeld && GetKey(olc::S).bHeld)
-        menuOffsetY++;
-    if(GetKey(olc::SHIFT).bHeld && GetKey(olc::A).bHeld)
-        menuOffsetX--;
-    if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld)
-        menuOffsetX++;
 
-		return true;
+    if(GetMouse(2).bPressed)
+    {
+        startPan = mousePos;
+    }
+
+    if(GetMouse(2).bHeld)
+    {
+        worldOffset -= (mousePos - startPan) / scale; 
+        startPan = mousePos;
+    }
+
+    if(GetKey(olc::SHIFT).bHeld && GetKey(olc::W).bHeld)
+        menuOffset.y-=(int)(std::sqrt(scale));
+    if(GetKey(olc::SHIFT).bHeld && GetKey(olc::S).bHeld)
+        menuOffset.y+=(int)(std::sqrt(scale));
+    if(GetKey(olc::SHIFT).bHeld && GetKey(olc::A).bHeld)
+        menuOffset.x-=(int)(std::sqrt(scale));
+    if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld)
+        menuOffset.x+=(int)(std::sqrt(scale));
+
+    olc::vf2d mousePosBZoom;
+    ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosBZoom);
+
+    if(GetKey(olc::EQUALS).bPressed || GetMouseWheel() > 0)
+        scale *= 1.1f;
+    if(GetKey(olc::MINUS).bPressed || GetMouseWheel() < 0)
+        scale *= 0.9f;
+	  
+    olc::vf2d mousePosAZoom;
+    ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosAZoom);
+    worldOffset += (mousePosBZoom - mousePosAZoom);
+
+    return true;
 	}
 };
 
