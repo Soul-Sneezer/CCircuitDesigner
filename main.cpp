@@ -16,6 +16,7 @@ class CircuitElement
 {
 protected:
     olc::vi2d position;
+
     int32_t voltage;
     int32_t power;
     uint32_t temperature; // useless for now
@@ -23,6 +24,9 @@ protected:
     CircuitElement* in; // prev element
     CircuitElement* out; // next element
 public:
+    static olc::vf2d worldOffset;
+    static float worldScale;
+
     CircuitElement()
     {
         position = {0, 0};
@@ -93,9 +97,18 @@ public:
         return *this;
     }
 
+    void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY)
+    {
+        screenX = (int)((v.x - worldOffset.x) * worldScale);
+        screenY = (int)((v.y - worldOffset.y) * worldScale);
+    }
+
     virtual void changeValue(int32_t value) = 0;
-    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f) = 0;
+    virtual void drawYourself(olc::PixelGameEngine *pge) = 0;
 };
+
+float CircuitElement::worldScale = 1.0f;
+olc::vf2d CircuitElement::worldOffset = {0, 0};
 
 class CableNode : public CircuitElement
 {
@@ -142,13 +155,15 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value)
+    void changeValue(int32_t value) override
     {
     }
 
-    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f)
+    void drawYourself(olc::PixelGameEngine *pge) override
     {
-        pge->DrawCircle(this->position.x, this->position.y, scale);
+        int nx, ny;
+        WorldToScreen(this->position, nx, ny);
+        pge->DrawCircle(nx, ny, worldScale);
     }
 };
 
@@ -229,13 +244,15 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value)
+    void changeValue(int32_t value) override
     {
     }
 
-    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f)
+    void drawYourself(olc::PixelGameEngine *pge) override
     {
-        pge->DrawCircle(this->position.x, this->position.y, 10);
+        int nx, ny;
+        WorldToScreen(this->position, nx, ny);
+        pge->DrawCircle(nx, ny, worldScale);
     }
 };
 
@@ -325,12 +342,14 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value)
+    void changeValue(int32_t value) override
     {
     }
-    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f)
+    void drawYourself(olc::PixelGameEngine *pge) override
     {
-        pge->DrawCircle(this->position.x, this->position.y, scale);
+        int nx, ny;
+        WorldToScreen(this->position, nx, ny);
+        pge->DrawCircle(nx, ny, worldScale);
     }
 };
 
@@ -383,7 +402,6 @@ class Switch
 
     void closeSwitch()
     {
-    std::string drawing[8];
         this->open = false;
     }
 };
@@ -480,12 +498,14 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value)
+    void changeValue(int32_t value) override
     {
     }
-    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale)
+    void drawYourself(olc::PixelGameEngine *pge) override
     {
-        pge->DrawCircle(this->position.x, this->position.y, scale);
+        int nx, ny;
+        WorldToScreen(this->position, nx, ny);
+        pge->DrawCircle(nx, ny, worldScale);
     }
 };
 
@@ -542,12 +562,14 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value)
+    void changeValue(int32_t value) override
     {
     }
-    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale)
+    void drawYourself(olc::PixelGameEngine *pge) override
     {
-        pge->DrawCircle(this->position.x, this->position.y, scale);
+        int nx, ny;
+        WorldToScreen(this->position, nx, ny);
+        pge->DrawCircle(nx, ny, worldScale);
     }
 };
 
@@ -619,12 +641,14 @@ class Battery : public CircuitElement
         return *this;
     }
 
-    void changeValue(int32_t value)
+    void changeValue(int32_t value) override
     {
     }
-    virtual void drawYourself(olc::PixelGameEngine *pge, const float scale = 10.0f)
+    void drawYourself(olc::PixelGameEngine *pge) override
     {
-        pge->DrawCircle(this->position.x, this->position.y, scale);
+        int nx, ny;
+        WorldToScreen(this->position, nx, ny);
+        pge->DrawCircle(nx, ny, worldScale);
     }
 };
 
@@ -693,6 +717,7 @@ private:
     olc::vf2d worldOffset = {0.0f, 0.0f};
     
     float scale = 10.0f;
+    float gridInc = 1.0f;
 
     olc::vf2d mousePos;
     olc::vf2d startPan;
@@ -708,26 +733,26 @@ private:
         menuOffset = {0,0};
     }
 
-    void pressEntry(olc::vi2d pos, std::string key, std::string action)
+    void pressEntry(const olc::vi2d pos, const std::string key, const std::string action)
     {
         DrawString(pos.x     , pos.y, "Press ");
         DrawString(pos.x + 45, pos.y, key, olc::GREEN);
         DrawString(pos.x + 50, pos.y, " to ");
         DrawString(pos.x + 80, pos.y, action);
     }
-    void pressEntry(olc::vi2d pos, std::string key1, std::string key2, std::string action)
+    void pressEntry(const olc::vi2d pos, const std::string key1, const std::string key2, const std::string action)
     {
-        DrawString(pos.x   , pos.y, "Press ");
-        DrawString(pos.x + 45, pos.y, key1, olc::GREEN);
-        DrawString(pos.x + 85, pos.y, ", ");
-        DrawString(pos.x + 95, pos.y, key2, olc::GREEN);
+        DrawString(pos.x      , pos.y, "Press ");
+        DrawString(pos.x + 45 , pos.y, key1, olc::GREEN);
+        DrawString(pos.x + 85 , pos.y, ", ");
+        DrawString(pos.x + 95 , pos.y, key2, olc::GREEN);
         DrawString(pos.x + 100, pos.y, " to ");
         DrawString(pos.x + 130, pos.y, action);
     }
    
     void drawElement(CircuitElement* element)
     {
-        element->drawYourself(this, scale);
+        element->drawYourself(this);
     }
 
     void drawCircuit()
@@ -744,7 +769,7 @@ private:
         tempPos.y = GetScreenSize().y / 2;
     }
 
-    void WorldToScreen(olc::vf2d& v, int& screenX, int& screenY)
+    void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY)
     {
         screenX = (int)((v.x - worldOffset.x) * scale);
         screenY = (int)((v.y - worldOffset.y) * scale);
@@ -775,9 +800,56 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-    mousePos = {(float)GetMouseX(), (float)GetMouseY() };
-
     Clear(olc::BLACK);
+
+    mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+    CircuitElement::worldOffset = this->worldOffset;
+    CircuitElement::worldScale = scale;
+    
+    if(GetMouse(2).bPressed)
+    {
+        startPan = mousePos;
+    }
+
+    if(GetMouse(2).bHeld)
+    {
+        worldOffset -= (mousePos - startPan) / scale; 
+        startPan = mousePos;
+    }
+    
+    olc::vf2d mousePosBZoom;
+    ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosBZoom);
+
+    if(GetKey(olc::EQUALS).bPressed || GetMouseWheel() > 0)
+        scale *= 1.1f;
+    if(GetKey(olc::MINUS).bPressed || GetMouseWheel() < 0)
+        scale *= 0.9f;
+	  
+    olc::vf2d mousePosAZoom;
+    ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosAZoom);
+    worldOffset += (mousePosBZoom - mousePosAZoom);
+
+    int32_t sx, sy;
+    int32_t ex, ey;
+
+    olc::vf2d worldTopLeft, worldBottomRight;
+    ScreenToWorld(0, 0, worldTopLeft);
+    ScreenToWorld(ScreenWidth(), ScreenHeight(), worldBottomRight);
+
+    worldTopLeft.x = floor(worldTopLeft.x);
+    worldTopLeft.y = floor(worldTopLeft.y);
+    worldBottomRight.x = ceil(worldBottomRight.x);
+    worldBottomRight.y = ceil(worldBottomRight.y);
+
+    for (float x = worldTopLeft.x; x < worldBottomRight.x; x += gridInc)
+    {
+        for(float y = worldTopLeft.y; y < worldBottomRight.y; y += gridInc)
+        {
+            WorldToScreen({x, y}, sx, sy);
+            Draw(sx, sy, olc::BLUE);
+        }
+    }
+    
     drawCircuit();
 
     if(addElement)
@@ -791,25 +863,27 @@ public:
         if(GetKey(olc::ENTER).bPressed) // add element to circuit
         {
             CircuitElement* element;
+            olc::vf2d worldPos;
+            ScreenToWorld(tempPos.x, tempPos.y, worldPos);
             switch(tempType)
             {
                 case ELEM_CABLE:
-                    element = new Cable(tempPos.x, tempPos.y);
+                    element = new Cable(worldPos.x, worldPos.y);
                     break;
                 case ELEM_NODE:
-                    element = new CableNode(tempPos.x, tempPos.y);
+                    element = new CableNode(worldPos.x, worldPos.y);
                     break;
                 case ELEM_RESISTOR:
-                    element = new Resistor(tempPos.x, tempPos.y);
+                    element = new Resistor(worldPos.x, worldPos.y);
                     break;
                 case ELEM_TRANSISTOR:
-                    element = new Transistor(tempPos.x, tempPos.y);
+                    element = new Transistor(worldPos.x, worldPos.y);
                     break;
                 case ELEM_SOURCE:
-                    element = new Source(tempPos.x, tempPos.y);
+                    element = new Source(worldPos.x, worldPos.y);
                     break;
                 case ELEM_BATTERY:
-                    element = new Battery(tempPos.x, tempPos.y);
+                    element = new Battery(worldPos.x, worldPos.y);
                     break;
                 default:
                     return false;
@@ -819,19 +893,19 @@ public:
         DrawCircle(tempPos.x, tempPos.y, scale);
         if(GetKey(olc::W).bHeld)
         {
-            tempPos.y -= (int)(std::sqrt(scale));
+            tempPos.y -= std::max(1, (int)(std::sqrt(scale / 4)));
         }
         if(GetKey(olc::S).bHeld)
         {
-            tempPos.y += (int)(std::sqrt(scale));
+            tempPos.y += std::max(1, (int)(std::sqrt(scale / 4)));
         }
         if(GetKey(olc::A).bHeld)
         {
-            tempPos.x -= (int)(std::sqrt(scale));
+            tempPos.x -= std::max(1, (int)(std::sqrt(scale / 4)));
         }
         if(GetKey(olc::D).bHeld)
         {
-            tempPos.x += (int)(std::sqrt(scale));
+            tempPos.x += std::max(1, (int)(std::sqrt(scale / 4)));
         }
     }
 
@@ -943,17 +1017,6 @@ public:
         resetOffset();
     }
 
-    if(GetMouse(2).bPressed)
-    {
-        startPan = mousePos;
-    }
-
-    if(GetMouse(2).bHeld)
-    {
-        worldOffset -= (mousePos - startPan) / scale; 
-        startPan = mousePos;
-    }
-
     if(GetKey(olc::SHIFT).bHeld && GetKey(olc::W).bHeld)
         menuOffset.y-=(int)(std::sqrt(scale));
     if(GetKey(olc::SHIFT).bHeld && GetKey(olc::S).bHeld)
@@ -963,27 +1026,16 @@ public:
     if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld)
         menuOffset.x+=(int)(std::sqrt(scale));
 
-    olc::vf2d mousePosBZoom;
-    ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosBZoom);
-
-    if(GetKey(olc::EQUALS).bPressed || GetMouseWheel() > 0)
-        scale *= 1.1f;
-    if(GetKey(olc::MINUS).bPressed || GetMouseWheel() < 0)
-        scale *= 0.9f;
-	  
-    olc::vf2d mousePosAZoom;
-    ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosAZoom);
-    worldOffset += (mousePosBZoom - mousePosAZoom);
-
+    
+    
     return true;
 	}
 };
 
 int main() 
 {
-    /*
     Cable cable;
-    cable.changeValue();
+    cable.changeValue(10);
     Switch circuit_switch = cable.getSwitch();
     circuit_switch.activate();
     circuit_switch.deactivate();
@@ -998,7 +1050,6 @@ int main()
     Transistor transistor;
     transistor.getThreshold();
     transistor.getThresholdVoltage();
-*/
 
     Sim sim;
     if(sim.Construct(1280, 720, 1, 1))
