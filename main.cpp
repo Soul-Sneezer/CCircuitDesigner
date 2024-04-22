@@ -103,7 +103,7 @@ public:
         screenY = (int)((v.y - worldOffset.y) * worldScale);
     }
 
-    virtual void changeValue(int32_t value) = 0;
+    virtual void changeValue(int32_t& value) = 0;
     virtual void drawYourself(olc::PixelGameEngine *pge) = 0;
 };
 
@@ -155,8 +155,9 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value) override
+    void changeValue(int32_t& value) override
     {
+        value = 0;
     }
 
     void drawYourself(olc::PixelGameEngine *pge) override
@@ -244,8 +245,9 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value) override
+    void changeValue(int32_t& value) override
     {
+        value = 10;
     }
 
     void drawYourself(olc::PixelGameEngine *pge) override
@@ -342,8 +344,9 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value) override
+    void changeValue(int32_t& value) override
     {
+        value = 10;
     }
     void drawYourself(olc::PixelGameEngine *pge) override
     {
@@ -498,8 +501,9 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value) override
+    void changeValue(int32_t& value) override
     {
+        value = 10;
     }
     void drawYourself(olc::PixelGameEngine *pge) override
     {
@@ -562,8 +566,9 @@ public:
         return *this;
     }
 
-    void changeValue(int32_t value) override
+    void changeValue(int32_t& value) override
     {
+        value = 10;
     }
     void drawYourself(olc::PixelGameEngine *pge) override
     {
@@ -641,8 +646,9 @@ class Battery : public CircuitElement
         return *this;
     }
 
-    void changeValue(int32_t value) override
+    void changeValue(int32_t& value) override
     {
+        value = 10;
     }
     void drawYourself(olc::PixelGameEngine *pge) override
     {
@@ -830,7 +836,6 @@ public:
     worldOffset += (mousePosBZoom - mousePosAZoom);
 
     int32_t sx, sy;
-    int32_t ex, ey;
 
     olc::vf2d worldTopLeft, worldBottomRight;
     ScreenToWorld(0, 0, worldTopLeft);
@@ -1034,8 +1039,9 @@ public:
 
 int main() 
 {
+    int value = 3;
     Cable cable;
-    cable.changeValue(10);
+    cable.changeValue(value);
     Switch circuit_switch = cable.getSwitch();
     circuit_switch.activate();
     circuit_switch.deactivate();
