@@ -95,7 +95,6 @@ endfunction()
 
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${PROJECT_NAME} main.cpp
-    olcPixelGameEngine.h    
     generated/src/Helper.cpp)
 
 ###############################################################################
@@ -130,22 +129,27 @@ set_custom_stdlib_and_sanitizers(${PROJECT_NAME} true)
 
 # use SYSTEM so cppcheck/clang-tidy does not report warnings from these directories
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE generated/include)
-# target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ext/<SomeHppLib>/include)
-# target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${<SomeLib>_SOURCE_DIR}/include)
-# target_link_directories(${PROJECT_NAME} PRIVATE ${<SomeLib>_BINARY_DIR}/lib)
-# target_link_libraries(${PROJECT_NAME} <SomeLib>)
+target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ext)
+#target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE include)
+#target_link_directories(${PROJECT_NAME} PRIVATE lib)
+#target_link_libraries(${PROJECT_NAME} PRIVATE)
 
 ###############################################################################
 
 # copy binaries to "bin" folder; these are uploaded as artifacts on each release
 # update name in .github/workflows/cmake.yml:29 when changing "bin" name here
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 # install(DIRECTORY some_dir1 some_dir2 DESTINATION bin)
 # install(FILES some_file1.txt some_file2.md DESTINATION bin)
+if(APPLE)
+elseif(UNIX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE X11)
+endif()
+
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
 if(APPLE)
     install(FILES launcher.command DESTINATION bin)
 endif()
 
-include(./PGE.cmake)
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -lX11 -lGL -lpthread -lpng -lstdc++fs -std=c++17") 
-SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -g -lX11 -lGL -lpthread -lpng -lstdc++fs -std=c++17") 
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -lGL -lpng") 
+SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -g -lGL -lpng") 

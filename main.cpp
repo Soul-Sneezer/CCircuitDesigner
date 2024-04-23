@@ -1,5 +1,5 @@
 #define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
+#include <olcPixelGameEngine.h>
 
 enum ElementType 
 {
@@ -181,7 +181,7 @@ public:
     }
 
     explicit Transistor(const int32_t posX, const int32_t posY, const int32_t voltage = 0, const int32_t power = 0, \
-            CircuitElement* in = NULL, CircuitElement* out = NULL,\ 
+            CircuitElement* in = NULL, CircuitElement* out = NULL,\
             const int32_t thresholdVoltage = 0, const uint32_t temperature = 273)
     {
         this->position = {posX, posY};
@@ -272,7 +272,7 @@ public:
         this->tolerance = 0;
     }
 
-    explicit Resistor(const int32_t posX, const int32_t posY,\ 
+    explicit Resistor(const int32_t posX, const int32_t posY,\
             const int32_t voltage = 0, const int32_t power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
             const int32_t resistance = 0, const int32_t powerDissipation = 0, const int32_t tolerance = 0, const uint32_t temperature = 273)
     {
@@ -763,7 +763,7 @@ private:
 
     void drawCircuit()
     {
-        for(int i = 0; i < circuit.getElements().size(); i++)
+        for(unsigned int i = 0; i < circuit.getElements().size(); i++)
         {
             drawElement(circuit.getElements()[i]); 
         }
@@ -1031,7 +1031,7 @@ public:
     if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld)
         menuOffset.x+=(int)(std::sqrt(scale));
 
-    
+    fElapsedTime = fElapsedTime; 
     
     return true;
 	}
