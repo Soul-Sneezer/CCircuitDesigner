@@ -15,7 +15,7 @@ enum ElementType
 class CircuitElement
 {
 protected:
-    olc::vi2d position;
+    olc::vi2d position = {0, 0};
 
     int32_t voltage;
     int32_t power;
@@ -29,7 +29,6 @@ public:
 
     CircuitElement()
     {
-        position = {0, 0};
         this->voltage = 0;
         this->power = 0;
         this->in = NULL;
@@ -724,7 +723,6 @@ private:
     
     float scale = 10.0f;
     float gridInc = 1.0f;
-    float lastTime; // anything to get rid of warnings
 
     olc::vf2d mousePos;
     olc::vf2d startPan;
@@ -739,14 +737,14 @@ private:
         menuOffset = {0,0};
     }
 
-    void pressEntry(const olc::vi2d pos, const std::string key, const std::string action)
+    void pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action)
     {
         DrawString(pos.x     , pos.y, "Press ");
         DrawString(pos.x + 45, pos.y, key, olc::GREEN);
         DrawString(pos.x + 50, pos.y, " to ");
         DrawString(pos.x + 80, pos.y, action);
     }
-    void pressEntry(const olc::vi2d pos, const std::string key1, const std::string key2, const std::string action)
+    void pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action)
     {
         DrawString(pos.x      , pos.y, "Press ");
         DrawString(pos.x + 45 , pos.y, key1, olc::GREEN);
@@ -1031,8 +1029,6 @@ public:
     if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld)
         menuOffset.x+=(int)(std::sqrt(scale));
 
-    lastTime = fElapsedTime;
-    
     return true;
 	}
 };
