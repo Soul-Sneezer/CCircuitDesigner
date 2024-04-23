@@ -233,7 +233,7 @@ jobs:
         if: runner.os == 'Linux' && matrix.runs_valgrind == true
         run: |
           # sudo apt-get update
-          sudo apt-get install --no-install-recommends valgrind libgl1-mesa-dev libpng-dev
+          sudo apt-get install --no-install-recommends valgrind
 
       - name: Cache tools
         uses: actions/cache@v4

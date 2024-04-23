@@ -52,8 +52,10 @@ function(set_custom_stdlib_and_sanitizers target add_apple_asan)
             if("${CMAKE_CXX_COMPILER_VERSION}" MATCHES "12.")
                 # check leaks on Linux since macOS does not support the leaks sanitizer yet
                 # leaks sanitizer is enabled by default on Linux, so we do not need to enable it explicitly
-                target_compile_options(${target} PRIVATE "$<${debug_mode}:-fsanitize=address,undefined>")
-                target_link_options(${target} PRIVATE "$<${debug_mode}:-fsanitize=address,undefined>")
+                target_compile_options(${target} PRIVATE
+                    "$<${debug_mode}:-fsanitize=address,undefined>")
+                target_link_options(${target} PRIVATE
+                    "$<${debug_mode}:-fsanitize=address,undefined>")
             endif()
         elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
             if("${CMAKE_CXX_COMPILER_VERSION}" MATCHES "17.")
@@ -132,7 +134,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE generated/include)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ext)
 #target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE include)
 #target_link_directories(${PROJECT_NAME} PRIVATE lib)
-#target_link_libraries(${PROJECT_NAME} PRIVATE)
+target_link_libraries(${PROJECT_NAME} PRIVATE)
 
 ###############################################################################
 
@@ -143,6 +145,8 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ext)
 if(APPLE)
 elseif(UNIX)
     target_link_libraries(${PROJECT_NAME} PRIVATE X11)
+    SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -lGL -lpng") 
+    SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -g -lGL -lpng") 
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
@@ -150,6 +154,3 @@ install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 if(APPLE)
     install(FILES launcher.command DESTINATION bin)
 endif()
-
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -lGL -lpng") 
-SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -g -lGL -lpng") 
