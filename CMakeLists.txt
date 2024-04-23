@@ -94,7 +94,10 @@ endfunction()
 # find_package(Threads REQUIRED)
 
 ###############################################################################
-
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
+find_package(PNG)
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${PROJECT_NAME} main.cpp
     generated/src/Helper.cpp)
@@ -134,7 +137,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE generated/include)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ext)
 #target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE include)
 #target_link_directories(${PROJECT_NAME} PRIVATE lib)
-target_link_libraries(${PROJECT_NAME} PRIVATE)
+target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs Threads::Threads)
 
 ###############################################################################
 
@@ -145,8 +148,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE)
 if(APPLE)
 elseif(UNIX)
     target_link_libraries(${PROJECT_NAME} PRIVATE X11 GL png)
-    #SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -lGL -lpng") 
-    #SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -g -lGL -lpng") 
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
