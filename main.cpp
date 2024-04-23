@@ -723,7 +723,8 @@ private:
     
     float scale = 10.0f;
     float gridInc = 1.0f;
-
+    float lastTime = 0.0f; // Don't ask
+    
     olc::vf2d mousePos;
     olc::vf2d startPan;
 
@@ -1028,6 +1029,8 @@ public:
         menuOffset.x-=(int)(std::sqrt(scale));
     if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld)
         menuOffset.x+=(int)(std::sqrt(scale));
+
+    lastTime = fElapsedTime; // don't ask
 
     return true;
 	}
