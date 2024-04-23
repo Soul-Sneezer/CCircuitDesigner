@@ -182,7 +182,7 @@ public:
 
     explicit Transistor(const int32_t posX, const int32_t posY, const int32_t voltage = 0, const int32_t power = 0, \
             CircuitElement* in = NULL, CircuitElement* out = NULL,\
-            const int32_t thresholdVoltage = 0, const uint32_t temperature = 273)
+            const int32_t threshold = 0, const int32_t thresholdVoltage = 0, const uint32_t temperature = 273)
     {
         this->position = {posX, posY};
 
@@ -724,11 +724,11 @@ private:
     
     float scale = 10.0f;
     float gridInc = 1.0f;
+    float lastTime; // anything to get rid of warnings
 
     olc::vf2d mousePos;
     olc::vf2d startPan;
 
-    CircuitElement* tempElement = NULL;
     ElementType tempType = ELEM_UNASSIGNED;
     olc::vi2d tempPos;
         
@@ -1031,7 +1031,7 @@ public:
     if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld)
         menuOffset.x+=(int)(std::sqrt(scale));
 
-    fElapsedTime = fElapsedTime; 
+    lastTime = fElapsedTime;
     
     return true;
 	}
