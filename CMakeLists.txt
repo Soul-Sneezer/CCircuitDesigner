@@ -146,7 +146,7 @@ if(APPLE)
 elseif(UNIX)
     target_link_libraries(${PROJECT_NAME} PRIVATE X11)
     SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -lGL -lpng") 
-    SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -g -lGL -lpng") 
+    #SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -g -lGL -lpng") 
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
