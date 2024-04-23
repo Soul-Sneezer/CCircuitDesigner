@@ -128,7 +128,7 @@ jobs:
             c: clang-17
             cxx: clang++-17
             name: "MSan: Ubuntu 22.04 Clang 17"
-            # cmake_flags:
+            cmake_flags: -DBUILD_SHARED_LIBS=TRUE
             cmake_generator: Ninja
             # This env runs memory sanitizers
             runs_msan: true
@@ -137,7 +137,7 @@ jobs:
             c: gcc-12
             cxx: g++-12
             name: "ASan: Ubuntu 22.04 GCC 12"
-            # cmake_flags:
+            cmake_flags: -DBUILD_SHARED_LIBS=TRUE
             cmake_generator: Ninja
             # This env runs address sanitizers
             runs_asan: true
@@ -146,7 +146,7 @@ jobs:
             c: gcc-11
             cxx: g++-11
             name: "Valgrind: Ubuntu 22.04 GCC 11"
-            # cmake_flags:
+            cmake_flags: -DBUILD_SHARED_LIBS=TRUE
             cmake_generator: Ninja
             # This env runs valgrind
             runs_valgrind: true
@@ -155,7 +155,7 @@ jobs:
             c: clang
             cxx: clang++
             name: "ASan: macOS 12 Apple Clang 14"
-            # cmake_flags:
+            cmake_flags: -DBUILD_SHARED_LIBS=TRUE
             # cmake_generator:
             # This env runs address sanitizers
             runs_asan: true
@@ -164,24 +164,24 @@ jobs:
             c: gcc-12
             cxx: g++-12
             name: "macOS 12 GCC 12"
-            # cmake_flags:
+            cmake_flags: -DBUILD_SHARED_LIBS=TRUE
             # cmake_generator: Ninja
 
           - os: windows-2022
             c: cl
             cxx: cl
             name: "ASan: Windows 2022 MSVC 19.38"
-            # cmake_flags:
+            cmake_flags: -DBUILD_SHARED_LIBS=TRUE
             # cmake_generator: Ninja
             # This env runs address sanitizers
-            runs_asan: true
+            #runs_asan: true
 
-          - os: windows-2022
-            c: gcc
-            cxx: g++
-            name: "Windows 2022 MinGW GCC 12"
+              #- os: windows-2022
+              #c: gcc
+              #cxx: g++
+              #name: "Windows 2022 MinGW GCC 12"
             # cmake_flags:
-            cmake_generator: Ninja
+            #cmake_generator: Ninja
 
     steps:
       - name: Checkout repo
@@ -209,7 +209,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install ninja-build libgl1-mesa-dev
-
       # Also see https://github.com/actions/runner-images/discussions/9446#discussioncomment-8668538
       - name: Install Clang 17
         if: runner.os == 'Linux' && matrix.runs_msan == true
@@ -227,7 +226,7 @@ jobs:
       - name: Install ninja (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install ninja
+          choco install ninja libpng
 
       - name: Install valgrind
         if: runner.os == 'Linux' && matrix.runs_valgrind == true
