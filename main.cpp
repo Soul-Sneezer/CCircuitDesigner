@@ -864,12 +864,13 @@ public:
         removeMenuActive = false;
         modifyMenuActive = false;
 
+				olc::vf2d worldPos;
+        ScreenToWorld(tempPos.x, tempPos.y, worldPos);
+
         if(GetKey(olc::ENTER).bPressed) // add element to circuit
         {
             CircuitElement* element;
-            olc::vf2d worldPos;
-            ScreenToWorld(tempPos.x, tempPos.y, worldPos);
-            switch(tempType)
+                        switch(tempType)
             {
                 case ELEM_CABLE:
                     element = new Cable(worldPos.x, worldPos.y);
