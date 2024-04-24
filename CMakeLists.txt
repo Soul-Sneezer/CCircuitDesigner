@@ -137,7 +137,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE generated/include)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ext)
 #target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE include)
 #target_link_directories(${PROJECT_NAME} PRIVATE lib)
-target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs Threads::Threads PNG::PNG)
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads PNG::PNG) 
 
 ###############################################################################
 
