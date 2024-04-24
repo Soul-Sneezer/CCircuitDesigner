@@ -721,7 +721,7 @@ private:
     olc::vi2d menuOffset = {0, 0};
     olc::vf2d worldOffset = {0.0f, 0.0f};
     
-    float scale = 10.0f;
+    float scale = 8.0f;
     float gridInc = 1.0f;
     float lastTime = 0.0f; // Don't ask
     
@@ -729,7 +729,7 @@ private:
     olc::vf2d startPan;
 
     ElementType tempType = ELEM_UNASSIGNED;
-    olc::vi2d tempPos;
+    olc::vf2d tempPos;
         
     Circuit circuit;
 
@@ -865,7 +865,7 @@ public:
         modifyMenuActive = false;
 
 				olc::vf2d worldPos;
-        ScreenToWorld(tempPos.x, tempPos.y, worldPos);
+        ScreenToWorld((int)tempPos.x, (int)tempPos.y, worldPos);
 
         if(GetKey(olc::ENTER).bPressed) // add element to circuit
         {
@@ -895,22 +895,26 @@ public:
             }
             circuit.addElementToCircuit(element);
         }
-        DrawCircle(tempPos.x, tempPos.y, scale);
+        int nx, ny;
+        nx = floorf((tempPos.x + 0.5f) * gridInc);
+		    ny = floorf((tempPos.y + 0.5f) * gridInc);
+         
+        FillCircle(nx, ny, 1);
         if(GetKey(olc::W).bHeld)
         {
-            tempPos.y -= std::max(1, (int)(std::sqrt(scale / 4)));
+            tempPos.y -= std::sqrt(scale) / 16;
         }
         if(GetKey(olc::S).bHeld)
         {
-            tempPos.y += std::max(1, (int)(std::sqrt(scale / 4)));
+            tempPos.y += std::sqrt(scale) / 16; 
         }
         if(GetKey(olc::A).bHeld)
         {
-            tempPos.x -= std::max(1, (int)(std::sqrt(scale / 4)));
+            tempPos.x -= std::sqrt(scale) / 16; 
         }
         if(GetKey(olc::D).bHeld)
         {
-            tempPos.x += std::max(1, (int)(std::sqrt(scale / 4)));
+            tempPos.x += std::sqrt(scale) / 16; 
         }
     }
 
