@@ -119,7 +119,7 @@ endfunction()
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
-find_package(OpenGL REQUIRED)
+find_package(OpenGL)
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${PROJECT_NAME} main.cpp
     generated/src/Helper.cpp)
@@ -159,7 +159,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE generated/include)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ext)
 #target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE include)
 #target_link_directories(${PROJECT_NAME} PRIVATE lib)
-target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads PNG::PNG OpenGL::OpenGL) 
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads OpenGL::OpenGL) 
 
 ###############################################################################
 
@@ -169,6 +169,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads PNG::PNG OpenGL::
 # install(FILES some_file1.txt some_file2.md DESTINATION bin)
 if(APPLE)
     find_package(PNG REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE PNG::PNG)
 elseif(UNIX)
     find_package(PNG REQUIRED)
     target_link_libraries(${PROJECT_NAME} PRIVATE X11 GL png)
