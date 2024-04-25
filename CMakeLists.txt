@@ -116,10 +116,18 @@ endfunction()
 # find_package(Threads REQUIRED)
 
 ###############################################################################
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(Threads REQUIRED)
+
+if(UNIX)
+    find_package(PNG REQUIRED)
+    if(APPLE)
+        find_package(GLUT REQUIRED)
+    else()
+        find_package(X11)
+    endif()
+endif()
+
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${PROJECT_NAME} main.cpp
     generated/src/Helper.cpp)
@@ -159,7 +167,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE generated/include)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ext)
 #target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE include)
 #target_link_directories(${PROJECT_NAME} PRIVATE lib)
-target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads) 
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads OpenGL::GL) 
 
 ###############################################################################
 
@@ -167,14 +175,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 # update name in .github/workflows/cmake.yml:29 when changing "bin" name here
 # install(DIRECTORY some_dir1 some_dir2 DESTINATION bin)
 # install(FILES some_file1.txt some_file2.md DESTINATION bin)
-if(APPLE)
-    find_package(PNG REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE PNG::PNG OpenGL::OpenGL)
-elseif(UNIX)
-    find_package(PNG REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE X11 GL png)
-else()
-    target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::OpenGL)
+if(UNIX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE PNG::PNG)
+    if(APPLE)
+        target_link_libraries(${PROJECT_NAME} PRIVATE GLUT::GLUT)
+    else()
+        target_link_libraries(${PROJECT_NAME} PRIVATE X11)
+    endif()
+endif()
+
+if(WIN32 AND NOT MSVC)
+    target_link_libraries(${PROJECT_NAME} PRIVATE gdiplus Shlwapi dwmapi)
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
