@@ -47,7 +47,7 @@ jobs:
       - name: Install cppcheck
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends cppcheck libgl1-mesa-dev libpng-dev zlib
+          sudo apt-get install --no-install-recommends cppcheck libgl1-mesa-dev libpng-dev
 
       # The flag CMAKE_EXPORT_COMPILE_COMMANDS generates compile_commands.json
       # which is used by cppcheck and clang-tidy
@@ -89,7 +89,7 @@ jobs:
       - name: Install clang-tidy
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends clang-tidy-17 libc++-17-dev libc++abi-17-dev libgl1-mesa-dev libpng-dev zlib
+          sudo apt-get install --no-install-recommends clang-tidy-17 libc++-17-dev libc++abi-17-dev libgl1-mesa-dev libpng-dev
 
       - name: Configure CMake
         uses: ./.github/actions/configure-cmake
@@ -208,7 +208,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install ninja-build libgl1-mesa-dev zlib
+          sudo apt-get install ninja-build libgl1-mesa-dev
       # Also see https://github.com/actions/runner-images/discussions/9446#discussioncomment-8668538
       - name: Install Clang 17
         if: runner.os == 'Linux' && matrix.runs_msan == true
@@ -221,7 +221,7 @@ jobs:
         if: runner.os == 'Linux' && matrix.runs_msan == true
         run: |
           # sudo apt-get update
-          sudo apt-get install --no-install-recommends libc++-17-dev libc++abi-17-dev libgl1-mesa-dev libpng-dev zlib
+          sudo apt-get install --no-install-recommends libc++-17-dev libc++abi-17-dev libgl1-mesa-dev libpng-dev
 
       - name: Install ninja (Windows)
         if: runner.os == 'Windows'
