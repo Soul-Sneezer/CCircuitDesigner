@@ -1063,5 +1063,10 @@ int main()
 
     Sim sim;
     if(sim.Construct(1280, 720, 1, 1))
+    {
         sim.Start();
+        sim.OnUserCreate();     // look mom I'm using these functions
+        sim.OnUserUpdate(0.0f);
+
+    }
 }
