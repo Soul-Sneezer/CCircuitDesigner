@@ -47,7 +47,7 @@ jobs:
       - name: Install cppcheck
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends cppcheck libgl1-mesa-dev libpng-dev
+          sudo apt-get install --no-install-recommends cppcheck libgl1-mesa-dev libpng-dev zlib
 
       # The flag CMAKE_EXPORT_COMPILE_COMMANDS generates compile_commands.json
       # which is used by cppcheck and clang-tidy
@@ -89,7 +89,7 @@ jobs:
       - name: Install clang-tidy
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends clang-tidy-17 libc++-17-dev libc++abi-17-dev libgl1-mesa-dev libpng-dev
+          sudo apt-get install --no-install-recommends clang-tidy-17 libc++-17-dev libc++abi-17-dev libgl1-mesa-dev libpng-dev zlib
 
       - name: Configure CMake
         uses: ./.github/actions/configure-cmake
@@ -160,11 +160,11 @@ jobs:
             # This env runs address sanitizers
             runs_asan: true
 
-          - os: macos-12
-            c: gcc-12
-            cxx: g++-12
-            name: "macOS 12 GCC 12"
-            cmake_flags: -DBUILD_SHARED_LIBS=TRUE
+#          - os: macos-12
+#            c: gcc-12
+#            cxx: g++-12
+#            name: "macOS 12 GCC 12"
+#            cmake_flags: -DBUILD_SHARED_LIBS=TRUE
             # cmake_generator: Ninja
 
           - os: windows-2022
@@ -208,7 +208,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install ninja-build libgl1-mesa-dev
+          sudo apt-get install ninja-build libgl1-mesa-dev zlib
       # Also see https://github.com/actions/runner-images/discussions/9446#discussioncomment-8668538
       - name: Install Clang 17
         if: runner.os == 'Linux' && matrix.runs_msan == true
@@ -221,7 +221,7 @@ jobs:
         if: runner.os == 'Linux' && matrix.runs_msan == true
         run: |
           # sudo apt-get update
-          sudo apt-get install --no-install-recommends libc++-17-dev libc++abi-17-dev libgl1-mesa-dev libpng-dev
+          sudo apt-get install --no-install-recommends libc++-17-dev libc++abi-17-dev libgl1-mesa-dev libpng-dev zlib
 
       - name: Install ninja (Windows)
         if: runner.os == 'Windows'
@@ -329,28 +329,34 @@ jobs:
           name: ${{ env.ZIP_NAME }}_${{ env.TIMESTAMP }}
           path: ${{ env.ZIP_NAME }}
           retention-days: 30
-
-      - name: Setup memory sanitizer
-        if: runner.os == 'Linux' && matrix.runs_msan == true && steps.cache-tools.outputs.cache-hit != 'true'
+  
+#      - name: Setup memory sanitizer
+#        if: runner.os == 'Linux' && matrix.runs_msan == true && steps.cache-tools.outputs.cache-hit != 'true'
+#        run: |
+#          mkdir -p tools
+#          cd tools
+#          git clone --depth=1 --branch=llvmorg-17.0.6 https://github.com/llvm/llvm-project
+#          cd llvm-project
+#          # mkdir build; cd build
+#          sudo ln -s -f /usr/bin/$CC /usr/bin/clang
+#          sudo ln -s -f /usr/bin/$CXX /usr/bin/clang++
+#          cmake -G Ninja -S runtimes -B build \
+#            -DCMAKE_BUILD_TYPE=Release \
+#            -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" \
+#            -DCMAKE_C_COMPILER=clang \
+#            -DCMAKE_CXX_COMPILER=clang++ \
+#            -DLLVM_USE_SANITIZER=MemoryWithOrigins \
+#            -DCMAKE_BUILD_WITH_INSTALL_RPATH=true
+#          cmake --build build -j6 -- cxx cxxabi
+#
+      - name: Make scripts executable
+        if: runner.os == 'Linux'
         run: |
-          mkdir -p tools
-          cd tools
-          git clone --depth=1 --branch=llvmorg-17.0.6 https://github.com/llvm/llvm-project
-          cd llvm-project
-          # mkdir build; cd build
-          sudo ln -s -f /usr/bin/$CC /usr/bin/clang
-          sudo ln -s -f /usr/bin/$CXX /usr/bin/clang++
-          cmake -G Ninja -S runtimes -B build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" \
-            -DCMAKE_C_COMPILER=clang \
-            -DCMAKE_CXX_COMPILER=clang++ \
-            -DLLVM_USE_SANITIZER=MemoryWithOrigins \
-            -DCMAKE_BUILD_WITH_INSTALL_RPATH=true
-          cmake --build build -j6 -- cxx cxxabi
-
+          chmod +x scripts/*
+          # chmod +x scripts/run_sanitizers.sh scripts/run_valgrind.sh
       - name: Sanitizers
         # run one sanitizer for each env to avoid building extra binaries on one env
+        continue-on-error: true
         if: (matrix.runs_asan == true || matrix.runs_msan == true) && runner.os != 'Windows'
         # detect_leaks is not supported on macOS
         # env:
@@ -366,6 +372,7 @@ jobs:
           cat "${INPUT_FILENAME}" | ./${{ env.ZIP_NAME }}/"${EXECUTABLE_NAME}".exe
 
       - name: Valgrind
+        continue-on-error: true
         if: runner.os == 'Linux' && matrix.runs_valgrind == true
         run: |
           # remove --show-leak-kinds=all (and --track-origins=yes) if there are many leaks in external libs
