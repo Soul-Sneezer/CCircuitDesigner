@@ -792,7 +792,7 @@ public:
 	}
 
 public:
-	bool OnUserCreate() override
+	[[maybe_unused]] bool OnUserCreate() override
 	{
     worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
     worldOffset.y = (float)(-GetScreenSize().y / 2) / scale;
@@ -803,7 +803,7 @@ public:
 		return true;
 	}
 
-	bool OnUserUpdate(float fElapsedTime) override
+	[[maybe_unused]] bool OnUserUpdate([[maybe_unused]] float fElapsedTime) override
 	{
     Clear(olc::BLACK);
 
@@ -1065,8 +1065,5 @@ int main()
     if(sim.Construct(1280, 720, 1, 1))
     {
         sim.Start();
-        sim.OnUserCreate();     // look mom I'm using these functions
-        sim.OnUserUpdate(0.0f);
-
     }
 }
