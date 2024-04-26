@@ -1064,6 +1064,8 @@ int main()
     Sim sim;
     if(sim.Construct(1280, 720, 1, 1))
     {
+        sim.OnUserCreate();
+        sim.OnUserUpdate(0.0f); // Look mom
         sim.Start();
     }
 }
