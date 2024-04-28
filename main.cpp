@@ -1055,7 +1055,7 @@ class Sim : public olc::PixelGameEngine
         }
 
     public:
-        // cppcheck-suppress
+        // cppcheck-suppress unusedFunction
         [[maybe_unused]] bool OnUserCreate() override
         {
             worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
@@ -1067,7 +1067,7 @@ class Sim : public olc::PixelGameEngine
             return true;
         }
 
-        // cppcheck-suppress 
+        // cppcheck-suppress unusedFunction
         [[maybe_unused]] bool OnUserUpdate([[maybe_unused]] float fElapsedTime) override
         {
             Clear(olc::BLACK);
