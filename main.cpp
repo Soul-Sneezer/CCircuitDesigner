@@ -66,12 +66,12 @@ class CircuitElement
         {
         }
 
-        olc::vi2d getPosition() { return this->position; };
-        int32_t getVoltage() { return this->voltage; };
-        int32_t getPower() { return this->power; };
-        int32_t getTemperature() { return this->temperature; };
-        CircuitElement* getIn() { return this->in; };
-        CircuitElement* getOut() { return this->out; };
+        olc::vi2d getPosition() const{ return this->position; };
+        int32_t getVoltage() const{ return this->voltage; };
+        int32_t getPower() const{ return this->power; };
+        int32_t getTemperature() const{ return this->temperature; };
+        CircuitElement* getIn() const{ return this->in; };
+        CircuitElement* getOut() const{ return this->out; };
 
         friend std::ostream& operator<<(std::ostream& os, const CircuitElement& el)
         {
@@ -137,10 +137,10 @@ class CableNode : public CircuitElement
             return os;        
         }
 
-        std::vector<CircuitElement*> getIn() { return this->inputs; };
-        std::vector<CircuitElement*> getOut() { return this->outputs; };
+        std::vector<CircuitElement*> getIn() const{ return this->inputs; };
+        std::vector<CircuitElement*> getOut() const{ return this->outputs; };
 
-        CableNode& operator=(CableNode& element)
+        CableNode& operator=(const CableNode& element)
         {
             this->position = element.getPosition();
             this->inputs = element.getIn();
@@ -220,10 +220,10 @@ class Transistor : public CircuitElement
             return os;
         }
 
-        int32_t getThreshold() { return this->threshold; };
-        int32_t getThresholdVoltage() { return this->thresholdVoltage; };
+        int32_t getThreshold() const{ return this->threshold; };
+        int32_t getThresholdVoltage() const{ return this->thresholdVoltage; };
 
-        Transistor& operator=(Transistor& transistor)
+        Transistor& operator=(const Transistor& transistor)
         {
             this->position = transistor.getPosition();
 
@@ -314,11 +314,11 @@ class Resistor : public CircuitElement
             return os; 
         }
 
-        int32_t getResistance() { return this->resistance; };
-        int32_t getPowerDissipation() { return this->powerDissipation; };
-        int32_t getTolerance() { return this->tolerance; };
+        int32_t getResistance() const{ return this->resistance; };
+        int32_t getPowerDissipation() const{ return this->powerDissipation; };
+        int32_t getTolerance() const{ return this->tolerance; };
 
-        Resistor& operator=(Resistor& r)
+        Resistor& operator=(const Resistor& r)
         {
             this->position = r.getPosition();
 
@@ -470,12 +470,12 @@ class Cable : public CircuitElement
             return os;
         }
 
-        olc::vi2d getEnd() { return this->end; };
-        int32_t getResistance() { return this->resistance; };
-        Switch getSwitch() { return this->circuitSwitch; };
-        bool getFlowDirection() { return this->reverse; };
-        int32_t getLength() { return this->length; };
-        Cable& operator=(Cable& cable)
+        olc::vi2d getEnd() const{ return this->end; };
+        int32_t getResistance() const{ return this->resistance; };
+        Switch getSwitch() const{ return this->circuitSwitch; };
+        bool getFlowDirection() const{ return this->reverse; };
+        int32_t getLength() const{ return this->length; };
+        Cable& operator=(const Cable& cable)
         {
             this->position = cable.getPosition();
             this->end = cable.getEnd();
@@ -545,7 +545,7 @@ class Source : public CircuitElement
             return os;
         }
 
-        Source& operator=(Source& s) 
+        Source& operator=(const Source& s) 
         {
             this->position = s.getPosition();
 
@@ -622,9 +622,9 @@ class Battery : public CircuitElement
             os<<"Capacity: "<<el.capacity<<" Voltage: "<<el.voltage<<"\n";
             return os;
         }
-        int32_t getCapacity() { return this->capacity; };
+        int32_t getCapacity() const{ return this->capacity; };
 
-        Battery& operator=(Battery& b)
+        Battery& operator=(const Battery& b)
         {
             this->position = b.getPosition();
 
@@ -687,10 +687,10 @@ class Circuit
             return os;
         }
 
-        int32_t getVoltageIn() { return this->voltageIn; };
-        int32_t getVoltageOut() { return this->voltageOut; };
+        int32_t getVoltageIn() const{ return this->voltageIn; };
+        int32_t getVoltageOut() const{ return this->voltageOut; };
         std::vector<CircuitElement*>& getElements() { return this->elements; };
-        Circuit& operator=(Circuit& circuit)
+        Circuit& operator=(const Circuit& circuit)
         {
             this->voltageIn = circuit.getVoltageIn();
             this->voltageOut = circuit.getVoltageOut();
