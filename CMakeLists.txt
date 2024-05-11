@@ -130,9 +130,9 @@ endif()
 
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${PROJECT_NAME} main.cpp
-    ext/circuit_elements.cpp
-    ext/circuit.cpp
-    ext/simulator.cpp
+    circuit_elements.cpp
+    circuit.cpp
+    simulator.cpp
     generated/src/Helper.cpp)
 
 ###############################################################################
