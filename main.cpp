@@ -1,8 +1,8 @@
 #define OLC_PGE_APPLICATION
 #include <olcPixelGameEngine.h>
-#include <circuit_elements.hpp>
-#include <circuit.hpp>
-#include <simulator.hpp>
+#include "circuit_elements.hpp"
+#include "circuit.hpp"
+#include "simulator.hpp"
 
 int main() 
 {
