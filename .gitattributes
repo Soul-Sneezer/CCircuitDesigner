@@ -1,2 +1,3 @@
 generated/** linguist-generated
-ext/** linguist-vendored
+ext/olcPixelGameEngine.h linguist-vendored
+ext/olcPixelGameEngine.cpp linguist-vendored
