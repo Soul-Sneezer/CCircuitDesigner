@@ -1,7 +1,7 @@
 #ifndef CC_SIMULATOR
 #define CC_SIMULATOR
 
-#include "olcPixelGameEngine.h"
+#include <olcPixelGameEngine.h>
 #include "circuit_elements.hpp"
 #include "circuit.hpp"
 

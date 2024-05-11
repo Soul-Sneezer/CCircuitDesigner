@@ -1,7 +1,7 @@
 #ifndef CC_CIRCUIT_ELEMENTS
 #define CC_CIRCUIT_ELEMENTS
 
-#include "olcPixelGameEngine.h"
+#include <olcPixelGameEngine.h>
 
 enum ElementType 
 {
