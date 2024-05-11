@@ -91,4 +91,4 @@ O cerință nu se consideră îndeplinită dacă este realizată doar ca o serie
 - The Art of Electronics(3rd ed) by Paul Horowitz, Winfield Hill
 - Game Programming Patterns by Robert Nystrom
 
-* mentioned features might not be present at current time
+"*" - mentioned features might not be present at current time
