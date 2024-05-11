@@ -96,7 +96,7 @@
 
         }
 
-        std::ostream& operator<<(std::ostream& os, CableNode& el)
+        std::ostream& operator<<(std::ostream& os, const CableNode& el)
         {
             os<<(el.getInputs()).size()<<" "<<(el.getOutputs()).size();
             return os;        
