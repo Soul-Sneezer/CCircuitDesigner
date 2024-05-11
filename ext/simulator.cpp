@@ -65,7 +65,6 @@
 
                 olc::vf2d worldPos;
                 ScreenToWorld((int)tempPos.x, (int)tempPos.y, worldPos);
-
                 if(GetKey(olc::ENTER).bPressed) // add element to circuit
                 {
                     CircuitElement* element;
@@ -95,25 +94,27 @@
                     circuit.addElementToCircuit(element);
                 }
                 int nx, ny;
-                nx = floorf((tempPos.x + 0.5f) * gridInc);
-                ny = floorf((tempPos.y + 0.5f) * gridInc);
-
+                worldPos.x = floorf(worldPos.x) + 1;
+                worldPos.y = floorf(worldPos.y) + 1;
+                worldPos.x *= gridInc;
+                worldPos.y *= gridInc;
+                WorldToScreen(worldPos, nx, ny);
                 FillCircle(nx, ny, 1);
                 if(GetKey(olc::W).bHeld)
                 {
-                    tempPos.y -= std::sqrt(scale) / 16;
+                    tempPos.y -= gridInc / 2;
                 }
                 if(GetKey(olc::S).bHeld)
                 {
-                    tempPos.y += std::sqrt(scale) / 16; 
+                    tempPos.y += gridInc / 2; 
                 }
                 if(GetKey(olc::A).bHeld)
                 {
-                    tempPos.x -= std::sqrt(scale) / 16; 
+                    tempPos.x -= gridInc / 2; 
                 }
                 if(GetKey(olc::D).bHeld)
                 {
-                    tempPos.x += std::sqrt(scale) / 16; 
+                    tempPos.x += gridInc / 2; 
                 }
 
                 return true;
@@ -240,7 +241,7 @@
             ScreenToWorld(0, 0, worldTopLeft);
             ScreenToWorld(ScreenWidth(), ScreenHeight(), worldBottomRight);
 
-                       worldTopLeft.x = floor(worldTopLeft.x);
+            worldTopLeft.x = floor(worldTopLeft.x);
             worldTopLeft.y = floor(worldTopLeft.y);
             worldBottomRight.x = ceil(worldBottomRight.x);
             worldBottomRight.y = ceil(worldBottomRight.y);
