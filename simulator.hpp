@@ -8,7 +8,7 @@
 class OperationFailed : public std::runtime_error
 {
     public:
-        OperationFailed(const char* message) throw();
+        explicit OperationFailed(const char* message) throw();
 };
 
 class Sim : public olc::PixelGameEngine

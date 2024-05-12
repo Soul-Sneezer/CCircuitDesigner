@@ -3,7 +3,7 @@
 
 #include <olcPixelGameEngine.h>
 
-enum ElementType 
+enum class ElementType 
 {
     ELEM_UNASSIGNED,
     ELEM_CABLE,
