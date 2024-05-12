@@ -5,6 +5,12 @@
 #include "circuit_elements.hpp"
 #include "circuit.hpp"
 
+class OperationFailed : public std::runtime_error
+{
+    public:
+        OperationFailed(const char* message) throw();
+};
+
 class Sim : public olc::PixelGameEngine
 {
     private:
@@ -24,7 +30,7 @@ class Sim : public olc::PixelGameEngine
         olc::vf2d mousePos;
         olc::vf2d startPan;
 
-        ElementType tempType = ELEM_UNASSIGNED;
+        ElementType tempType = ElementType::ELEM_UNASSIGNED;
         olc::vf2d tempPos;
 
         Circuit circuit;
@@ -42,7 +48,7 @@ class Sim : public olc::PixelGameEngine
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
         void ScreenToWorld(int screenX, int screenY, olc::vf2d& v);
 
-        bool addElem();
+        void addElem();
         void drawMainMenu();
         void drawEditMenu();
         void drawAddMenu();
