@@ -1,10 +1,8 @@
 #include "circuit.hpp"
-
-        void Circuit::addElementToCircuit(CircuitElement* element)
+        void Circuit::addElementToCircuit(std::shared_ptr<CircuitElement>& element)
         {
             elements.push_back(element);
         }
-
         Circuit::Circuit()
         {
             this->voltageIn = 0;
@@ -30,7 +28,7 @@
 
         int32_t Circuit::getVoltageIn() const{ return this->voltageIn; };
         int32_t Circuit::getVoltageOut() const{ return this->voltageOut; };
-        std::vector<CircuitElement*>& Circuit::getElements() { return this->elements; };
+        std::vector<std::shared_ptr<CircuitElement>>& Circuit::getElements() { return this->elements; };
         Circuit& Circuit::operator=(const Circuit& circuit)
         {
             this->voltageIn = circuit.getVoltageIn();

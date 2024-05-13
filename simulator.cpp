@@ -1,9 +1,9 @@
 #include "simulator.hpp"
 
     OperationFailed::OperationFailed(const char* message) throw() : std::runtime_error(message)
-{
+    {
 
-}
+    }
 
     void Sim::resetOffset()
     {
@@ -27,9 +27,9 @@
         DrawString(pos.x + 130, pos.y, action);
     }
 
-    void Sim::drawElement(CircuitElement* element)
+    void Sim::drawElement(std::shared_ptr<CircuitElement> element)
     {
-        element->drawYourself(this, this->worldOffset, this->scale);
+        element->drawYourself(this);
     }
 
     void Sim::drawCircuit()
@@ -72,26 +72,26 @@
             ScreenToWorld((int)tempPos.x, (int)tempPos.y, worldPos);
             if(GetKey(olc::ENTER).bPressed) // add element to circuit
             {
-                CircuitElement* element;
+                std::shared_ptr<CircuitElement> element;
                 switch(tempType)
                 {
                     case ElementType::ELEM_CABLE:
-                        element = new Cable(worldPos.x, worldPos.y);
+                        element = std::shared_ptr<Cable> (new Cable(worldPos.x, worldPos.y));
                         break;
                     case ElementType::ELEM_NODE:
-                        element = new CableNode(worldPos.x, worldPos.y);
+                        element = std::shared_ptr<CableNode> (new CableNode(worldPos.x, worldPos.y));
                         break;
                     case ElementType::ELEM_RESISTOR:
-                        element = new Resistor(worldPos.x, worldPos.y);
+                        element = std::shared_ptr<Resistor> (new Resistor(worldPos.x, worldPos.y));
                         break;
                     case ElementType::ELEM_TRANSISTOR:
-                        element = new Transistor(worldPos.x, worldPos.y);
+                        element = std::shared_ptr<Transistor> (new Transistor(worldPos.x, worldPos.y));
                         break;
                     case ElementType::ELEM_SOURCE:
-                        element = new Source(worldPos.x, worldPos.y);
+                        element = std::shared_ptr<Source> (new Source(worldPos.x, worldPos.y));
                         break;
                     case ElementType::ELEM_BATTERY:
-                        element = new Battery(worldPos.x, worldPos.y);
+                        element = std::shared_ptr<Battery> (new Battery(worldPos.x, worldPos.y));
                         break;
                     default:
                         throw OperationFailed("Failed to create new element!");
@@ -348,6 +348,9 @@
         mouseControls();
         checkKeyPress();
         
+        CircuitElement::setWorldOffset(worldOffset);
+        CircuitElement::setWorldScale(scale);
+
         drawGrid();
         drawCircuit(); 
 
@@ -364,7 +367,7 @@
         drawAddMenu();
         drawModifyMenu();
         drawDeleteMenu();
-                   
+        
         return true;
     }
 

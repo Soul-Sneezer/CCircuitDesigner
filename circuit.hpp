@@ -8,9 +8,9 @@ class Circuit
     private:
         int32_t voltageIn;
         int32_t voltageOut;
-        std::vector<CircuitElement*> elements;
+        std::vector<std::shared_ptr<CircuitElement>> elements;
     public:
-        void addElementToCircuit(CircuitElement* element);
+        void addElementToCircuit(std::shared_ptr<CircuitElement>& element);
 
         Circuit();
         Circuit(const Circuit& circuit);
@@ -18,7 +18,7 @@ class Circuit
 
         int32_t getVoltageIn() const;
         int32_t getVoltageOut() const;
-        std::vector<CircuitElement*>& getElements(); 
+        std::vector<std::shared_ptr<CircuitElement>>& getElements(); 
         Circuit& operator=(const Circuit& circuit);
 
         void run();

@@ -40,7 +40,7 @@ class Sim : public olc::PixelGameEngine
         void pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action);
         void pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action);
 
-        void drawElement(CircuitElement* element);
+        void drawElement(std::shared_ptr<CircuitElement> element);
         void drawCircuit();
 
         void resetTempCoord();
