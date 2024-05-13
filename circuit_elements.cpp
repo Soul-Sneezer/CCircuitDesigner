@@ -35,7 +35,19 @@
         }
 
         CircuitElement::CircuitElement(CircuitElement&& element)
+            :position{element.position},
+             voltage{element.voltage},
+             power{element.power},
+            temperature{element.temperature},
+             in{element.in},
+             out{element.out}
         {
+            element.position = { 0, 0};
+            element.voltage = 0;
+            element.power = 0;
+            element.in = nullptr;
+            element.out = nullptr;
+            element.temperature = 273;
         }
 
         CircuitElement& CircuitElement::operator=(const CircuitElement& element)
@@ -52,6 +64,21 @@
 
         CircuitElement& CircuitElement::operator=(CircuitElement&& element)
         {
+            this->position = element.getPosition();
+            this->voltage = element.getVoltage();
+            this->power = element.getPower();
+            this->in = element.getIn();
+            this->out = element.getOut();
+            this->temperature = element.getTemperature();
+
+            element.position = { 0, 0};
+            element.voltage = 0;
+            element.power = 0;
+            element.in = nullptr;
+            element.out = nullptr;
+            element.temperature = 273;
+
+            return *this;
         }
 
         CircuitElement::~CircuitElement()
@@ -92,8 +119,12 @@
             this->outputs = node.outputs;
         }
 
-        CableNode::CableNode(CableNode&& node)
+        CableNode::CableNode(CableNode&& node) : CircuitElement(node),
+             inputs{node.inputs},
+             outputs{node.outputs}
         {
+            node.inputs.clear();
+            node.outputs.clear();
         }
 
         CableNode::~CableNode()
@@ -127,6 +158,28 @@
         
         CableNode& CableNode::operator=(CableNode&& element)
         {
+            this->inputs = element.getInputs();
+            this->outputs = element.getOutputs();
+            
+            this->position = element.getPosition();
+            this->voltage = element.getVoltage();
+            this->power = element.getPower();
+            this->in = element.getIn();
+            this->out = element.getOut();
+            this->temperature = element.getTemperature();
+
+            element.inputs.clear();
+            element.outputs.clear();
+
+            element.position = { 0, 0};
+            element.voltage = 0;
+            element.power = 0;
+            element.in = nullptr;
+            element.out = nullptr;
+            element.temperature = 273;
+
+            return *this;
+
         }
 
         void CableNode::changeValue(int32_t& value) 
@@ -171,8 +224,12 @@
             this->thresholdVoltage = transistor.thresholdVoltage;
         }
 
-        Transistor::Transistor(Transistor&& transistor)
+        Transistor::Transistor(Transistor&& transistor) : CircuitElement(transistor),
+            thresholdVoltage(transistor.thresholdVoltage),
+            threshold(transistor.threshold)
         {
+            transistor.threshold = 0;
+            transistor.thresholdVoltage = 0;
         }
 
         Transistor::~Transistor()
@@ -206,7 +263,27 @@
         }
 
         Transistor& Transistor::operator=(Transistor&& transistor)
-        {   
+        {  
+            this->threshold = transistor.getThreshold();
+            this->thresholdVoltage = transistor.getThresholdVoltage();
+            
+            this->position = transistor.getPosition();
+            this->voltage = transistor.getVoltage();
+            this->power = transistor.getPower();
+            this->in = transistor.getIn();
+            this->out = transistor.getOut();
+            this->temperature = transistor.getTemperature();
+
+            transistor.threshold = 0;
+            transistor.thresholdVoltage = 0;
+            transistor.position = {0,0};
+            transistor.voltage = 0;
+            transistor.power = 0;
+            transistor.in = nullptr;
+            transistor.out = nullptr;
+            transistor.temperature = 273;
+
+            return *this;
         }
 
         void Transistor::changeValue(int32_t& value) 
@@ -254,8 +331,14 @@
             this->tolerance = r.tolerance;
         }
 
-        Resistor::Resistor(Resistor&& r)
+        Resistor::Resistor(Resistor&& r) : CircuitElement(r),
+            resistance(r.resistance),
+            powerDissipation(r.powerDissipation),
+            tolerance(r.tolerance)
         {
+            r.resistance = 0;
+            r.powerDissipation = 0;
+            r.tolerance = 0;
         }
 
         Resistor::~Resistor()
@@ -292,6 +375,29 @@
 
         Resistor& Resistor::operator=(Resistor&& r)
         {
+            this->resistance = r.getResistance();
+            this->powerDissipation = r.getPowerDissipation();
+            this->tolerance = r.getTolerance();
+
+            this->position = r.getPosition();
+            this->voltage = r.getVoltage();
+            this->power = r.getPower();
+            this->in = r.getIn();
+            this->out = r.getOut();
+            this->temperature = r.getTemperature();
+
+            r.resistance = 0;
+            r.powerDissipation = 0;
+            r.tolerance = 0;
+            r.position = { 0,0 };
+            r.voltage = 0;
+            r.power = 0;
+            r.in = nullptr;
+            r.out = nullptr;
+            r.temperature = 273;
+
+            return *this;
+
         }
 
         void Resistor::changeValue(int32_t& value) 
@@ -388,8 +494,16 @@
             this->length = c.length;
         }
 
-        Cable::Cable(Cable&& c)
+        Cable::Cable(Cable&& c) : CircuitElement(c),
+            end(c.end),
+            resistance(c.resistance),
+            reverse(c.reverse),
+            length(c.length)
         {
+            c.end = { 0, 0 };
+            c.resistance = 0;
+            c.reverse = false;
+            c.length = 0;
         }
 
         Cable::~Cable()
@@ -428,6 +542,31 @@
 
         Cable& Cable::operator=(Cable&& cable)
         {
+            this->end = cable.getEnd();
+            this->reverse = cable.getFlowDirection();
+            this->resistance = cable.getResistance();
+            this->length = cable.getLength();
+
+            this->position = cable.getPosition();
+            this->voltage = cable.getVoltage();
+            this->power = cable.getPower();
+            this->in = cable.getIn();
+            this->out = cable.getOut();
+            this->temperature = cable.getTemperature();
+
+            cable.end = { 0, 0 };
+            cable.reverse = false;
+            cable.resistance = 0;
+            cable.length = 0;
+            cable.position = { 0, 0 };
+            cable.voltage = 0;
+            cable.power = 0;
+            cable.in = nullptr;
+            cable.out = nullptr;
+            cable.temperature = 273;
+
+            return *this;
+
         }
         
         void Cable::changeValue(int32_t& value) 
@@ -464,7 +603,7 @@
         {
         }
 
-        Source::Source(Source&& s)
+        Source::Source(Source&& s) : CircuitElement(s)
         {
         }
         
@@ -493,6 +632,22 @@
 
         Source& Source::operator=(Source&& s)
         {
+            this->position = s.getPosition();
+            this->voltage = s.getVoltage();
+            this->power = s.getPower();
+            this->in = s.getIn();
+            this->out = s.getOut();
+            this->temperature = s.getTemperature();
+
+            s.position = { 0, 0 };
+            s.voltage = 0;
+            s.power = 0;
+            s.in = nullptr;
+            s.out = nullptr;
+            s.temperature = 273;
+
+            return *this;
+
         }
 
         void Source::changeValue(int32_t& value) 
@@ -532,8 +687,10 @@
             this->capacity = b.capacity;
         }
 
-        Battery::Battery(Battery&& b)
+        Battery::Battery(Battery&& b) : CircuitElement(b),
+            capacity(b.capacity)
         {
+            b.capacity = 0;
         }
     
         Battery::~Battery()
@@ -563,6 +720,25 @@
 
         Battery& Battery::operator=(Battery&& b)
         {
+            this->capacity = b.getCapacity();
+            
+            this->position = b.getPosition();
+            this->voltage = b.getVoltage();
+            this->power = b.getPower();
+            this->in = b.getIn();
+            this->out = b.getOut();
+            this->temperature = b.getTemperature();
+
+            b.capacity = 0;
+            b.position = { 0, 0 };
+            b.voltage = 0;
+            b.power = 0;
+            b.in = nullptr;
+            b.out = nullptr;
+            b.temperature = 273;
+
+            return *this;
+
         }
 
         void Battery::changeValue(int32_t& value) 
