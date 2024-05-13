@@ -47,7 +47,7 @@ class CircuitElement
                 const uint32_t temperature = 273);
         CircuitElement(const CircuitElement& element);
         CircuitElement(CircuitElement&& element);
-        ~CircuitElement();
+        virtual ~CircuitElement() = 0;
 
         olc::vi2d getPosition() const; 
         int32_t getVoltage() const; 
@@ -137,7 +137,7 @@ class Resistor : public CircuitElement
                 const int32_t resistance = 0, const int32_t powerDissipation = 0, const int32_t tolerance = 0, const uint32_t temperature = 273);
         Resistor(const Resistor& r);
         Resistor(Resistor&& r);
-        ~Resistor();
+        virtual ~Resistor();
 
         int32_t getResistance() const;
         int32_t getPowerDissipation() const; 
