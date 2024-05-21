@@ -132,12 +132,12 @@
             
             if(GetKey(olc::MINUS).bHeld)
             {
-                scale *= 0.999;
+                scale *= 0.999f;
             }
 
             if(GetKey(olc::EQUALS).bHeld)
             {
-                scale *= 1.001;
+                scale *= 1.001f;
             }
 
             ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosAZoom);
