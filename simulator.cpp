@@ -108,19 +108,41 @@
             if(GetKey(olc::W).bHeld)
             {
                 tempPos.y -= gridInc / 2;
+                worldOffset.y -= gridInc / (scale * 10 + 100);
             }
             if(GetKey(olc::S).bHeld)
             {
                 tempPos.y += gridInc / 2; 
+                worldOffset.y += gridInc / (scale * 10 + 100);
             }
             if(GetKey(olc::A).bHeld)
             {
                 tempPos.x -= gridInc / 2; 
+                worldOffset.x -= gridInc / (scale * 10 + 100);
             }
             if(GetKey(olc::D).bHeld)
             {
                 tempPos.x += gridInc / 2; 
+                worldOffset.x += gridInc / (scale * 10 + 100);
             }
+           
+            olc::vf2d mousePosBZoom;
+            olc::vf2d mousePosAZoom;
+		        ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosBZoom);
+            
+            if(GetKey(olc::MINUS).bHeld)
+            {
+                scale *= 0.999;
+            }
+
+            if(GetKey(olc::EQUALS).bHeld)
+            {
+                scale *= 1.001;
+            }
+
+            ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosAZoom);
+            worldOffset += (mousePosBZoom - mousePosAZoom);
+
         }
     }
 
@@ -257,7 +279,7 @@
         }
     }
 
-    void Sim::checkKeyPress()
+    void Sim::checkGlobalKeyPress()
     {
         if(GetKey(olc::ESCAPE).bPressed)
         {
@@ -277,12 +299,7 @@
             addMenuActive = false;
             resetOffset();
         }
-
-        if(GetKey(olc::EQUALS).bPressed)
-            scale *= 1.1f;
-        if(GetKey(olc::MINUS).bPressed)
-            scale *= 0.9f;
-
+        
         if(GetKey(olc::SHIFT).bHeld && GetKey(olc::W).bHeld) // move window up
             menuOffset.y-=(int)(std::sqrt(scale));
         if(GetKey(olc::SHIFT).bHeld && GetKey(olc::S).bHeld) // move window down
@@ -313,9 +330,9 @@
         ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosBZoom);
 
         if(GetMouseWheel() > 0)
-            scale *= 1.1f;
+            scale *= 1.01f;
         if(GetMouseWheel() < 0)
-            scale *= 0.9f;
+            scale *= 0.99f;
 
         olc::vf2d mousePosAZoom;
         ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosAZoom);
@@ -346,7 +363,7 @@
         Clear(olc::BLACK);
 
         mouseControls();
-        checkKeyPress();
+        checkGlobalKeyPress();
         
         CircuitElement::setWorldOffset(worldOffset);
         CircuitElement::setWorldScale(scale);

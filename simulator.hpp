@@ -57,7 +57,7 @@ class Sim : public olc::PixelGameEngine
 
         void drawGrid();
 
-        void checkKeyPress();
+        void checkGlobalKeyPress();
         void mouseControls();
 
     public:
