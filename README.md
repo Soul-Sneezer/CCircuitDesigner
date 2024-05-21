@@ -4,7 +4,7 @@ A circuit designer made for my university OOP class.
 # Features*
 
 # To Do
-- [ ] maintain current cursor position as you zoom in
+- [x] maintain current cursor position as you zoom in
 - [ ] mouse/touchpad compatibility(right now it's keyboard only)
 - [ ] add sprites for circuit elements
 - [ ] make it so changing pixelSize does not destroy the UI
