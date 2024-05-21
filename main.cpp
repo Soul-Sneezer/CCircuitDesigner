@@ -25,8 +25,12 @@ int main()
     transistor.getThresholdVoltage();
 
     Sim sim;
-    if(sim.Construct(1280, 720, 1, 1))
-    {
-        sim.Start();
-    }
+    //try()
+    //{
+        if(sim.Construct(1280, 720, 2, 2))
+            sim.Start();
+    //}
+    //catch()
+    //{
+    //}
 }

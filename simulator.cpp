@@ -70,6 +70,13 @@
 
             olc::vf2d worldPos;
             ScreenToWorld((int)tempPos.x, (int)tempPos.y, worldPos);
+            
+            int nx, ny;
+            worldPos.x = floorf(worldPos.x) + 1;
+            worldPos.y = floorf(worldPos.y) + 1;
+            WorldToScreen(worldPos, nx, ny);
+            FillCircle(nx, ny, 1);
+
             if(GetKey(olc::ENTER).bPressed) // add element to circuit
             {
                 std::shared_ptr<CircuitElement> element;
@@ -98,34 +105,24 @@
                 }
                 circuit.addElementToCircuit(element);
             }
-            int nx, ny;
-            worldPos.x = floorf(worldPos.x) + 1;
-            worldPos.y = floorf(worldPos.y) + 1;
-            worldPos.x *= gridInc;
-            worldPos.y *= gridInc;
-            WorldToScreen(worldPos, nx, ny);
-            FillCircle(nx, ny, 1);
+            
             if(GetKey(olc::W).bHeld)
             {
                 tempPos.y -= gridInc / 2;
-                worldOffset.y -= gridInc / (scale * 10 + 100);
             }
             if(GetKey(olc::S).bHeld)
             {
                 tempPos.y += gridInc / 2; 
-                worldOffset.y += gridInc / (scale * 10 + 100);
             }
             if(GetKey(olc::A).bHeld)
             {
                 tempPos.x -= gridInc / 2; 
-                worldOffset.x -= gridInc / (scale * 10 + 100);
             }
             if(GetKey(olc::D).bHeld)
             {
                 tempPos.x += gridInc / 2; 
-                worldOffset.x += gridInc / (scale * 10 + 100);
             }
-           
+
             olc::vf2d mousePosBZoom;
             olc::vf2d mousePosAZoom;
 		        ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosBZoom);
@@ -139,10 +136,9 @@
             {
                 scale *= 1.001f;
             }
-
+           
             ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosAZoom);
             worldOffset += (mousePosBZoom - mousePosAZoom);
-
         }
     }
 
