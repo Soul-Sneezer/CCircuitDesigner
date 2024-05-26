@@ -14,6 +14,7 @@ class OperationFailed : public std::runtime_error
 class Sim : public olc::PixelGameEngine
 {
     private:
+        const int radius = 4;
         bool mainMenuActive = false;
         bool editMenuActive = false;
         bool removeMenuActive = false;
@@ -37,8 +38,8 @@ class Sim : public olc::PixelGameEngine
 
         void resetOffset();
 
-        void pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action);
-        void pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action);
+        void pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action, const uint32_t fontSize);
+        void pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action, const uint32_t fontSize);
 
         void drawElement(std::shared_ptr<CircuitElement> element);
         void drawCircuit();
@@ -48,6 +49,7 @@ class Sim : public olc::PixelGameEngine
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
         void ScreenToWorld(int screenX, int screenY, olc::vf2d& v);
 
+        void addLine();
         void addElem();
         void drawMainMenu();
         void drawEditMenu();

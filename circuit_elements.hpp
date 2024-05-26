@@ -20,19 +20,16 @@ class CircuitElement
         static float& worldScale()
         {
             static float v1 = 0.0f;
-
             return v1;
         }
         static olc::vf2d& worldOffset()
         {
             static olc::vf2d v2 = { 0.0f, 0.0f };
-
             return v2;
         }
 
     protected:
         olc::vi2d position = {0, 0};
-
         
         int32_t voltage;
         int32_t power;
@@ -102,6 +99,11 @@ class CableNode : public CircuitElement
 class Transistor : public CircuitElement
 {
     private:
+        static olc::Sprite*& sprite()
+        {
+            static olc::Sprite* v = new olc::Sprite("./sprites/transistor.png");
+            return v;
+        }
         int32_t thresholdVoltage;
         int32_t threshold;
     public:
@@ -112,6 +114,9 @@ class Transistor : public CircuitElement
         Transistor(const Transistor& transistor);
         Transistor(Transistor&& transistor);
         ~Transistor();
+        
+        static olc::Sprite* getSprite() { return sprite(); };
+        static void setSprite(char* path) { sprite() = new olc::Sprite(path); }
 
         int32_t getThreshold() const; 
         int32_t getThresholdVoltage() const; 
@@ -127,6 +132,12 @@ class Transistor : public CircuitElement
 class Resistor : public CircuitElement
 {
     private:
+        static olc::Sprite*& sprite()
+        {
+            static olc::Sprite* v = new olc::Sprite("./sprites/resistor.png");
+            return v;
+        }
+
         int32_t resistance;
         int32_t powerDissipation;
         int32_t tolerance;
@@ -138,6 +149,9 @@ class Resistor : public CircuitElement
         Resistor(const Resistor& r);
         Resistor(Resistor&& r);
         virtual ~Resistor();
+        
+        static olc::Sprite* getSprite() { return sprite(); };
+        static void setSprite(char* path) { sprite() = new olc::Sprite(path); }
 
         int32_t getResistance() const;
         int32_t getPowerDissipation() const; 
@@ -204,6 +218,11 @@ class Cable : public CircuitElement
 class Source : public CircuitElement
 {
     private:
+        static olc::Sprite*& sprite()
+        {
+            static olc::Sprite* v = new olc::Sprite("./sprites/source.png");
+            return v;
+        }
     public:
         Source();
         Source(int32_t posX, int32_t posY, int32_t voltage = 0, int32_t power = 0, \
@@ -212,6 +231,9 @@ class Source : public CircuitElement
         Source(const Source& s);
         Source(Source&& s);
         ~Source();
+        
+        static olc::Sprite* getSprite() { return sprite(); };
+        static void setSprite(char* path) { sprite() = new olc::Sprite(path); }
 
         Source& operator=(const Source& s);
         Source& operator=(Source&& s);
@@ -225,6 +247,11 @@ class Source : public CircuitElement
 class Battery : public CircuitElement
 {
     private:
+        static olc::Sprite*& sprite()
+        {
+            static olc::Sprite* v = new olc::Sprite("./sprites/battery.png");
+            return v;
+        }
         uint32_t capacity;
     public:
         Battery();
@@ -234,6 +261,9 @@ class Battery : public CircuitElement
         Battery(const Battery& b);
         Battery(Battery&& b);
         ~Battery();
+
+        static olc::Sprite* getSprite() { return sprite(); };
+        static void setSprite(char* path) { sprite() = new olc::Sprite(path); }
 
         int32_t getCapacity() const; 
 
