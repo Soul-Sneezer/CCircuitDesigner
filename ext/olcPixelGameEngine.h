@@ -1095,6 +1095,7 @@ namespace olc
 		void FillTexturedPolygon(const std::vector<olc::vf2d>& vPoints, const std::vector<olc::vf2d>& vTex, const std::vector<olc::Pixel>& vColour, olc::Sprite* sprTex, olc::DecalStructure structure = olc::DecalStructure::LIST);
 		// Draws an entire sprite at location (x,y)
 		void DrawSprite(int32_t x, int32_t y, Sprite* sprite, uint32_t scale = 1, uint8_t flip = olc::Sprite::NONE);
+		void DrawSprite(int32_t x, int32_t y, Sprite* sprite, float scale, uint8_t flip = olc::Sprite::NONE);
 		void DrawSprite(const olc::vi2d& pos, Sprite* sprite, uint32_t scale = 1, uint8_t flip = olc::Sprite::NONE);
 		// Draws an area of a sprite at location (x,y), where the
 		// selected area is (ox,oy) to (ox+w,oy+h)
@@ -2787,6 +2788,28 @@ namespace olc
 			}
 		}
 	}
+
+	void PixelGameEngine::DrawSprite(int32_t x, int32_t y, Sprite* sprite, float scale, uint8_t flip)
+	{
+		if (sprite == nullptr)
+			return;
+
+		int32_t fxs = 0, fxm = 1, fx = 0;
+		int32_t fys = 0, fym = 1, fy = 0;
+		if (flip & olc::Sprite::Flip::HORIZ) { fxs = sprite->width - 1; fxm = -1; }
+		if (flip & olc::Sprite::Flip::VERT) { fys = sprite->height - 1; fym = -1; }
+
+		fx = fxs;
+		for (int32_t i = 0; i < sprite->width; i++, fx += fxm)
+		{
+			fy = fys;
+			for (int32_t j = 0; j < sprite->height; j++, fy += fym)
+				for (uint32_t is = 0; is < scale; is++)
+					for (uint32_t js = 0; js < scale; js++)
+						Draw(x + (i * scale) + is, y + (j * scale) + js, sprite->GetPixel(fx, fy));
+		}
+	}
+
 
 	void PixelGameEngine::DrawPartialSprite(const olc::vi2d& pos, Sprite* sprite, const olc::vi2d& sourcepos, const olc::vi2d& size, uint32_t scale, uint8_t flip)
 	{ DrawPartialSprite(pos.x, pos.y, sprite, sourcepos.x, sourcepos.y, size.x, size.y, scale, flip); }
