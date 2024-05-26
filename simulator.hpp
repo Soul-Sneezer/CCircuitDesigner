@@ -28,7 +28,6 @@ class Sim : public olc::PixelGameEngine
         float scale = 8.0f;
         float gridInc = 1.0f;
 
-        olc::vf2d mousePos;
         olc::vf2d startPan;
 
         ElementType tempType = ElementType::ELEM_UNASSIGNED;

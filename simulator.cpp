@@ -358,7 +358,7 @@
 
     void Sim::mouseControls()
     {
-        mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+        olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
 
         if(GetMouse(2).bPressed)
         {
