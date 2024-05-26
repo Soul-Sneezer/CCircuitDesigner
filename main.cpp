@@ -27,8 +27,8 @@ int main()
     Sim sim;
     //try()
     //{
-        if(sim.Construct(1280, 720, 2, 2))
-            sim.Start();
+    if(sim.Construct(1280, 720, 1, 1))
+        sim.Start();
     //}
     //catch()
     //{

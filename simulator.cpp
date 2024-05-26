@@ -10,21 +10,22 @@
         menuOffset = {0,0};
     }
 
-    void Sim::pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action)
+    void Sim::pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action, const uint32_t fontSize = 1)
     {
-        DrawString(pos.x     , pos.y, "Press ");
-        DrawString(pos.x + 45, pos.y, key, olc::GREEN);
-        DrawString(pos.x + 50, pos.y, " to ");
-        DrawString(pos.x + 80, pos.y, action);
+        DrawString(pos.x + menuOffset.x                , pos.y + menuOffset.y , "Press ", olc::WHITE, fontSize);
+        DrawString(pos.x + menuOffset.x + 48 * fontSize, pos.y + menuOffset.y , key,      olc::GREEN, fontSize);
+        DrawString(pos.x + menuOffset.x + (48 + 8 * key.size()) * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, fontSize);
+        DrawString(pos.x + menuOffset.x + (80 + 8 * key.size()) * fontSize, pos.y + menuOffset.y , action,   olc::WHITE, fontSize);
     }
-    void Sim::pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action)
+    void Sim::pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action, const uint32_t fontSize = 1)
     {
-        DrawString(pos.x      , pos.y, "Press ");
-        DrawString(pos.x + 45 , pos.y, key1, olc::GREEN);
-        DrawString(pos.x + 85 , pos.y, ", ");
-        DrawString(pos.x + 95 , pos.y, key2, olc::GREEN);
-        DrawString(pos.x + 100, pos.y, " to ");
-        DrawString(pos.x + 130, pos.y, action);
+        DrawString(pos.x + menuOffset.x                 , pos.y + menuOffset.y , "Press ", olc::WHITE, fontSize);
+        DrawString(pos.x + menuOffset.x + 48  * fontSize, pos.y + menuOffset.y , key1,     olc::GREEN, fontSize);
+        DrawString(pos.x + menuOffset.x + (48 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , ",",      olc::WHITE, fontSize);
+        DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , key2,      olc::GREEN, fontSize);
+        DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size() + 8 * key2.size())  * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, fontSize);
+        DrawString(pos.x + menuOffset.x + (88 + 8 * key1.size() + 8 * key2.size()) * fontSize, pos.y + menuOffset.y , action,   olc::WHITE, fontSize);
+
     }
 
     void Sim::drawElement(std::shared_ptr<CircuitElement> element)
@@ -58,6 +59,58 @@
         v.y = (float)(screenY) / scale + worldOffset.y;
     }
 
+    void Sim::addLine()
+    {
+        olc::vf2d worldPos;
+        olc::vf2d worldPos1;
+        olc::vf2d worldPos2;
+        olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+        ScreenToWorld((int)mousePos.x, (int)mousePos.y, worldPos);
+       
+        worldPos2.x = floorf(worldPos.x + gridInc);
+        worldPos2.y = floorf(worldPos.y + gridInc);
+        worldPos1.x = floorf(worldPos.x);
+        worldPos1.y = floorf(worldPos.y);
+
+        float distX1 = worldPos.x - worldPos1.x;
+        float distX2 = worldPos2.x - worldPos.x;
+        float distY1 = worldPos.y - worldPos1.y;
+        float distY2 = worldPos2.y - worldPos.y;
+        
+        int coordX1, coordX2, coordY1, coordY2;
+
+        WorldToScreen(worldPos1, coordX1, coordY1);
+        WorldToScreen(worldPos2, coordX2, coordY2);
+
+        float min = distX1;
+        
+        if(distX2 < min)
+            min = distX2;
+        if(distY1 < min)
+            min = distY1;
+        if(distY2 < min)
+            min = distY2;
+       
+        if(min == distX1)
+        {
+            DrawLine(coordX1, coordY1, coordX1, coordY2, olc::WHITE);
+        }
+        else if(min == distX2)
+        {
+            DrawLine(coordX2, coordY1, coordX2, coordY2, olc::WHITE);
+        }
+        else if(min == distY1)
+        {
+            DrawLine(coordX1, coordY1, coordX2, coordY1, olc::WHITE);
+        }
+        else
+        {
+            DrawLine(coordX1, coordY2, coordX2, coordY2, olc::WHITE);
+        }
+
+        //DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
+    }
+
     void Sim::addElem()
     {
         if(addElement)
@@ -69,15 +122,17 @@
             modifyMenuActive = false;
 
             olc::vf2d worldPos;
-            ScreenToWorld((int)tempPos.x, (int)tempPos.y, worldPos);
-            
-            int nx, ny;
-            worldPos.x = floorf(worldPos.x) + 1;
-            worldPos.y = floorf(worldPos.y) + 1;
-            WorldToScreen(worldPos, nx, ny);
-            FillCircle(nx, ny, 1);
+            olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+            ScreenToWorld((int)mousePos.x, (int)mousePos.y, worldPos);
 
-            if(GetKey(olc::ENTER).bPressed) // add element to circuit
+            worldPos.x = floorf(worldPos.x + gridInc / 2);
+            worldPos.y = floorf(worldPos.y + gridInc / 2);
+            addLine();
+            int nx, ny;
+            WorldToScreen(worldPos, nx, ny);
+            FillCircle(nx , ny, radius / std::min(2, (int)scale));
+
+            if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
             {
                 std::shared_ptr<CircuitElement> element;
                 switch(tempType)
@@ -106,37 +161,26 @@
                 circuit.addElementToCircuit(element);
             }
             
-            if(GetKey(olc::W).bHeld)
-            {
-                tempPos.y -= gridInc / 2;
-            }
-            if(GetKey(olc::S).bHeld)
-            {
-                tempPos.y += gridInc / 2; 
-            }
-            if(GetKey(olc::A).bHeld)
-            {
-                tempPos.x -= gridInc / 2; 
-            }
-            if(GetKey(olc::D).bHeld)
-            {
-                tempPos.x += gridInc / 2; 
-            }
-
             olc::vf2d mousePosBZoom;
             olc::vf2d mousePosAZoom;
 		        ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosBZoom);
             
             if(GetKey(olc::MINUS).bHeld)
             {
-                scale *= 0.999f;
+                if(scale > 10.0f)
+                    scale *= 0.99f;
+                else
+                    scale = 10.0f;
             }
 
             if(GetKey(olc::EQUALS).bHeld)
             {
-                scale *= 1.001f;
+                if(scale < 100.0f)
+                    scale *= 1.01f;
+                else
+                    scale = 100.0f;
             }
-           
+            
             ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosAZoom);
             worldOffset += (mousePosBZoom - mousePosAZoom);
         }
@@ -149,15 +193,13 @@
             FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
             DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
             DrawString(70 + menuOffset.x, 70 + menuOffset.y, "CCircuit Designer - Commands", olc::WHITE, 2);
-            DrawString(70 + menuOffset.x, 90 + menuOffset.y, "Press");
-            DrawString(115 + menuOffset.x, 90 + menuOffset.y, "ESC", olc::GREEN);
-            DrawString(145 + menuOffset.x, 90 + menuOffset.y, "to open/close this window");
-            pressEntry({70 + menuOffset.x, 110 + menuOffset.y}, "Q", "open edit menu");
-            pressEntry({70 + menuOffset.x, 130 + menuOffset.y}, "R", "start/stop simulation");
-            pressEntry({70 + menuOffset.x, 150 + menuOffset.y}, "SHIFT", "W", "move window up");
-            pressEntry({70 + menuOffset.x, 160 + menuOffset.y}, "SHIFT", "S", "move window down");
-            pressEntry({70 + menuOffset.x, 170 + menuOffset.y}, "SHIFT", "A", "move window left");
-            pressEntry({70 + menuOffset.x, 180 + menuOffset.y}, "SHIFT", "D", "move window right");
+            pressEntry({70, 90}, "ESC", "to open/close this window");
+            pressEntry({70, 110}, "Q", "open edit menu");
+            pressEntry({70, 130}, "R", "start/stop simulation");
+            pressEntry({70, 150}, "SHIFT", "W", "move window up");
+            pressEntry({70, 160}, "SHIFT", "S", "move window down");
+            pressEntry({70, 170}, "SHIFT", "A", "move window left");
+            pressEntry({70, 180}, "SHIFT", "D", "move window right");
         }
     }
 
@@ -168,10 +210,10 @@
             FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
             DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
             DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Edit circuit", olc::WHITE, 2);
-            pressEntry({70 + menuOffset.x, 90 + menuOffset.y}, "Q", "open/close this window");
-            pressEntry({70 + menuOffset.x, 110 + menuOffset.y}, "1","add elements to circuit");
-            pressEntry({70 + menuOffset.x, 130 + menuOffset.y}, "2","remove elements from circuit");
-            pressEntry({70 + menuOffset.x, 150 + menuOffset.y}, "3","edit elements in circuit");
+            pressEntry({70,  90}, "Q", "open/close this window");
+            pressEntry({70, 110}, "1","add elements to circuit");
+            pressEntry({70, 130}, "2","remove elements from circuit");
+            pressEntry({70, 150}, "3","edit elements in circuit");
             if(GetKey(olc::K1).bPressed)
             {
                 addMenuActive = true;
@@ -197,14 +239,13 @@
             FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
             DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
             DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Edit circuit", olc::WHITE, 2);
-            pressEntry({70 + menuOffset.x, 90 + menuOffset.y}, "Q", "go back to edit menu");
-            pressEntry({70 + menuOffset.x, 110 + menuOffset.y}, "1", "add cable");
-            pressEntry({70 + menuOffset.x, 130 + menuOffset.y}, "2", "add cable node");
-            pressEntry({70 + menuOffset.x, 150 + menuOffset.y}, "3", "add resistor");
-            pressEntry({70 + menuOffset.x, 170 + menuOffset.y}, "4", "add transistor");
-            pressEntry({70 + menuOffset.x, 190 + menuOffset.y}, "5", "add source");
-            pressEntry({70 + menuOffset.x, 210 + menuOffset.y}, "6", "add battery");
-
+            pressEntry({70,  90}, "Q", "go back to edit menu");
+            pressEntry({70, 110}, "1", "add cable");
+            pressEntry({70, 130}, "2", "add cable node");
+            pressEntry({70, 150}, "3", "add resistor");
+            pressEntry({70, 170}, "4", "add transistor");
+            pressEntry({70, 190}, "5", "add source");
+            pressEntry({70, 210}, "6", "add battery");
             if(GetKey(olc::K1).bPressed)
             {
                 addElement = true;
@@ -267,11 +308,19 @@
 
         for (float x = worldTopLeft.x; x < worldBottomRight.x; x += gridInc)
         {
+            WorldToScreen({x, 0}, sx, sy);
+            DrawLine(sx, 0, sx, ScreenHeight(), olc::BLUE);
             for(float y = worldTopLeft.y; y < worldBottomRight.y; y += gridInc)
             {
                 WorldToScreen({x, y}, sx, sy);
-                Draw(sx, sy, olc::BLUE);
+                FillCircle(sx, sy, radius / std::min(2, (int)scale), olc::BLUE);
             }
+        }
+
+        for(float y = worldTopLeft.y; y < worldBottomRight.y; y += gridInc)
+        {
+            WorldToScreen({0, y}, sx, sy);
+            DrawLine(0, sy, ScreenWidth(), sy, olc::BLUE);
         }
     }
 
@@ -326,10 +375,19 @@
         ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosBZoom);
 
         if(GetMouseWheel() > 0)
-            scale *= 1.01f;
+        {
+            if(scale < 100.0f)
+                scale *= 1.1f;
+            else
+                scale = 100.0f;
+        }
         if(GetMouseWheel() < 0)
-            scale *= 0.99f;
-
+        {
+            if(scale > 10.0f)
+                scale *= 0.9f;
+            else
+                scale = 10.0f;
+        }
         olc::vf2d mousePosAZoom;
         ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosAZoom);
         worldOffset += (mousePosBZoom - mousePosAZoom);
@@ -367,20 +425,21 @@
         drawGrid();
         drawCircuit(); 
 
+        drawAddMenu();
+
+        drawMainMenu();
+        drawEditMenu();
+        drawModifyMenu();
+        drawDeleteMenu();
+        
         try{
             addElem();
         } // couldn't add a new element for whatever reason
         catch (OperationFailed const &)
         {
-            addElement = false;
+            addElement = false; 
         }
 
-        drawMainMenu();
-        drawEditMenu();
-        drawAddMenu();
-        drawModifyMenu();
-        drawDeleteMenu();
-        
         return true;
     }
 
