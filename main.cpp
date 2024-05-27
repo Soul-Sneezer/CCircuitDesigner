@@ -25,12 +25,23 @@ int main()
     transistor.getThresholdVoltage();
 
     Sim sim;
-    //try()
-    //{
-    if(sim.Construct(1280, 720, 1, 1))
-        sim.Start();
-    //}
-    //catch()
-    //{
-    //}
+    try{
+        if(sim.Construct(1280, 720, 1, 1))
+            sim.Start();
+        else
+            throw StartupFailed("Failed to start simulation! Trying at a lower resolution.");
+    }
+    catch(StartupFailed const &)
+    {
+        // try starting the sim at a lower resolution
+        try{if(sim.Construct(640, 480, 1, 1))
+            sim.Start();
+        else
+            throw StartupFailed("Failed to start simulation! Closing program.");
+        }
+        catch(StartupFailed const &)
+        {
+            return 0;
+        }
+    }
 }

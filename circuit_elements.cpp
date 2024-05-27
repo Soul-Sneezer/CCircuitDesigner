@@ -1,5 +1,10 @@
 #include "circuit_elements.hpp"
 
+        SpriteAllocFailed::SpriteAllocFailed(const char* message) throw() : std::runtime_error(message)
+        {
+
+        }
+
         CircuitElement::CircuitElement()
         {
             this->voltage = 0;
@@ -191,7 +196,6 @@
         {
             int nx, ny;
             WorldToScreen(this->position, nx, ny);
-            pge->DrawCircle(nx, ny, CircuitElement::getWorldScale());
         }
  
         Transistor::Transistor() 
@@ -296,7 +300,6 @@
             int nx, ny;
             WorldToScreen(this->position, nx, ny);
             pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Transistor::getSprite(), CircuitElement::getWorldScale() / 30);
-            pge->DrawCircle(nx, ny, CircuitElement::getWorldScale() / 2);
         }
 
         Resistor::Resistor()
@@ -410,7 +413,6 @@
             int nx, ny;
             WorldToScreen(this->position, nx, ny);
             pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Resistor::getSprite(), CircuitElement::getWorldScale() / 30);
-            pge->DrawCircle(nx, ny, CircuitElement::getWorldScale() / 2);
         }
 
         Switch::Switch()
@@ -661,7 +663,6 @@
             int nx, ny;
             WorldToScreen(this->position, nx, ny);
             pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Source::getSprite(), CircuitElement::getWorldScale() / 30);
-            pge->DrawCircle(nx, ny, CircuitElement::getWorldScale());
         }
 
         Battery::Battery()
@@ -753,5 +754,4 @@
             int nx, ny;
             WorldToScreen(this->position, nx, ny);
             pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Battery::getSprite(), CircuitElement::getWorldScale() / 30);
-            pge->DrawCircle(nx, ny, CircuitElement::getWorldScale());
         }

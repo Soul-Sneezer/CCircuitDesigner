@@ -5,6 +5,11 @@
 
     }
 
+    StartupFailed::StartupFailed(const char* message) throw() : std::runtime_error(message)
+    {
+
+    }
+
     void Sim::resetOffset()
     {
         menuOffset = {0,0};
@@ -108,7 +113,6 @@
             DrawLine(coordX1, coordY2, coordX2, coordY2, olc::WHITE);
         }
 
-        //DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
     }
 
     void Sim::addElem()
@@ -159,30 +163,7 @@
                         throw OperationFailed("Failed to create new element!");
                 }
                 circuit.addElementToCircuit(element);
-            }
-            
-            olc::vf2d mousePosBZoom;
-            olc::vf2d mousePosAZoom;
-		        ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosBZoom);
-            
-            if(GetKey(olc::MINUS).bHeld)
-            {
-                if(scale > 10.0f)
-                    scale *= 0.99f;
-                else
-                    scale = 10.0f;
-            }
-
-            if(GetKey(olc::EQUALS).bHeld)
-            {
-                if(scale < 100.0f)
-                    scale *= 1.01f;
-                else
-                    scale = 100.0f;
-            }
-            
-            ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosAZoom);
-            worldOffset += (mousePosBZoom - mousePosAZoom);
+            }     
         }
     }
 
@@ -218,16 +199,22 @@
             {
                 addMenuActive = true;
                 editMenuActive = false;
+                removeMenuActive = false;
+                modifyMenuActive = false;
             }
             if(GetKey(olc::K2).bPressed)
             {
                 removeMenuActive = true;
                 editMenuActive = false;
+                modifyMenuActive = false;
+                addMenuActive = false;
             }
             if(GetKey(olc::K3).bPressed)
             {
                 modifyMenuActive = true;
                 editMenuActive = false;
+                addMenuActive = false;
+                removeMenuActive = false;
             }
         }
     }
@@ -238,7 +225,7 @@
         {
             FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
             DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
-            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Edit circuit", olc::WHITE, 2);
+            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Add element to circuit", olc::WHITE, 2);
             pressEntry({70,  90}, "Q", "go back to edit menu");
             pressEntry({70, 110}, "1", "add cable");
             pressEntry({70, 130}, "2", "add cable node");
@@ -285,12 +272,51 @@
         }
     }
 
+    void Sim::selectElement()
+    {
+        olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY()};
+        olc::vi2d screenPos;
+        std::vector<std::shared_ptr<CircuitElement>> elements = circuit.getElements();
+        for(long unsigned int i = 0; i < elements.size(); i++)
+        {
+            float posX = (*elements[i]).getPosition().x;
+            float posY = (*elements[i]).getPosition().y;
+            WorldToScreen({posX, posY}, screenPos.x, screenPos.y);
+            if((float)(pow(abs(mousePos.x - (float)screenPos.x), 2) + pow(abs(mousePos.y - (float)screenPos.y), 2)) < scale * scale / 4)
+            {
+                int nx, ny;
+                WorldToScreen((*elements[i]).getPosition(), nx, ny);
+                DrawCircle(nx, ny, scale / 2);
+            }
+        } 
+    }
+
     void Sim::drawDeleteMenu()
     {
+        if(removeMenuActive)
+        {   
+            selectElement();
+
+            FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::BLACK);
+            DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::WHITE);
+            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Delete element from circuit", olc::WHITE, 2);
+            pressEntry({70,  90}, "Q", "go back to edit menu");
+            DrawString(70 + menuOffset.x, 110 + menuOffset.y, "Select element to delete", olc::WHITE);
+
+        }
+  
     }
 
     void Sim::drawModifyMenu()
     {
+        if(modifyMenuActive)
+        {
+            FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::BLACK);
+            DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::WHITE);
+            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Modify circuit elements", olc::WHITE, 2);
+            pressEntry({70,  90}, "Q", "go back to edit menu");
+            DrawString(70 + menuOffset.x, 110 + menuOffset.y, "Select element to modify", olc::WHITE);
+        }
     }
 
     void Sim::drawGrid()
@@ -324,7 +350,7 @@
         }
     }
 
-    void Sim::checkGlobalKeyPress()
+    void Sim::keyboardControls()
     {
         if(GetKey(olc::ESCAPE).bPressed)
         {
@@ -354,6 +380,28 @@
         if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld) // move window left
             menuOffset.x+=(int)(std::sqrt(scale));
 
+        olc::vf2d mousePosBZoom;
+        olc::vf2d mousePosAZoom;
+        ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosBZoom);
+        
+        if(GetKey(olc::MINUS).bHeld)
+        {
+            if(scale > 10.0f)
+                scale *= 0.99f;
+            else
+                scale = 10.0f;
+        }
+
+        if(GetKey(olc::EQUALS).bHeld)
+        {
+            if(scale < 100.0f)
+                scale *= 1.01f;
+            else
+                scale = 100.0f;
+        }
+        
+        ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosAZoom);
+        worldOffset += (mousePosBZoom - mousePosAZoom);
     }
 
     void Sim::mouseControls()
@@ -417,21 +465,12 @@
         Clear(olc::BLACK);
 
         mouseControls();
-        checkGlobalKeyPress();
+        keyboardControls();
         
         CircuitElement::setWorldOffset(worldOffset);
         CircuitElement::setWorldScale(scale);
 
         drawGrid();
-        drawCircuit(); 
-
-        drawAddMenu();
-
-        drawMainMenu();
-        drawEditMenu();
-        drawModifyMenu();
-        drawDeleteMenu();
-        
         try{
             addElem();
         } // couldn't add a new element for whatever reason
@@ -439,6 +478,16 @@
         {
             addElement = false; 
         }
+        drawCircuit(); 
+
+        drawAddMenu();
+        drawModifyMenu();
+        drawDeleteMenu();
+
+        drawMainMenu();
+        drawEditMenu();
+                
+        
 
         return true;
     }

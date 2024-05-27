@@ -14,6 +14,12 @@ enum class ElementType
     ELEM_BATTERY
 }; 
 
+class SpriteAllocFailed : public std::runtime_error
+{
+    public:
+        explicit SpriteAllocFailed(const char* message) throw();
+};
+
 class CircuitElement
 {
     private:
@@ -101,7 +107,17 @@ class Transistor : public CircuitElement
     private:
         static olc::Sprite*& sprite()
         {
-            static olc::Sprite* v = new olc::Sprite("./sprites/transistor.png");
+            static olc::Sprite* v;
+            try{
+                v = new olc::Sprite("./sprites/transistor.png");
+                if(v == nullptr)
+                    throw SpriteAllocFailed("Failed to alloc transistor sprite!");
+
+            }
+            catch (SpriteAllocFailed const &)
+            {
+            }
+
             return v;
         }
         int32_t thresholdVoltage;
@@ -134,7 +150,15 @@ class Resistor : public CircuitElement
     private:
         static olc::Sprite*& sprite()
         {
-            static olc::Sprite* v = new olc::Sprite("./sprites/resistor.png");
+            static olc::Sprite* v;
+            try{
+                v = new olc::Sprite("./sprites/resistor.png");
+                if(v == nullptr)
+                    throw SpriteAllocFailed("Faield to alloc resistor sprite!");
+            }
+            catch(SpriteAllocFailed const &) 
+            {
+            }
             return v;
         }
 
@@ -220,7 +244,16 @@ class Source : public CircuitElement
     private:
         static olc::Sprite*& sprite()
         {
-            static olc::Sprite* v = new olc::Sprite("./sprites/source.png");
+            static olc::Sprite* v;
+            try{
+                v = new olc::Sprite("./sprites/source.png");
+                if(v == nullptr)
+                    throw SpriteAllocFailed("Failed to alloc power source sprite!");
+            } 
+            catch(SpriteAllocFailed const &)
+            {
+            }
+
             return v;
         }
     public:
@@ -249,7 +282,16 @@ class Battery : public CircuitElement
     private:
         static olc::Sprite*& sprite()
         {
-            static olc::Sprite* v = new olc::Sprite("./sprites/battery.png");
+            static olc::Sprite* v;
+            try{
+                v = new olc::Sprite("./sprites/battery.png");
+                if(v == nullptr)
+                    throw SpriteAllocFailed("Failed to alloc battery sprite!");
+            }
+            catch(SpriteAllocFailed const &)
+            {
+            }
+
             return v;
         }
         uint32_t capacity;

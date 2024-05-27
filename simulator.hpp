@@ -11,6 +11,12 @@ class OperationFailed : public std::runtime_error
         explicit OperationFailed(const char* message) throw();
 };
 
+class StartupFailed : public std::runtime_error
+{
+    public:
+        explicit StartupFailed(const char* message) throw();
+};
+
 class Sim : public olc::PixelGameEngine
 {
     private:
@@ -53,14 +59,15 @@ class Sim : public olc::PixelGameEngine
         void drawMainMenu();
         void drawEditMenu();
         void drawAddMenu();
+
+        void selectElement();
         void drawDeleteMenu();
         void drawModifyMenu();
 
         void drawGrid();
 
-        void checkGlobalKeyPress();
         void mouseControls();
-
+        void keyboardControls();
     public:
         Sim();
 
