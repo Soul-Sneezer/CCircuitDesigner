@@ -109,6 +109,7 @@
             screenY = (int)((v.y - CircuitElement::getWorldOffset().y) * CircuitElement::getWorldScale());
         }
 
+        // cppcheck-suppress unusedFunction
         CircuitElement* CircuitElement::toBaseClass()
         {
             return dynamic_cast<CircuitElement*>(this);

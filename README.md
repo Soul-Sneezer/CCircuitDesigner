@@ -5,9 +5,8 @@ A circuit designer made for my university OOP class.
 
 # To Do
 - [x] maintain current cursor position as you zoom in
-- [ ] mouse/touchpad compatibility(right now it's keyboard only)
+- [x] mouse/touchpad compatibility(right now it's keyboard only)
 - [ ] add sprites for circuit elements
-- [ ] make it so changing pixelSize does not destroy the UI
 - [ ] properly draw cables
 - [ ] add ability to remove circuit elements
 - [ ] add ability to modify circuit elements
@@ -63,11 +62,11 @@ O cerință nu se consideră îndeplinită dacă este realizată doar ca o serie
     - constructori virtuali (clone): sunt necesari, dar nu se consideră funcții specifice temei
   - [x] apelarea constructorului din clasa de bază din constructori din derivate
   - [x] smart pointers (recomandat, opțional)
-  - [ ] `dynamic_cast`/`std::dynamic_pointer_cast` pentru downcast cu sens
+  - [x] `dynamic_cast`/`std::dynamic_pointer_cast` pentru downcast cu sens
 - [x] suprascris cc/op= pentru copieri/atribuiri corecte, copy and swap
-- [ ] excepții
-  - [ ] ierarhie proprie cu baza `std::exception` sau derivată din `std::exception`; minim **3** clase pentru erori specifice
-  - [ ] utilizare cu sens: de exemplu, `throw` în constructor (sau funcție care întoarce un obiect), `try`/`catch` în `main`
+- [x] excepții
+  - [x] ierarhie proprie cu baza `std::exception` sau derivată din `std::exception`; minim **3** clase pentru erori specifice
+  - [x] utilizare cu sens: de exemplu, `throw` în constructor (sau funcție care întoarce un obiect), `try`/`catch` în `main`
 - [x] funcții și atribute `static`
 - [x] STL
 - [x] cât mai multe `const`

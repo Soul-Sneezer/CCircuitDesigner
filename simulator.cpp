@@ -150,19 +150,24 @@
                 switch(tempType)
                 {
                     case ElementType::ELEM_CABLE:
-                        element = std::shared_ptr<Cable> (new Cable(linePos));
+                        element = std::make_shared<Cable>(linePos);
+                        element = std::dynamic_pointer_cast<Cable>(element);
                         break;
                     case ElementType::ELEM_RESISTOR:
-                        element = std::shared_ptr<Resistor> (new Resistor(linePos));
+                        element = std::make_shared<Resistor>(linePos);
+                        element = std::dynamic_pointer_cast<Resistor>(element);
                         break;
                     case ElementType::ELEM_TRANSISTOR:
-                        element = std::shared_ptr<Transistor> (new Transistor(linePos));
+                        element = std::make_shared<Transistor>(linePos);
+                        element = std::dynamic_pointer_cast<Transistor>(element);
                         break;
                     case ElementType::ELEM_SOURCE:
-                        element = std::shared_ptr<Source> (new Source(linePos));
+                        element = std::make_shared<Source>(linePos);
+                        element = std::dynamic_pointer_cast<Source>(element);
                         break;
                     case ElementType::ELEM_BATTERY:
-                        element = std::shared_ptr<Battery> (new Battery(linePos));
+                        element = std::make_shared<Battery>(linePos);
+                        element = std::dynamic_pointer_cast<Battery>(element);
                         break;
                     default:
                         throw OperationFailed("Failed to create new element!");
