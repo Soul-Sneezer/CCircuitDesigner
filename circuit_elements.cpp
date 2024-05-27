@@ -109,6 +109,11 @@
             screenY = (int)((v.y - CircuitElement::getWorldOffset().y) * CircuitElement::getWorldScale());
         }
 
+        CircuitElement* CircuitElement::toBaseClass()
+        {
+            return dynamic_cast<CircuitElement*>(this);
+        }
+
         CableNode::CableNode()   
         {
         }

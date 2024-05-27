@@ -75,6 +75,8 @@ class CircuitElement
         std::ostream& operator<<(std::ostream& os); 
 
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
+
+        CircuitElement* toBaseClass();
         virtual void changeValue(int32_t& value) = 0;
         virtual void drawYourself(olc::PixelGameEngine *pge) = 0;
 };
@@ -141,6 +143,7 @@ class Transistor : public CircuitElement
         Transistor& operator=(Transistor&& transistor);
         std::ostream& operator<<(std::ostream& os); 
 
+        
         void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
@@ -185,6 +188,7 @@ class Resistor : public CircuitElement
         Resistor& operator=(Resistor&& r);
         std::ostream& operator<<(std::ostream& os); 
 
+        
         void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
@@ -233,6 +237,7 @@ class Cable : public CircuitElement
         Cable& operator=(Cable&& cable);
         std::ostream& operator<<(std::ostream& os); 
 
+        
         void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
@@ -256,7 +261,7 @@ class Source : public CircuitElement
         }
     public:
         Source();
-        Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage = 0, int32_t power = 0, \
+        explicit Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage = 0, int32_t power = 0, \
                 CircuitElement* in = NULL, CircuitElement* out = NULL,\
                 uint32_t temperature = 273);
         Source(const Source& s);
@@ -270,6 +275,7 @@ class Source : public CircuitElement
         Source& operator=(Source&& s);
         std::ostream& operator<<(std::ostream& os); 
 
+        
         void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
