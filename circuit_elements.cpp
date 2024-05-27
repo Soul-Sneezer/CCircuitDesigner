@@ -14,11 +14,11 @@
             this->temperature = 273;
         }
 
-        CircuitElement::CircuitElement(const int32_t posX, const int32_t posY, const int32_t voltage, const int32_t power, \
+        CircuitElement::CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
                 CircuitElement* in, CircuitElement* out, \
                 const uint32_t temperature)
         {
-            this->position = {posX, posY};
+            this->position = pos;
 
             this->voltage = voltage;
             this->power = power;
@@ -47,7 +47,7 @@
              in{element.in},
              out{element.out}
         {
-            element.position = { 0, 0};
+            element.position = std::make_pair<olc::vf2d, olc::vf2d>({0,0}, {0,0});
             element.voltage = 0;
             element.power = 0;
             element.in = nullptr;
@@ -76,7 +76,7 @@
             this->out = element.getOut();
             this->temperature = element.getTemperature();
 
-            element.position = { 0, 0};
+            element.position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
             element.voltage = 0;
             element.power = 0;
             element.in = nullptr;
@@ -90,7 +90,7 @@
         {
         }
 
-        olc::vi2d CircuitElement::getPosition() const { return this->position; }
+        std::pair<olc::vf2d, olc::vf2d> CircuitElement::getPosition() const { return this->position; }
         int32_t CircuitElement::getVoltage() const { return this->voltage; }
         int32_t CircuitElement::getPower() const { return this->power; }
         int32_t CircuitElement::getTemperature() const { return this->temperature; }
@@ -113,9 +113,9 @@
         {
         }
 
-        CableNode::CableNode(const int32_t posX, const int32_t posY)
+        CableNode::CableNode(std::pair<olc::vf2d, olc::vf2d> pos)
         {
-            this->position = {posX, posY};
+            this->position = pos;
         }
 
         CableNode::CableNode(const CableNode& node) : CircuitElement(node)
@@ -176,7 +176,7 @@
             element.inputs.clear();
             element.outputs.clear();
 
-            element.position = { 0, 0};
+            element.position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
             element.voltage = 0;
             element.power = 0;
             element.in = nullptr;
@@ -194,8 +194,10 @@
 
         void CableNode::drawYourself(olc::PixelGameEngine *pge) 
         {
-            int nx, ny;
-            WorldToScreen(this->position, nx, ny);
+            int coordX1, coordX2, coordY1, coordY2;
+            WorldToScreen(this->position.first, coordX1, coordY1);
+            WorldToScreen(this->position.second, coordX2, coordY2);
+            pge->DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
         }
  
         Transistor::Transistor() 
@@ -204,11 +206,11 @@
             this->thresholdVoltage = 0;
         }
 
-        Transistor::Transistor(const int32_t posX, const int32_t posY, const int32_t voltage, const int32_t power, \
+        Transistor::Transistor(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
                 CircuitElement* in, CircuitElement* out,\
                 const int32_t threshold, const int32_t thresholdVoltage, const uint32_t temperature)
         {
-            this->position = {posX, posY};
+            this->position = pos;
 
             this->voltage = voltage;
             this->power = power;
@@ -280,7 +282,7 @@
 
             transistor.threshold = 0;
             transistor.thresholdVoltage = 0;
-            transistor.position = {0,0};
+            transistor.position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
             transistor.voltage = 0;
             transistor.power = 0;
             transistor.in = nullptr;
@@ -297,9 +299,12 @@
 
         void Transistor::drawYourself(olc::PixelGameEngine *pge) 
         {
-            int nx, ny;
-            WorldToScreen(this->position, nx, ny);
-            pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Transistor::getSprite(), CircuitElement::getWorldScale() / 30);
+            int coordX1, coordX2, coordY1, coordY2;
+            WorldToScreen(this->position.first, coordX1, coordY1);
+            WorldToScreen(this->position.second, coordX2, coordY2);
+            pge->DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
+
+           // pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Transistor::getSprite(), CircuitElement::getWorldScale() / 30);
         }
 
         Resistor::Resistor()
@@ -309,11 +314,11 @@
             this->tolerance = 0;
         }
 
-        Resistor::Resistor(const int32_t posX, const int32_t posY,\
+        Resistor::Resistor(std::pair<olc::vf2d, olc::vf2d> pos,\
                 const int32_t voltage, const int32_t power, CircuitElement* in, CircuitElement* out, \
                 const int32_t resistance, const int32_t powerDissipation, const int32_t tolerance, const uint32_t temperature)
         {
-            this->position = {posX, posY};
+            this->position = pos;
 
             this->voltage = voltage;
             this->power = power;
@@ -393,7 +398,7 @@
             r.resistance = 0;
             r.powerDissipation = 0;
             r.tolerance = 0;
-            r.position = { 0,0 };
+            r.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0, 0 }, { 0, 0});
             r.voltage = 0;
             r.power = 0;
             r.in = nullptr;
@@ -410,9 +415,12 @@
         }
         void Resistor::drawYourself(olc::PixelGameEngine *pge) 
         {
-            int nx, ny;
-            WorldToScreen(this->position, nx, ny);
-            pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Resistor::getSprite(), CircuitElement::getWorldScale() / 30);
+            int coordX1, coordX2, coordY1, coordY2;
+            WorldToScreen(this->position.first, coordX1, coordY1);
+            WorldToScreen(this->position.second, coordX2, coordY2);
+            pge->DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
+
+           // pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Resistor::getSprite(), CircuitElement::getWorldScale() / 30);
         }
 
         Switch::Switch()
@@ -463,19 +471,17 @@
 
         Cable::Cable()
         {
-            this->end = {0,0};
             this->length = 0;
             this->resistance = 0;
             this->reverse = false;
         }
 
-        Cable::Cable(const int32_t posX, const int32_t posY, const olc::vi2d end, \
+        Cable::Cable(std::pair<olc::vf2d, olc::vf2d> pos, \
                 const int32_t voltage, const int32_t power, \
                 CircuitElement* in, CircuitElement* out, \
                 const int32_t resistance, const bool reverse, const int32_t length, const uint32_t temperature)
         {
-            this->position = {posX, posY};
-            this->end = end;
+            this->position = pos;
 
             this->voltage = voltage;
             this->power = power;
@@ -492,19 +498,16 @@
 
         Cable::Cable(const Cable& c) : CircuitElement(c) 
         {
-            this->end = c.end;
             this->resistance = c.resistance;
             this->reverse = c.reverse;
             this->length = c.length;
         }
 
         Cable::Cable(Cable&& c) : CircuitElement(c),
-            end(c.end),
             resistance(c.resistance),
             reverse(c.reverse),
             length(c.length)
         {
-            c.end = { 0, 0 };
             c.resistance = 0;
             c.reverse = false;
             c.length = 0;
@@ -521,7 +524,6 @@
             return os;
         }
 
-        olc::vi2d Cable::getEnd() const { return this->end; }
         int32_t Cable::getResistance() const { return this->resistance; }
         Switch Cable::getSwitch() const { return this->circuitSwitch; }
         bool Cable::getFlowDirection() const { return this->reverse; }
@@ -529,7 +531,6 @@
      
         Cable& Cable::operator=(const Cable& cable) 
         {
-            this->end = cable.getEnd();
             this->reverse = cable.getFlowDirection();
             this->resistance = cable.getResistance();
             this->length = cable.getLength();
@@ -546,7 +547,6 @@
 
         Cable& Cable::operator=(Cable&& cable)
         {
-            this->end = cable.getEnd();
             this->reverse = cable.getFlowDirection();
             this->resistance = cable.getResistance();
             this->length = cable.getLength();
@@ -558,11 +558,10 @@
             this->out = cable.getOut();
             this->temperature = cable.getTemperature();
 
-            cable.end = { 0, 0 };
             cable.reverse = false;
             cable.resistance = 0;
             cable.length = 0;
-            cable.position = { 0, 0 };
+            cable.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0, 0 }, { 0, 0 });
             cable.voltage = 0;
             cable.power = 0;
             cable.in = nullptr;
@@ -579,20 +578,23 @@
         }
         void Cable::drawYourself(olc::PixelGameEngine *pge) 
         {
-            int nx, ny;
-            WorldToScreen(this->position, nx, ny);
-            pge->DrawCircle(nx, ny, CircuitElement::getWorldScale());
+            int coordX1, coordX2, coordY1, coordY2;
+            WorldToScreen(this->position.first, coordX1, coordY1);
+            WorldToScreen(this->position.second, coordX2, coordY2);
+            pge->DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
+
+            //pge->DrawCircle(nx, ny, CircuitElement::getWorldScale());
         }
 
         Source::Source()
         {
         }
 
-        Source::Source(int32_t posX, int32_t posY, int32_t voltage, int32_t power, \
+        Source::Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage, int32_t power, \
                 CircuitElement* in, CircuitElement* out,\
                 uint32_t temperature)
         {
-            this->position = {posX, posY};
+            this->position = pos;
 
             this->voltage = voltage;
             this->power = power;
@@ -643,7 +645,7 @@
             this->out = s.getOut();
             this->temperature = s.getTemperature();
 
-            s.position = { 0, 0 };
+            s.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0,0 }, { 0,0 });
             s.voltage = 0;
             s.power = 0;
             s.in = nullptr;
@@ -660,9 +662,12 @@
         }
         void Source::drawYourself(olc::PixelGameEngine *pge) 
         {
-            int nx, ny;
-            WorldToScreen(this->position, nx, ny);
-            pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Source::getSprite(), CircuitElement::getWorldScale() / 30);
+            int coordX1, coordX2, coordY1, coordY2;
+            WorldToScreen(this->position.first, coordX1, coordY1);
+            WorldToScreen(this->position.second, coordX2, coordY2);
+            pge->DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
+
+           // pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Source::getSprite(), CircuitElement::getWorldScale() / 30);
         }
 
         Battery::Battery()
@@ -670,11 +675,11 @@
             this->capacity = 0;
         }
 
-        Battery::Battery(const int32_t posX, const int32_t posY, const int32_t voltage, const int32_t power, \
+        Battery::Battery(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
                 CircuitElement* in, CircuitElement* out, \
                 const uint32_t capacity, const uint32_t temperature)
         {
-            this->position = {posX, posY};
+            this->position = pos;
 
             this->voltage = voltage;
             this->power = power;
@@ -734,7 +739,7 @@
             this->temperature = b.getTemperature();
 
             b.capacity = 0;
-            b.position = { 0, 0 };
+            b.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0,0 }, { 0,0 });
             b.voltage = 0;
             b.power = 0;
             b.in = nullptr;
@@ -751,7 +756,10 @@
         }
         void Battery::drawYourself(olc::PixelGameEngine *pge) 
         {
-            int nx, ny;
-            WorldToScreen(this->position, nx, ny);
-            pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Battery::getSprite(), CircuitElement::getWorldScale() / 30);
+            int coordX1, coordX2, coordY1, coordY2;
+            WorldToScreen(this->position.first, coordX1, coordY1);
+            WorldToScreen(this->position.second, coordX2, coordY2);
+            pge->DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
+
+           // pge->DrawSprite(nx - CircuitElement::getWorldScale() / 2, ny - CircuitElement::getWorldScale() / 2, Battery::getSprite(), CircuitElement::getWorldScale() / 30);
         }

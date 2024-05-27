@@ -35,7 +35,7 @@ class CircuitElement
         }
 
     protected:
-        olc::vi2d position = {0, 0};
+        std::pair<olc::vf2d, olc::vf2d> position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
         
         int32_t voltage;
         int32_t power;
@@ -45,14 +45,14 @@ class CircuitElement
         CircuitElement* out; // next element
     public:
         CircuitElement();
-        explicit CircuitElement(const int32_t posX, const int32_t posY, const int32_t voltage, const int32_t power = 0, \
+        explicit CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power = 0, \
                 CircuitElement* in = NULL, CircuitElement* out = NULL, \
                 const uint32_t temperature = 273);
         CircuitElement(const CircuitElement& element);
         CircuitElement(CircuitElement&& element);
         virtual ~CircuitElement() = 0;
 
-        olc::vi2d getPosition() const; 
+        std::pair<olc::vf2d, olc::vf2d> getPosition() const; 
         int32_t getVoltage() const; 
         int32_t getPower() const; 
         int32_t getTemperature() const; 
@@ -79,14 +79,14 @@ class CircuitElement
         virtual void drawYourself(olc::PixelGameEngine *pge) = 0;
 };
 
-class CableNode : public CircuitElement
+class CableNode : public CircuitElement // work in progress
 {
     private:
         std::vector<std::shared_ptr<CircuitElement>> inputs;
         std::vector<std::shared_ptr<CircuitElement>> outputs;
     public:
         CableNode();   
-        explicit CableNode(const int32_t posX, const int32_t posY);
+        explicit CableNode(std::pair<olc::vf2d, olc::vf2d> pos);
         CableNode(const CableNode& node); 
         CableNode(CableNode&& node);
         ~CableNode();
@@ -124,7 +124,7 @@ class Transistor : public CircuitElement
         int32_t threshold;
     public:
         Transistor(); 
-        explicit Transistor(const int32_t posX, const int32_t posY, const int32_t voltage = 0, const int32_t power = 0, \
+        explicit Transistor(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage = 0, const int32_t power = 0, \
                 CircuitElement* in = NULL, CircuitElement* out = NULL,\
                 const int32_t threshold = 0, const int32_t thresholdVoltage = 0, const uint32_t temperature = 273);
         Transistor(const Transistor& transistor);
@@ -167,7 +167,7 @@ class Resistor : public CircuitElement
         int32_t tolerance;
     public:
         Resistor();
-        explicit Resistor(const int32_t posX, const int32_t posY,\
+        explicit Resistor(std::pair<olc::vf2d, olc::vf2d> pos,\
                 const int32_t voltage = 0, const int32_t power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
                 const int32_t resistance = 0, const int32_t powerDissipation = 0, const int32_t tolerance = 0, const uint32_t temperature = 273);
         Resistor(const Resistor& r);
@@ -210,14 +210,13 @@ class Switch
 class Cable : public CircuitElement
 {
     private:
-        olc::vi2d end;
         int32_t resistance;
         bool reverse;
         int32_t length;
         Switch circuitSwitch;
     public:
         Cable();
-        explicit Cable(const int32_t posX, const int32_t posY, const olc::vi2d end = {0, 0}, \
+        explicit Cable(std::pair<olc::vf2d, olc::vf2d> pos, \
                 const int32_t voltage = 0, const int32_t power = 0, \
                 CircuitElement* in = NULL,CircuitElement* out = NULL, \
                 const int32_t resistance = 0, const bool reverse = false, const int32_t length = 0, const uint32_t temperature = 273);
@@ -225,7 +224,6 @@ class Cable : public CircuitElement
         Cable(Cable&& c);
         ~Cable();
 
-        olc::vi2d getEnd() const; 
         int32_t getResistance() const; 
         Switch getSwitch() const; 
         bool getFlowDirection() const; 
@@ -258,7 +256,7 @@ class Source : public CircuitElement
         }
     public:
         Source();
-        Source(int32_t posX, int32_t posY, int32_t voltage = 0, int32_t power = 0, \
+        Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage = 0, int32_t power = 0, \
                 CircuitElement* in = NULL, CircuitElement* out = NULL,\
                 uint32_t temperature = 273);
         Source(const Source& s);
@@ -297,7 +295,7 @@ class Battery : public CircuitElement
         uint32_t capacity;
     public:
         Battery();
-        explicit Battery(const int32_t posX, const int32_t posY, const int32_t voltage = 0, const int32_t power = 0, \
+        explicit Battery(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage = 0, const int32_t power = 0, \
                 CircuitElement* in = NULL, CircuitElement* out = NULL, \
                 const uint32_t capacity = 0, const uint32_t temperature = 273);
         Battery(const Battery& b);

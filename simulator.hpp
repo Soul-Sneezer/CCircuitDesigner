@@ -54,7 +54,7 @@ class Sim : public olc::PixelGameEngine
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
         void ScreenToWorld(int screenX, int screenY, olc::vf2d& v);
 
-        void addLine();
+        std::pair<olc::vf2d, olc::vf2d> addLine();
         void addElem();
         void drawMainMenu();
         void drawEditMenu();

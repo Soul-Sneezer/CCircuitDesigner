@@ -64,7 +64,7 @@
         v.y = (float)(screenY) / scale + worldOffset.y;
     }
 
-    void Sim::addLine()
+    std::pair<olc::vf2d, olc::vf2d> Sim::addLine()
     {
         olc::vf2d worldPos;
         olc::vf2d worldPos1;
@@ -99,19 +99,25 @@
         if(min == distX1)
         {
             DrawLine(coordX1, coordY1, coordX1, coordY2, olc::WHITE);
+            worldPos2.x = worldPos1.x;
         }
         else if(min == distX2)
         {
             DrawLine(coordX2, coordY1, coordX2, coordY2, olc::WHITE);
+            worldPos1.x = worldPos2.x;
         }
         else if(min == distY1)
         {
             DrawLine(coordX1, coordY1, coordX2, coordY1, olc::WHITE);
+            worldPos2.y = worldPos1.y; 
         }
         else
         {
             DrawLine(coordX1, coordY2, coordX2, coordY2, olc::WHITE);
+            worldPos1.y = worldPos2.y;
         }
+      
+        return std::make_pair(worldPos1, worldPos2);
 
     }
 
@@ -126,15 +132,17 @@
             modifyMenuActive = false;
 
             olc::vf2d worldPos;
+            std::pair<olc::vf2d, olc::vf2d> linePos;
             olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
             ScreenToWorld((int)mousePos.x, (int)mousePos.y, worldPos);
 
             worldPos.x = floorf(worldPos.x + gridInc / 2);
             worldPos.y = floorf(worldPos.y + gridInc / 2);
-            addLine();
+           
             int nx, ny;
             WorldToScreen(worldPos, nx, ny);
             FillCircle(nx , ny, radius / std::min(2, (int)scale));
+            linePos = addLine();
 
             if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
             {
@@ -142,22 +150,19 @@
                 switch(tempType)
                 {
                     case ElementType::ELEM_CABLE:
-                        element = std::shared_ptr<Cable> (new Cable(worldPos.x, worldPos.y));
-                        break;
-                    case ElementType::ELEM_NODE:
-                        element = std::shared_ptr<CableNode> (new CableNode(worldPos.x, worldPos.y));
+                        element = std::shared_ptr<Cable> (new Cable(linePos));
                         break;
                     case ElementType::ELEM_RESISTOR:
-                        element = std::shared_ptr<Resistor> (new Resistor(worldPos.x, worldPos.y));
+                        element = std::shared_ptr<Resistor> (new Resistor(linePos));
                         break;
                     case ElementType::ELEM_TRANSISTOR:
-                        element = std::shared_ptr<Transistor> (new Transistor(worldPos.x, worldPos.y));
+                        element = std::shared_ptr<Transistor> (new Transistor(linePos));
                         break;
                     case ElementType::ELEM_SOURCE:
-                        element = std::shared_ptr<Source> (new Source(worldPos.x, worldPos.y));
+                        element = std::shared_ptr<Source> (new Source(linePos));
                         break;
                     case ElementType::ELEM_BATTERY:
-                        element = std::shared_ptr<Battery> (new Battery(worldPos.x, worldPos.y));
+                        element = std::shared_ptr<Battery> (new Battery(linePos));
                         break;
                     default:
                         throw OperationFailed("Failed to create new element!");
@@ -228,11 +233,10 @@
             DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Add element to circuit", olc::WHITE, 2);
             pressEntry({70,  90}, "Q", "go back to edit menu");
             pressEntry({70, 110}, "1", "add cable");
-            pressEntry({70, 130}, "2", "add cable node");
-            pressEntry({70, 150}, "3", "add resistor");
-            pressEntry({70, 170}, "4", "add transistor");
-            pressEntry({70, 190}, "5", "add source");
-            pressEntry({70, 210}, "6", "add battery");
+            pressEntry({70, 130}, "2", "add resistor");
+            pressEntry({70, 150}, "3", "add transistor");
+            pressEntry({70, 170}, "4", "add source");
+            pressEntry({70, 190}, "5", "add battery");
             if(GetKey(olc::K1).bPressed)
             {
                 addElement = true;
@@ -242,28 +246,22 @@
             else if(GetKey(olc::K2).bPressed)
             {
                 addElement = true;
-                tempType = ElementType::ELEM_NODE;
+                tempType = ElementType::ELEM_RESISTOR;
                 resetTempCoord();
             }
             else if(GetKey(olc::K3).bPressed)
             {
                 addElement = true;
-                tempType = ElementType::ELEM_RESISTOR;
+                tempType = ElementType::ELEM_TRANSISTOR;
                 resetTempCoord();
             }
             else if(GetKey(olc::K4).bPressed)
             {
                 addElement = true;
-                tempType = ElementType::ELEM_TRANSISTOR;
-                resetTempCoord();
-            }
-            else if(GetKey(olc::K5).bPressed)
-            {
-                addElement = true;
                 tempType = ElementType::ELEM_SOURCE;
                 resetTempCoord();
             }
-            else if(GetKey(olc::K6).bPressed)
+            else if(GetKey(olc::K5).bPressed)
             {
                 addElement = true;
                 tempType = ElementType::ELEM_BATTERY;
@@ -275,18 +273,20 @@
     void Sim::selectElement()
     {
         olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY()};
-        olc::vi2d screenPos;
+        std::pair<olc::vi2d, olc::vi2d> linePos;
+        olc::vf2d screenPos;
         std::vector<std::shared_ptr<CircuitElement>> elements = circuit.getElements();
         for(long unsigned int i = 0; i < elements.size(); i++)
         {
-            float posX = (*elements[i]).getPosition().x;
-            float posY = (*elements[i]).getPosition().y;
-            WorldToScreen({posX, posY}, screenPos.x, screenPos.y);
-            if((float)(pow(abs(mousePos.x - (float)screenPos.x), 2) + pow(abs(mousePos.y - (float)screenPos.y), 2)) < scale * scale / 4)
+            olc::vf2d pos1 = (*elements[i]).getPosition().first;
+            olc::vf2d pos2 = (*elements[i]).getPosition().second;
+            WorldToScreen(pos1, linePos.first.x, linePos.first.y);
+            WorldToScreen(pos2, linePos.second.x, linePos.second.y);
+            screenPos.x = (linePos.first.x + linePos.second.x) / 2;
+            screenPos.y = (linePos.first.y + linePos.second.y) / 2;
+            if((pow(abs(mousePos.x - (float)screenPos.x), 2) + pow(abs(mousePos.y - (float)screenPos.y), 2)) < scale * scale / 8)
             {
-                int nx, ny;
-                WorldToScreen((*elements[i]).getPosition(), nx, ny);
-                DrawCircle(nx, ny, scale / 2);
+                DrawLine(linePos.first.x, linePos.first.y, linePos.second.x, linePos.second.y, olc::YELLOW);
             }
         } 
     }
@@ -311,6 +311,8 @@
     {
         if(modifyMenuActive)
         {
+            selectElement();
+
             FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::BLACK);
             DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::WHITE);
             DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Modify circuit elements", olc::WHITE, 2);
