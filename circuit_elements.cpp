@@ -5,6 +5,66 @@
 
         }
 
+        void swap(CircuitElement& first, CircuitElement& second) noexcept
+        {
+            using std::swap;
+            swap(first.position, second.position);
+            swap(first.voltage, second.voltage);
+            swap(first.power, second.power);
+            swap(first.in, second.in);
+            swap(first.out, second.out);
+            swap(first.temperature, second.temperature);
+        }
+
+        void swap(Transistor& first, Transistor& second) noexcept
+        {
+            using std::swap;
+            swap(first.position, second.position);
+            swap(first.voltage, second.voltage);
+            swap(first.power, second.power);
+            swap(first.in, second.in);
+            swap(first.out, second.out);
+            swap(first.temperature, second.temperature);
+            swap(first.thresholdVoltage, second.thresholdVoltage);
+            swap(first.threshold, second.threshold);
+        }
+
+        void swap(Resistor& first, Resistor& second) noexcept
+        { 
+            using std::swap;
+            swap(first.position, second.position);
+            swap(first.voltage, second.voltage);
+            swap(first.power, second.power);
+            swap(first.in, second.in);
+            swap(first.out, second.out);
+            swap(first.temperature, second.temperature);
+            swap(first.resistance, second.resistance);
+            swap(first.powerDissipation, second.powerDissipation);
+        }
+
+        void swap(Source& first, Source& second) noexcept
+        {   
+            using std::swap;
+            swap(first.position, second.position);
+            swap(first.voltage, second.voltage);
+            swap(first.power, second.power);
+            swap(first.in, second.in);
+            swap(first.out, second.out);
+            swap(first.temperature, second.temperature);
+        }
+
+        void swap(Battery& first, Battery& second) noexcept
+        {
+            using std::swap;
+            swap(first.position, second.position);
+            swap(first.voltage, second.voltage);
+            swap(first.power, second.power);
+            swap(first.in, second.in);
+            swap(first.out, second.out);
+            swap(first.temperature, second.temperature);
+            swap(first.capacity, second.capacity);
+        }
+
         CircuitElement::CircuitElement()
         {
             this->voltage = 0;
@@ -317,12 +377,11 @@
         {
             this->resistance = 0;
             this->powerDissipation = 0;
-            this->tolerance = 0;
         }
 
         Resistor::Resistor(std::pair<olc::vf2d, olc::vf2d> pos,\
                 const int32_t voltage, const int32_t power, CircuitElement* in, CircuitElement* out, \
-                const int32_t resistance, const int32_t powerDissipation, const int32_t tolerance, const uint32_t temperature)
+                const int32_t resistance, const int32_t powerDissipation , const uint32_t temperature)
         {
             this->position = pos;
 
@@ -334,7 +393,6 @@
 
             this->resistance = resistance;
             this->powerDissipation = powerDissipation;
-            this->tolerance = tolerance;
 
             this->temperature = temperature;
         }
@@ -343,17 +401,14 @@
         {
             this->resistance = r.resistance;
             this->powerDissipation = r.powerDissipation;
-            this->tolerance = r.tolerance;
         }
 
         Resistor::Resistor(Resistor&& r) : CircuitElement(r),
             resistance(r.resistance),
-            powerDissipation(r.powerDissipation),
-            tolerance(r.tolerance)
+            powerDissipation(r.powerDissipation)
         {
             r.resistance = 0;
             r.powerDissipation = 0;
-            r.tolerance = 0;
         }
 
         Resistor::~Resistor()
@@ -362,7 +417,7 @@
 
         std::ostream& Resistor::operator<<(std::ostream& os)
         {
-            os<<"Resistance: "<<this->getResistance()<<"    Power that can be safely dissipated: "<<this->getPowerDissipation()<<"   Tolerance: "<<this->getTolerance()<<"\n";
+            os<<"Resistance: "<<this->getResistance()<<"    Power that can be safely dissipated: "<<this->getPowerDissipation()<<"\n";
             os << "Voltage: "<<this->getVoltage() <<"    Power: " <<this->getPower() <<"    Temperature: "<<this->getTemperature()<<"\n";
 
             return os; 
@@ -370,13 +425,11 @@
 
         int32_t Resistor::getResistance() const { return this->resistance; }
         int32_t Resistor::getPowerDissipation() const { return this->powerDissipation; }
-        int32_t Resistor::getTolerance() const { return this->tolerance; }
 
         Resistor& Resistor::operator=(const Resistor& r) 
         {
             this->resistance = r.getResistance();
             this->powerDissipation = r.getPowerDissipation();
-            this->tolerance = r.getTolerance();
 
             this->position = r.getPosition();
             this->voltage = r.getVoltage();
@@ -392,7 +445,6 @@
         {
             this->resistance = r.getResistance();
             this->powerDissipation = r.getPowerDissipation();
-            this->tolerance = r.getTolerance();
 
             this->position = r.getPosition();
             this->voltage = r.getVoltage();
@@ -403,7 +455,6 @@
 
             r.resistance = 0;
             r.powerDissipation = 0;
-            r.tolerance = 0;
             r.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0, 0 }, { 0, 0});
             r.voltage = 0;
             r.power = 0;

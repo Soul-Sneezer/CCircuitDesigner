@@ -23,6 +23,8 @@ class SpriteAllocFailed : public std::runtime_error
 class CircuitElement
 {
     private:
+        friend void swap(CircuitElement& first, CircuitElement& second) noexcept;
+
         static float& worldScale()
         {
             static float v1 = 0.0f;
@@ -107,6 +109,8 @@ class CableNode : public CircuitElement // work in progress
 class Transistor : public CircuitElement
 {
     private:
+        friend void swap(Transistor& first, Transistor& second) noexcept;
+
         static olc::Sprite*& sprite()
         {
             static olc::Sprite* v;
@@ -151,6 +155,8 @@ class Transistor : public CircuitElement
 class Resistor : public CircuitElement
 {
     private:
+        friend void swap(Resistor& first, Resistor& second) noexcept;
+
         static olc::Sprite*& sprite()
         {
             static olc::Sprite* v;
@@ -167,12 +173,11 @@ class Resistor : public CircuitElement
 
         int32_t resistance;
         int32_t powerDissipation;
-        int32_t tolerance;
     public:
         Resistor();
         explicit Resistor(std::pair<olc::vf2d, olc::vf2d> pos,\
                 const int32_t voltage = 0, const int32_t power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
-                const int32_t resistance = 0, const int32_t powerDissipation = 0, const int32_t tolerance = 0, const uint32_t temperature = 273);
+                const int32_t resistance = 0, const int32_t powerDissipation = 0, const uint32_t temperature = 273);
         Resistor(const Resistor& r);
         Resistor(Resistor&& r);
         virtual ~Resistor();
@@ -182,7 +187,6 @@ class Resistor : public CircuitElement
 
         int32_t getResistance() const;
         int32_t getPowerDissipation() const; 
-        int32_t getTolerance() const; 
 
         Resistor& operator=(const Resistor& r);
         Resistor& operator=(Resistor&& r);
@@ -214,6 +218,8 @@ class Switch
 class Cable : public CircuitElement
 {
     private:
+        friend void swap(Cable& first, Cable& second) noexcept;
+
         int32_t resistance;
         bool reverse;
         int32_t length;
@@ -245,6 +251,8 @@ class Cable : public CircuitElement
 class Source : public CircuitElement
 {
     private:
+        friend void swap(Source& first, Source& second) noexcept;
+
         static olc::Sprite*& sprite()
         {
             static olc::Sprite* v;
@@ -284,6 +292,8 @@ class Source : public CircuitElement
 class Battery : public CircuitElement
 {
     private:
+        friend void swap(Battery& first, Battery& second) noexcept;
+
         static olc::Sprite*& sprite()
         {
             static olc::Sprite* v;
