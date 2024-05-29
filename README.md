@@ -11,6 +11,7 @@ A circuit designer made for my university OOP class.
 - [ ] add ability to remove circuit elements
 - [ ] add ability to modify circuit elements
 - [ ] run circuit simulation
+- [ ] save/load circuits
 - [ ] error reporting
 - [ ] support for different resolutions
 

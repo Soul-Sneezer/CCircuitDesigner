@@ -185,12 +185,13 @@
             DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
             DrawString(70 + menuOffset.x, 70 + menuOffset.y, "CCircuit Designer - Commands", olc::WHITE, 2);
             pressEntry({70, 90}, "ESC", "to open/close this window");
-            pressEntry({70, 110}, "Q", "open edit menu");
-            pressEntry({70, 130}, "R", "start/stop simulation");
-            pressEntry({70, 150}, "SHIFT", "W", "move window up");
-            pressEntry({70, 160}, "SHIFT", "S", "move window down");
-            pressEntry({70, 170}, "SHIFT", "A", "move window left");
-            pressEntry({70, 180}, "SHIFT", "D", "move window right");
+            pressEntry({70, 110}, "X", "to close program");
+            pressEntry({70, 130}, "Q", "open edit menu");
+            pressEntry({70, 150}, "R", "start/stop simulation");
+            pressEntry({70, 170}, "SHIFT", "W", "move window up");
+            pressEntry({70, 180}, "SHIFT", "S", "move window down");
+            pressEntry({70, 190}, "SHIFT", "A", "move window left");
+            pressEntry({70, 200}, "SHIFT", "D", "move window right");
         }
     }
 
@@ -377,6 +378,9 @@
             addMenuActive = false;
             resetOffset();
         }
+
+        if(GetKey(olc::X).bPressed)
+            exit = true;
         
         if(GetKey(olc::SHIFT).bHeld && GetKey(olc::W).bHeld) // move window up
             menuOffset.y-=(int)(std::sqrt(scale));
@@ -469,6 +473,8 @@
     // cppcheck-suppress unusedFunction
     [[maybe_unused]] bool Sim::OnUserUpdate([[maybe_unused]] float fElapsedTime)
     {
+        if(exit)
+            return false;
         Clear(olc::BLACK);
 
         mouseControls();

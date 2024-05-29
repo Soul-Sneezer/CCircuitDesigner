@@ -20,6 +20,8 @@ class StartupFailed : public std::runtime_error
 class Sim : public olc::PixelGameEngine
 {
     private:
+        bool exit = false;
+
         const int radius = 4;
         bool mainMenuActive = false;
         bool editMenuActive = false;
