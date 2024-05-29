@@ -6,9 +6,7 @@
 
 int main() 
 {
-    int value = 3;
     Cable cable;
-    cable.changeValue(value);
     Switch circuit_switch = cable.getSwitch();
     circuit_switch.activate();
     circuit_switch.deactivate();

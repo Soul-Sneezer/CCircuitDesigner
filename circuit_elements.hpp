@@ -101,7 +101,6 @@ class CableNode : public CircuitElement // work in progress
         CableNode& operator=(CableNode&& eleemnt);
         std::ostream& operator<<(std::ostream& os); 
 
-        void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
 
