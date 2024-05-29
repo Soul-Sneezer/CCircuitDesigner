@@ -79,7 +79,6 @@ class CircuitElement
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
 
         CircuitElement* toBaseClass();
-        virtual void changeValue(int32_t& value) = 0;
         virtual void drawYourself(olc::PixelGameEngine *pge) = 0;
 };
 
@@ -147,8 +146,6 @@ class Transistor : public CircuitElement
         Transistor& operator=(Transistor&& transistor);
         std::ostream& operator<<(std::ostream& os); 
 
-        
-        void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
 
@@ -192,8 +189,6 @@ class Resistor : public CircuitElement
         Resistor& operator=(Resistor&& r);
         std::ostream& operator<<(std::ostream& os); 
 
-        
-        void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
 
@@ -243,8 +238,6 @@ class Cable : public CircuitElement
         Cable& operator=(Cable&& cable);
         std::ostream& operator<<(std::ostream& os); 
 
-        
-        void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
 
@@ -283,8 +276,6 @@ class Source : public CircuitElement
         Source& operator=(Source&& s);
         std::ostream& operator<<(std::ostream& os); 
 
-        
-        void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
 
@@ -327,7 +318,6 @@ class Battery : public CircuitElement
         Battery& operator=(Battery&& b);
         std::ostream& operator<<(std::ostream& os); 
 
-        void changeValue(int32_t& value) override;
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
 

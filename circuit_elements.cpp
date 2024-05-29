@@ -253,11 +253,6 @@
 
         }
 
-        void CableNode::changeValue(int32_t& value) 
-        {
-            value = 0;
-        }
-
         void CableNode::drawYourself(olc::PixelGameEngine *pge) 
         {
             int coordX1, coordX2, coordY1, coordY2;
@@ -356,11 +351,6 @@
             transistor.temperature = 273;
 
             return *this;
-        }
-
-        void Transistor::changeValue(int32_t& value) 
-        {
-            value = 10;
         }
 
         void Transistor::drawYourself(olc::PixelGameEngine *pge) 
@@ -466,10 +456,6 @@
 
         }
 
-        void Resistor::changeValue(int32_t& value) 
-        {
-            value = 10;
-        }
         void Resistor::drawYourself(olc::PixelGameEngine *pge) 
         {
             int coordX1, coordX2, coordY1, coordY2;
@@ -629,10 +615,6 @@
 
         }
         
-        void Cable::changeValue(int32_t& value) 
-        {
-            value = 10;
-        }
         void Cable::drawYourself(olc::PixelGameEngine *pge) 
         {
             int coordX1, coordX2, coordY1, coordY2;
@@ -713,10 +695,6 @@
 
         }
 
-        void Source::changeValue(int32_t& value) 
-        {
-            value = 10;
-        }
         void Source::drawYourself(olc::PixelGameEngine *pge) 
         {
             int coordX1, coordX2, coordY1, coordY2;
@@ -807,10 +785,6 @@
 
         }
 
-        void Battery::changeValue(int32_t& value) 
-        {
-            value = 10;
-        }
         void Battery::drawYourself(olc::PixelGameEngine *pge) 
         {
             int coordX1, coordX2, coordY1, coordY2;
