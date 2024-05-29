@@ -7,7 +7,7 @@ A circuit designer made for my university OOP class.
 - [x] maintain current cursor position as you zoom in
 - [x] mouse/touchpad compatibility(right now it's keyboard only)
 - [ ] add sprites for circuit elements
-- [ ] properly draw cables
+- [x] properly draw cables
 - [ ] add ability to remove circuit elements
 - [ ] add ability to modify circuit elements
 - [ ] run circuit simulation
@@ -70,9 +70,9 @@ O cerință nu se consideră îndeplinită dacă este realizată doar ca o serie
 - [x] funcții și atribute `static`
 - [x] STL
 - [x] cât mai multe `const`
-- [ ] la sfârșit: commit separat cu adăugarea unei noi clase derivate fără a modifica restul codului, **pe lângă cele 3 derivate deja adăugate**
+- [x] la sfârșit: commit separat cu adăugarea unei noi clase derivate fără a modifica restul codului, **pe lângă cele 3 derivate deja adăugate**
   - noua derivată nu poate fi una existentă care a fost ștearsă și adăugată din nou
-- [ ] tag de `git`: de exemplu `v0.2`
+- [x] tag de `git`: de exemplu `v0.2`
 
 ## Tema 3
 
