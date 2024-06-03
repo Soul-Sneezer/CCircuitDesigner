@@ -147,27 +147,33 @@
             if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
             {
                 std::shared_ptr<CircuitElement> element;
+                
                 switch(tempType)
                 {
                     case ElementType::ELEM_CABLE:
-                        element = std::make_shared<Cable>(linePos);
                         element = std::dynamic_pointer_cast<Cable>(element);
+                        element = std::make_shared<Cable>(linePos);
+                        
                         break;
                     case ElementType::ELEM_RESISTOR:
-                        element = std::make_shared<Resistor>(linePos);
                         element = std::dynamic_pointer_cast<Resistor>(element);
+                        element = std::make_shared<Resistor>(linePos);
+                        
                         break;
                     case ElementType::ELEM_TRANSISTOR:
-                        element = std::make_shared<Transistor>(linePos);
                         element = std::dynamic_pointer_cast<Transistor>(element);
+                        element = std::make_shared<Transistor>(linePos);
+                        
                         break;
                     case ElementType::ELEM_SOURCE:
-                        element = std::make_shared<Source>(linePos);
                         element = std::dynamic_pointer_cast<Source>(element);
+                        element = std::make_shared<Source>(linePos);
+                       
                         break;
                     case ElementType::ELEM_BATTERY:
-                        element = std::make_shared<Battery>(linePos);
                         element = std::dynamic_pointer_cast<Battery>(element);
+                        element = std::make_shared<Battery>(linePos);
+                        
                         break;
                     default:
                         throw OperationFailed("Failed to create new element!");
@@ -381,7 +387,27 @@
 
         if(GetKey(olc::X).bPressed)
             exit = true;
-        
+       
+        if(GetKey(olc::W).bHeld)
+        {
+            worldOffset.y -= 1.0f / scale;
+        }
+
+        if(GetKey(olc::A).bHeld)
+        {
+            worldOffset.x -= 1.0f / scale;
+        }
+
+        if(GetKey(olc::S).bHeld)
+        {
+            worldOffset.y += 1.0f / scale;
+        }
+
+        if(GetKey(olc::D).bHeld)
+        {
+            worldOffset.x += 1.0f / scale;
+        }
+
         if(GetKey(olc::SHIFT).bHeld && GetKey(olc::W).bHeld) // move window up
             menuOffset.y-=(int)(std::sqrt(scale));
         if(GetKey(olc::SHIFT).bHeld && GetKey(olc::S).bHeld) // move window down
@@ -419,12 +445,12 @@
     {
         olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
 
-        if(GetMouse(2).bPressed)
+        if(GetMouse(1).bPressed)
         {
             startPan = mousePos;
         }
 
-        if(GetMouse(2).bHeld)
+        if(GetMouse(1).bHeld)
         {
             worldOffset -= (mousePos - startPan) / scale; 
             startPan = mousePos;

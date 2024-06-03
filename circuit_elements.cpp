@@ -15,16 +15,20 @@
             swap(first.out, second.out);
             swap(first.temperature, second.temperature);
         }
+        
+        void swap(Cable& first, Cable& second) noexcept
+        {
+            using std::swap;
+            swap(static_cast<CircuitElement&>(first), static_cast<CircuitElement&>(second));
+            swap(first.resistance, second.resistance);
+            swap(first.reverse, second.reverse);
+            swap(first.circuitSwitch, second.circuitSwitch);
+        }
 
         void swap(Transistor& first, Transistor& second) noexcept
         {
             using std::swap;
-            swap(first.position, second.position);
-            swap(first.voltage, second.voltage);
-            swap(first.power, second.power);
-            swap(first.in, second.in);
-            swap(first.out, second.out);
-            swap(first.temperature, second.temperature);
+            swap(static_cast<CircuitElement&>(first), static_cast<CircuitElement&>(second));
             swap(first.thresholdVoltage, second.thresholdVoltage);
             swap(first.threshold, second.threshold);
         }
@@ -32,12 +36,7 @@
         void swap(Resistor& first, Resistor& second) noexcept
         { 
             using std::swap;
-            swap(first.position, second.position);
-            swap(first.voltage, second.voltage);
-            swap(first.power, second.power);
-            swap(first.in, second.in);
-            swap(first.out, second.out);
-            swap(first.temperature, second.temperature);
+            swap(static_cast<CircuitElement&>(first), static_cast<CircuitElement&>(second));
             swap(first.resistance, second.resistance);
             swap(first.powerDissipation, second.powerDissipation);
         }
@@ -45,26 +44,15 @@
         void swap(Source& first, Source& second) noexcept
         {   
             using std::swap;
-            swap(first.position, second.position);
-            swap(first.voltage, second.voltage);
-            swap(first.power, second.power);
-            swap(first.in, second.in);
-            swap(first.out, second.out);
-            swap(first.temperature, second.temperature);
+            swap(static_cast<CircuitElement&>(first), static_cast<CircuitElement&>(second));
         }
 
         void swap(Battery& first, Battery& second) noexcept
         {
             using std::swap;
-            swap(first.position, second.position);
-            swap(first.voltage, second.voltage);
-            swap(first.power, second.power);
-            swap(first.in, second.in);
-            swap(first.out, second.out);
-            swap(first.temperature, second.temperature);
+            swap(static_cast<CircuitElement&>(first), static_cast<CircuitElement&>(second));
             swap(first.capacity, second.capacity);
         }
-
         CircuitElement::CircuitElement()
         {
             this->voltage = 0;
@@ -100,19 +88,9 @@
         }
 
         CircuitElement::CircuitElement(CircuitElement&& element)
-            :position{element.position},
-             voltage{element.voltage},
-             power{element.power},
-            temperature{element.temperature},
-             in{element.in},
-             out{element.out}
+            : CircuitElement()
         {
-            element.position = std::make_pair<olc::vf2d, olc::vf2d>({0,0}, {0,0});
-            element.voltage = 0;
-            element.power = 0;
-            element.in = nullptr;
-            element.out = nullptr;
-            element.temperature = 273;
+            swap(*this, element);
         }
 
         CircuitElement& CircuitElement::operator=(const CircuitElement& element)
@@ -129,19 +107,7 @@
 
         CircuitElement& CircuitElement::operator=(CircuitElement&& element)
         {
-            this->position = element.getPosition();
-            this->voltage = element.getVoltage();
-            this->power = element.getPower();
-            this->in = element.getIn();
-            this->out = element.getOut();
-            this->temperature = element.getTemperature();
-
-            element.position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
-            element.voltage = 0;
-            element.power = 0;
-            element.in = nullptr;
-            element.out = nullptr;
-            element.temperature = 273;
+            swap(*this, element);
 
             return *this;
         }
@@ -157,9 +123,9 @@
         CircuitElement* CircuitElement::getIn() const { return this->in; }
         CircuitElement* CircuitElement::getOut() const { return this->out; }
 
-        std::ostream& CircuitElement::operator<<(std::ostream& os) 
+        std::ostream& operator<<(std::ostream& os, CircuitElement& el) 
         {
-            os << "Voltage: "<<this->getVoltage() <<"    Power: " <<this->getPower() <<"    Temperature: "<<this->getTemperature()<<"\n";
+            os << "Voltage: "<<el.voltage <<"    Power: " <<el.power <<"    Temperature: "<<el.temperature<<"\n";
             return os;        
         }
 
@@ -167,12 +133,6 @@
         {
             screenX = (int)((v.x - CircuitElement::getWorldOffset().x) * CircuitElement::getWorldScale());
             screenY = (int)((v.y - CircuitElement::getWorldOffset().y) * CircuitElement::getWorldScale());
-        }
-
-        // cppcheck-suppress unusedFunction
-        CircuitElement* CircuitElement::toBaseClass()
-        {
-            return dynamic_cast<CircuitElement*>(this);
         }
 
         CableNode::CableNode()   
@@ -190,12 +150,9 @@
             this->outputs = node.outputs;
         }
 
-        CableNode::CableNode(CableNode&& node) : CircuitElement(node),
-             inputs{node.inputs},
-             outputs{node.outputs}
+        CableNode::CableNode(CableNode&& node) : CableNode()
         {
-            node.inputs.clear();
-            node.outputs.clear();
+            swap(*this, node);
         }
 
         CableNode::~CableNode()
@@ -203,9 +160,9 @@
 
         }
 
-        std::ostream& CableNode::operator<<(std::ostream& os) 
+        std::ostream& operator<<(std::ostream& os, CableNode& node) 
         {
-            os<<(this->getInputs()).size()<<" "<<(this->getOutputs()).size();
+            os<<node.inputs.size()<<" "<<node.outputs.size();
             return os;        
         }
 
@@ -229,25 +186,7 @@
         
         CableNode& CableNode::operator=(CableNode&& element)
         {
-            this->inputs = element.getInputs();
-            this->outputs = element.getOutputs();
-            
-            this->position = element.getPosition();
-            this->voltage = element.getVoltage();
-            this->power = element.getPower();
-            this->in = element.getIn();
-            this->out = element.getOut();
-            this->temperature = element.getTemperature();
-
-            element.inputs.clear();
-            element.outputs.clear();
-
-            element.position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
-            element.voltage = 0;
-            element.power = 0;
-            element.in = nullptr;
-            element.out = nullptr;
-            element.temperature = 273;
+            swap(*this, element);
 
             return *this;
 
@@ -291,22 +230,19 @@
             this->thresholdVoltage = transistor.thresholdVoltage;
         }
 
-        Transistor::Transistor(Transistor&& transistor) : CircuitElement(transistor),
-            thresholdVoltage(transistor.thresholdVoltage),
-            threshold(transistor.threshold)
+        Transistor::Transistor(Transistor&& transistor) : Transistor()
         {
-            transistor.threshold = 0;
-            transistor.thresholdVoltage = 0;
+            swap(*this, transistor);
         }
 
         Transistor::~Transistor()
         {
         }
 
-        std::ostream& Transistor::operator<<(std::ostream& os)
+        std::ostream& operator<<(std::ostream& os, Transistor& t)
         {
-            os<<"Threshold value: "<<this->getThreshold()<<"    Threshold voltage: "<<this->getThresholdVoltage()<<"\n";
-            os << "Voltage: "<<this->getVoltage() <<"    Power: " <<this->getPower() <<"    Temperature: "<<this->getTemperature()<<"\n";
+            os<<"Threshold value: "<<t.threshold<<"    Threshold voltage: "<<t.thresholdVoltage<<"\n";
+            os << "Voltage: "<<t.voltage <<"    Power: " <<t.power <<"    Temperature: "<<t.temperature<<"\n";
 
             return os;
         }
@@ -329,27 +265,9 @@
             return *this;
         }
 
-        Transistor& Transistor::operator=(Transistor&& transistor)
-        {  
-            this->threshold = transistor.getThreshold();
-            this->thresholdVoltage = transistor.getThresholdVoltage();
-            
-            this->position = transistor.getPosition();
-            this->voltage = transistor.getVoltage();
-            this->power = transistor.getPower();
-            this->in = transistor.getIn();
-            this->out = transistor.getOut();
-            this->temperature = transistor.getTemperature();
-
-            transistor.threshold = 0;
-            transistor.thresholdVoltage = 0;
-            transistor.position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
-            transistor.voltage = 0;
-            transistor.power = 0;
-            transistor.in = nullptr;
-            transistor.out = nullptr;
-            transistor.temperature = 273;
-
+        Transistor& Transistor::operator=(Transistor&& transistor) 
+        {
+            swap(*this, transistor);
             return *this;
         }
 
@@ -393,22 +311,19 @@
             this->powerDissipation = r.powerDissipation;
         }
 
-        Resistor::Resistor(Resistor&& r) : CircuitElement(r),
-            resistance(r.resistance),
-            powerDissipation(r.powerDissipation)
+        Resistor::Resistor(Resistor&& r) : CircuitElement()
         {
-            r.resistance = 0;
-            r.powerDissipation = 0;
+            swap(*this, r);
         }
 
         Resistor::~Resistor()
         {
         }
 
-        std::ostream& Resistor::operator<<(std::ostream& os)
+        std::ostream& operator<<(std::ostream& os, Resistor& r)
         {
-            os<<"Resistance: "<<this->getResistance()<<"    Power that can be safely dissipated: "<<this->getPowerDissipation()<<"\n";
-            os << "Voltage: "<<this->getVoltage() <<"    Power: " <<this->getPower() <<"    Temperature: "<<this->getTemperature()<<"\n";
+            os<<"Resistance: "<<r.resistance<<"    Power that can be safely dissipated: "<<r.powerDissipation<<"\n";
+            os << "Voltage: "<<r.voltage <<"    Power: " <<r.power <<"    Temperature: "<<r.temperature<<"\n";
 
             return os; 
         }
@@ -433,24 +348,7 @@
 
         Resistor& Resistor::operator=(Resistor&& r)
         {
-            this->resistance = r.getResistance();
-            this->powerDissipation = r.getPowerDissipation();
-
-            this->position = r.getPosition();
-            this->voltage = r.getVoltage();
-            this->power = r.getPower();
-            this->in = r.getIn();
-            this->out = r.getOut();
-            this->temperature = r.getTemperature();
-
-            r.resistance = 0;
-            r.powerDissipation = 0;
-            r.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0, 0 }, { 0, 0});
-            r.voltage = 0;
-            r.power = 0;
-            r.in = nullptr;
-            r.out = nullptr;
-            r.temperature = 273;
+            swap(*this, r);
 
             return *this;
 
@@ -514,7 +412,6 @@
 
         Cable::Cable()
         {
-            this->length = 0;
             this->resistance = 0;
             this->reverse = false;
         }
@@ -522,7 +419,7 @@
         Cable::Cable(std::pair<olc::vf2d, olc::vf2d> pos, \
                 const int32_t voltage, const int32_t power, \
                 CircuitElement* in, CircuitElement* out, \
-                const int32_t resistance, const bool reverse, const int32_t length, const uint32_t temperature)
+                const int32_t resistance, const bool reverse, const uint32_t temperature)
         {
             this->position = pos;
 
@@ -536,33 +433,26 @@
             this->reverse = reverse;
 
             this->temperature = temperature;
-            this->length = length;
         }
 
         Cable::Cable(const Cable& c) : CircuitElement(c) 
         {
             this->resistance = c.resistance;
             this->reverse = c.reverse;
-            this->length = c.length;
         }
 
-        Cable::Cable(Cable&& c) : CircuitElement(c),
-            resistance(c.resistance),
-            reverse(c.reverse),
-            length(c.length)
+        Cable::Cable(Cable&& c) : Cable()
         {
-            c.resistance = 0;
-            c.reverse = false;
-            c.length = 0;
+            swap(*this, c);
         }
 
         Cable::~Cable()
         {
         }
 
-        std::ostream& Cable::operator<<(std::ostream& os)
+        std::ostream& operator<<(std::ostream& os, Cable& c)
         {
-            os <<"Resistance: "<<this->getResistance()<<"   Voltage: "<<this->getVoltage()<<"    Power: " <<this->getPower()<<"    Temperature: "<<this->getTemperature()<<"\n";
+            os <<"Resistance: "<<c.resistance<<"   Voltage: "<<c.voltage<<"    Power: " <<c.power<<"    Temperature: "<<c.temperature<<"\n";
 
             return os;
         }
@@ -570,13 +460,11 @@
         int32_t Cable::getResistance() const { return this->resistance; }
         Switch Cable::getSwitch() const { return this->circuitSwitch; }
         bool Cable::getFlowDirection() const { return this->reverse; }
-        int32_t Cable::getLength() const { return this->length; }
      
         Cable& Cable::operator=(const Cable& cable) 
         {
             this->reverse = cable.getFlowDirection();
             this->resistance = cable.getResistance();
-            this->length = cable.getLength();
 
             this->position = cable.getPosition();
             this->voltage = cable.getVoltage();
@@ -590,26 +478,7 @@
 
         Cable& Cable::operator=(Cable&& cable)
         {
-            this->reverse = cable.getFlowDirection();
-            this->resistance = cable.getResistance();
-            this->length = cable.getLength();
-
-            this->position = cable.getPosition();
-            this->voltage = cable.getVoltage();
-            this->power = cable.getPower();
-            this->in = cable.getIn();
-            this->out = cable.getOut();
-            this->temperature = cable.getTemperature();
-
-            cable.reverse = false;
-            cable.resistance = 0;
-            cable.length = 0;
-            cable.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0, 0 }, { 0, 0 });
-            cable.voltage = 0;
-            cable.power = 0;
-            cable.in = nullptr;
-            cable.out = nullptr;
-            cable.temperature = 273;
+            swap(*this, cable);
 
             return *this;
 
@@ -648,17 +517,18 @@
         {
         }
 
-        Source::Source(Source&& s) : CircuitElement(s)
+        Source::Source(Source&& s) : Source()
         {
+            swap(*this, s);
         }
         
         Source::~Source()
         {
         }
 
-        std::ostream& Source::operator<<(std::ostream& os)
+        std::ostream& operator<<(std::ostream& os, Source& s)
         {
-            os <<"Voltage: "<<this->getVoltage() <<"    Power: " <<this->getPower() <<"    Temperature: "<<this->getTemperature()<<"\n";
+            os <<"Voltage: "<<s.voltage <<"    Power: " <<s.power <<"    Temperature: "<<s.temperature<<"\n";
 
             return os;
         }
@@ -677,19 +547,7 @@
 
         Source& Source::operator=(Source&& s)
         {
-            this->position = s.getPosition();
-            this->voltage = s.getVoltage();
-            this->power = s.getPower();
-            this->in = s.getIn();
-            this->out = s.getOut();
-            this->temperature = s.getTemperature();
-
-            s.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0,0 }, { 0,0 });
-            s.voltage = 0;
-            s.power = 0;
-            s.in = nullptr;
-            s.out = nullptr;
-            s.temperature = 273;
+            swap(*this, s);
 
             return *this;
 
@@ -731,19 +589,18 @@
             this->capacity = b.capacity;
         }
 
-        Battery::Battery(Battery&& b) : CircuitElement(b),
-            capacity(b.capacity)
+        Battery::Battery(Battery&& b) : Battery()
         {
-            b.capacity = 0;
+            swap(*this, b);
         }
     
         Battery::~Battery()
         {
         }
 
-        std::ostream& Battery::operator<<(std::ostream& os)
+        std::ostream& operator<<(std::ostream& os, Battery& b)
         {
-            os<<"Capacity: "<<this->getCapacity()<<" Voltage: "<<this->getVoltage()<<"\n";
+            os<<"Capacity: "<<b.capacity<<" Voltage: "<<b.voltage<<"\n";
             return os;
         }
         int32_t Battery::getCapacity() const { return this->capacity; };
@@ -764,22 +621,7 @@
 
         Battery& Battery::operator=(Battery&& b)
         {
-            this->capacity = b.getCapacity();
-            
-            this->position = b.getPosition();
-            this->voltage = b.getVoltage();
-            this->power = b.getPower();
-            this->in = b.getIn();
-            this->out = b.getOut();
-            this->temperature = b.getTemperature();
-
-            b.capacity = 0;
-            b.position = std::make_pair<olc::vf2d, olc::vf2d>({ 0,0 }, { 0,0 });
-            b.voltage = 0;
-            b.power = 0;
-            b.in = nullptr;
-            b.out = nullptr;
-            b.temperature = 273;
+            swap(*this, b);
 
             return *this;
 

@@ -1,4 +1,12 @@
 #include "circuit.hpp"
+        void swap(Circuit& first, Circuit& second) noexcept
+        {
+            using std::swap;
+            swap(first.elements, second.elements);
+            swap(first.voltageIn, second.voltageIn);
+            swap(first.voltageOut, second.voltageOut);
+        }
+
         void Circuit::addElementToCircuit(std::shared_ptr<CircuitElement>& element)
         {
             elements.push_back(element);
@@ -13,6 +21,7 @@
         {
             this->voltageIn = circuit.voltageIn;
             this->voltageOut = circuit.voltageOut;
+            this->elements = circuit.elements;
         }
 
         Circuit::~Circuit()
