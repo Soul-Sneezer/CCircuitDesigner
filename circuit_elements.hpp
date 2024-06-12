@@ -185,7 +185,6 @@ class Cable : public CircuitElement
 
         int32_t resistance;
         bool reverse;
-        int32_t length;
         Switch circuitSwitch;
     public:
         Cable();
