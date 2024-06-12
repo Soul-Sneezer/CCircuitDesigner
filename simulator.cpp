@@ -1,15 +1,5 @@
 #include "simulator.hpp"
 
-    OperationFailed::OperationFailed(const char* message) throw() : std::runtime_error(message)
-    {
-
-    }
-
-    StartupFailed::StartupFailed(const char* message) throw() : std::runtime_error(message)
-    {
-
-    }
-
     void Sim::resetOffset()
     {
         menuOffset = {0,0};
@@ -31,19 +21,6 @@
         DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size() + 8 * key2.size())  * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, fontSize);
         DrawString(pos.x + menuOffset.x + (88 + 8 * key1.size() + 8 * key2.size()) * fontSize, pos.y + menuOffset.y , action,   olc::WHITE, fontSize);
 
-    }
-
-    void Sim::drawElement(std::shared_ptr<CircuitElement> element)
-    {
-        element->drawYourself(this);
-    }
-
-    void Sim::drawCircuit()
-    {
-        for(unsigned int i = 0; i < circuit.getElements().size(); i++)
-        {
-            drawElement(circuit.getElements()[i]); 
-        }
     }
 
     void Sim::resetTempCoord()
@@ -517,7 +494,8 @@
         {
             addElement = false; 
         }
-        drawCircuit(); 
+
+        circuit.drawCircuit(this); 
 
         drawAddMenu();
         drawModifyMenu();

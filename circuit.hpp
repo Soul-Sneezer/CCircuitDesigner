@@ -9,6 +9,7 @@ class Circuit
         int32_t voltageIn;
         int32_t voltageOut;
         std::vector<std::shared_ptr<CircuitElement>> elements;
+        void drawElement(std::shared_ptr<CircuitElement> element, olc::PixelGameEngine *pge);
     public:
         void addElementToCircuit(std::shared_ptr<CircuitElement>& element);
 
@@ -22,6 +23,9 @@ class Circuit
         Circuit& operator=(const Circuit& circuit);
 
         void run();
+        void drawCircuit(olc::PixelGameEngine *pge);
+        
+        friend void swap(Circuit& first, Circuit& second) noexcept;
 };
 
 #endif

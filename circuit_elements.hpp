@@ -2,6 +2,7 @@
 #define CC_CIRCUIT_ELEMENTS
 
 #include <olcPixelGameEngine.h>
+#include "debug.hpp"
 
 enum class ElementType 
 {
@@ -13,12 +14,6 @@ enum class ElementType
     ELEM_SOURCE,
     ELEM_BATTERY
 }; 
-
-class SpriteAllocFailed : public std::runtime_error
-{
-    public:
-        explicit SpriteAllocFailed(const char* message) throw();
-};
 
 class CircuitElement
 {
@@ -45,6 +40,8 @@ class CircuitElement
 
         CircuitElement* in; // prev element
         CircuitElement* out; // next element
+    
+        void allocSprite(olc::Sprite*& sprite, const char* path);
     public:
         CircuitElement();
         explicit CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power = 0, \
@@ -74,7 +71,7 @@ class CircuitElement
 
         CircuitElement& operator=(const CircuitElement& element);
         CircuitElement& operator=(CircuitElement&& element);
-        std::ostream& operator<<(std::ostream& os); 
+        friend std::ostream& operator<<(std::ostream& os, const CircuitElement& element); 
 
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
 
@@ -98,8 +95,8 @@ class CableNode : public CircuitElement // work in progress
         std::vector<std::shared_ptr<CircuitElement>> getOutputs() const;
 
         CableNode& operator=(const CableNode& element);
-        CableNode& operator=(CableNode&& eleemnt);
-        std::ostream& operator<<(std::ostream& os); 
+        CableNode& operator=(CableNode&& element);
+        friend std::ostream& operator<<(std::ostream& os, const CableNode& element); 
 
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
@@ -109,21 +106,7 @@ class Transistor : public CircuitElement
     private:
         friend void swap(Transistor& first, Transistor& second) noexcept;
 
-        static olc::Sprite*& sprite()
-        {
-            static olc::Sprite* v;
-            try{
-                v = new olc::Sprite("./sprites/transistor.png");
-                if(v == nullptr)
-                    throw SpriteAllocFailed("Failed to alloc transistor sprite!");
-
-            }
-            catch (SpriteAllocFailed const &)
-            {
-            }
-
-            return v;
-        }
+        static olc::Sprite* sprite;
         int32_t thresholdVoltage;
         int32_t threshold;
     public:
@@ -135,15 +118,14 @@ class Transistor : public CircuitElement
         Transistor(Transistor&& transistor);
         ~Transistor();
         
-        static olc::Sprite* getSprite() { return sprite(); };
-        static void setSprite(char* path) { sprite() = new olc::Sprite(path); }
+        static olc::Sprite* getSprite() { return sprite; };
 
         int32_t getThreshold() const; 
         int32_t getThresholdVoltage() const; 
 
         Transistor& operator=(const Transistor& transistor);
         Transistor& operator=(Transistor&& transistor);
-        std::ostream& operator<<(std::ostream& os); 
+        friend std::ostream& operator<<(std::ostream& os, const Transistor& transistor); 
 
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
@@ -153,19 +135,7 @@ class Resistor : public CircuitElement
     private:
         friend void swap(Resistor& first, Resistor& second) noexcept;
 
-        static olc::Sprite*& sprite()
-        {
-            static olc::Sprite* v;
-            try{
-                v = new olc::Sprite("./sprites/resistor.png");
-                if(v == nullptr)
-                    throw SpriteAllocFailed("Faield to alloc resistor sprite!");
-            }
-            catch(SpriteAllocFailed const &) 
-            {
-            }
-            return v;
-        }
+        static olc::Sprite* sprite;
 
         int32_t resistance;
         int32_t powerDissipation;
@@ -178,15 +148,14 @@ class Resistor : public CircuitElement
         Resistor(Resistor&& r);
         virtual ~Resistor();
         
-        static olc::Sprite* getSprite() { return sprite(); };
-        static void setSprite(char* path) { sprite() = new olc::Sprite(path); }
+        static olc::Sprite* getSprite() { return sprite; };
 
         int32_t getResistance() const;
         int32_t getPowerDissipation() const; 
 
         Resistor& operator=(const Resistor& r);
         Resistor& operator=(Resistor&& r);
-        std::ostream& operator<<(std::ostream& os); 
+        friend std::ostream& operator<<(std::ostream& os, const Resistor& r); 
 
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
@@ -223,7 +192,7 @@ class Cable : public CircuitElement
         explicit Cable(std::pair<olc::vf2d, olc::vf2d> pos, \
                 const int32_t voltage = 0, const int32_t power = 0, \
                 CircuitElement* in = NULL,CircuitElement* out = NULL, \
-                const int32_t resistance = 0, const bool reverse = false, const int32_t length = 0, const uint32_t temperature = 273);
+                const int32_t resistance = 0, const bool reverse = false,                 const uint32_t temperature = 273);
         Cable(const Cable& c);
         Cable(Cable&& c);
         ~Cable();
@@ -235,7 +204,7 @@ class Cable : public CircuitElement
 
         Cable& operator=(const Cable& cable);
         Cable& operator=(Cable&& cable);
-        std::ostream& operator<<(std::ostream& os); 
+        friend std::ostream& operator<<(std::ostream& os, const Cable& cable); 
 
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
@@ -245,20 +214,7 @@ class Source : public CircuitElement
     private:
         friend void swap(Source& first, Source& second) noexcept;
 
-        static olc::Sprite*& sprite()
-        {
-            static olc::Sprite* v;
-            try{
-                v = new olc::Sprite("./sprites/source.png");
-                if(v == nullptr)
-                    throw SpriteAllocFailed("Failed to alloc power source sprite!");
-            } 
-            catch(SpriteAllocFailed const &)
-            {
-            }
-
-            return v;
-        }
+        static olc::Sprite* sprite;
     public:
         Source();
         explicit Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage = 0, int32_t power = 0, \
@@ -268,12 +224,11 @@ class Source : public CircuitElement
         Source(Source&& s);
         ~Source();
         
-        static olc::Sprite* getSprite() { return sprite(); };
-        static void setSprite(char* path) { sprite() = new olc::Sprite(path); }
+        static olc::Sprite* getSprite() { return sprite; };
 
         Source& operator=(const Source& s);
         Source& operator=(Source&& s);
-        std::ostream& operator<<(std::ostream& os); 
+        friend std::ostream& operator<<(std::ostream& os, const Source& s); 
 
         void drawYourself(olc::PixelGameEngine *pge) override;
 };
@@ -284,20 +239,7 @@ class Battery : public CircuitElement
     private:
         friend void swap(Battery& first, Battery& second) noexcept;
 
-        static olc::Sprite*& sprite()
-        {
-            static olc::Sprite* v;
-            try{
-                v = new olc::Sprite("./sprites/battery.png");
-                if(v == nullptr)
-                    throw SpriteAllocFailed("Failed to alloc battery sprite!");
-            }
-            catch(SpriteAllocFailed const &)
-            {
-            }
-
-            return v;
-        }
+        static olc::Sprite* sprite;
         uint32_t capacity;
     public:
         Battery();
@@ -308,14 +250,13 @@ class Battery : public CircuitElement
         Battery(Battery&& b);
         ~Battery();
 
-        static olc::Sprite* getSprite() { return sprite(); };
-        static void setSprite(char* path) { sprite() = new olc::Sprite(path); }
+        static olc::Sprite* getSprite() { return sprite; };
 
         int32_t getCapacity() const; 
 
         Battery& operator=(const Battery& b);
         Battery& operator=(Battery&& b);
-        std::ostream& operator<<(std::ostream& os); 
+        friend std::ostream& operator<<(std::ostream& os, const Battery& b); 
 
         void drawYourself(olc::PixelGameEngine *pge) override;
 };

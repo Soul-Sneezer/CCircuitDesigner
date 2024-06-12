@@ -4,18 +4,7 @@
 #include <olcPixelGameEngine.h>
 #include "circuit_elements.hpp"
 #include "circuit.hpp"
-
-class OperationFailed : public std::runtime_error
-{
-    public:
-        explicit OperationFailed(const char* message) throw();
-};
-
-class StartupFailed : public std::runtime_error
-{
-    public:
-        explicit StartupFailed(const char* message) throw();
-};
+#include "debug.hpp"
 
 class Sim : public olc::PixelGameEngine
 {
@@ -47,9 +36,6 @@ class Sim : public olc::PixelGameEngine
 
         void pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action, const uint32_t fontSize);
         void pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action, const uint32_t fontSize);
-
-        void drawElement(std::shared_ptr<CircuitElement> element);
-        void drawCircuit();
 
         void resetTempCoord();
 

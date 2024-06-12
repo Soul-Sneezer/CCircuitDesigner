@@ -1,10 +1,5 @@
 #include "circuit_elements.hpp"
 
-        SpriteAllocFailed::SpriteAllocFailed(const char* message) throw() : std::runtime_error(message)
-        {
-
-        }
-
         void swap(CircuitElement& first, CircuitElement& second) noexcept
         {
             using std::swap;
@@ -53,6 +48,7 @@
             swap(static_cast<CircuitElement&>(first), static_cast<CircuitElement&>(second));
             swap(first.capacity, second.capacity);
         }
+
         CircuitElement::CircuitElement()
         {
             this->voltage = 0;
@@ -116,6 +112,20 @@
         {
         }
 
+        void CircuitElement::allocSprite(olc::Sprite*& sprite, const char* path)
+        {
+            try{
+                    sprite = new olc::Sprite(path);
+                    if(sprite == nullptr)
+                        throw SpriteAllocFailed("Failed to alloc sprite!");
+
+            }
+            catch (SpriteAllocFailed const &)
+            {
+                sprite = new olc::Sprite("./sprites/placeholder.png");
+            }
+        }
+
         std::pair<olc::vf2d, olc::vf2d> CircuitElement::getPosition() const { return this->position; }
         int32_t CircuitElement::getVoltage() const { return this->voltage; }
         int32_t CircuitElement::getPower() const { return this->power; }
@@ -123,7 +133,7 @@
         CircuitElement* CircuitElement::getIn() const { return this->in; }
         CircuitElement* CircuitElement::getOut() const { return this->out; }
 
-        std::ostream& operator<<(std::ostream& os, CircuitElement& el) 
+        std::ostream& operator<<(std::ostream& os, const CircuitElement& el) 
         {
             os << "Voltage: "<<el.voltage <<"    Power: " <<el.power <<"    Temperature: "<<el.temperature<<"\n";
             return os;        
@@ -160,7 +170,7 @@
 
         }
 
-        std::ostream& operator<<(std::ostream& os, CableNode& node) 
+        std::ostream& operator<<(std::ostream& os, const CableNode& node) 
         {
             os<<node.inputs.size()<<" "<<node.outputs.size();
             return os;        
@@ -239,7 +249,7 @@
         {
         }
 
-        std::ostream& operator<<(std::ostream& os, Transistor& t)
+        std::ostream& operator<<(std::ostream& os, const Transistor& t)
         {
             os<<"Threshold value: "<<t.threshold<<"    Threshold voltage: "<<t.thresholdVoltage<<"\n";
             os << "Voltage: "<<t.voltage <<"    Power: " <<t.power <<"    Temperature: "<<t.temperature<<"\n";
@@ -320,7 +330,7 @@
         {
         }
 
-        std::ostream& operator<<(std::ostream& os, Resistor& r)
+        std::ostream& operator<<(std::ostream& os, const Resistor& r)
         {
             os<<"Resistance: "<<r.resistance<<"    Power that can be safely dissipated: "<<r.powerDissipation<<"\n";
             os << "Voltage: "<<r.voltage <<"    Power: " <<r.power <<"    Temperature: "<<r.temperature<<"\n";
@@ -450,7 +460,7 @@
         {
         }
 
-        std::ostream& operator<<(std::ostream& os, Cable& c)
+        std::ostream& operator<<(std::ostream& os, const Cable& c)
         {
             os <<"Resistance: "<<c.resistance<<"   Voltage: "<<c.voltage<<"    Power: " <<c.power<<"    Temperature: "<<c.temperature<<"\n";
 
@@ -526,7 +536,7 @@
         {
         }
 
-        std::ostream& operator<<(std::ostream& os, Source& s)
+        std::ostream& operator<<(std::ostream& os, const Source& s)
         {
             os <<"Voltage: "<<s.voltage <<"    Power: " <<s.power <<"    Temperature: "<<s.temperature<<"\n";
 
@@ -598,11 +608,12 @@
         {
         }
 
-        std::ostream& operator<<(std::ostream& os, Battery& b)
+        std::ostream& operator<<(std::ostream& os, const Battery& b)
         {
             os<<"Capacity: "<<b.capacity<<" Voltage: "<<b.voltage<<"\n";
             return os;
         }
+ 
         int32_t Battery::getCapacity() const { return this->capacity; };
 
         Battery& Battery::operator=(const Battery& b) 
