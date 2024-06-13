@@ -405,14 +405,13 @@
 
     Sim::Sim()
     {
+        circuit = new Circuit();
         sAppName = "Circuit Simulator";
     }
 
     // cppcheck-suppress unusedFunction
     [[maybe_unused]] bool Sim::OnUserCreate()
     {
-        circuit = new Circuit();
-
         worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
         worldOffset.y = (float)(-GetScreenSize().y / 2) / scale;
 
