@@ -123,39 +123,7 @@
 
             if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
             {
-                std::shared_ptr<CircuitElement> element;
-                
-                switch(tempType)
-                {
-                    case ElementType::ELEM_CABLE:
-                        element = std::dynamic_pointer_cast<Cable>(element);
-                        element = std::make_shared<Cable>(linePos);
-                        
-                        break;
-                    case ElementType::ELEM_RESISTOR:
-                        element = std::dynamic_pointer_cast<Resistor>(element);
-                        element = std::make_shared<Resistor>(linePos);
-                        
-                        break;
-                    case ElementType::ELEM_TRANSISTOR:
-                        element = std::dynamic_pointer_cast<Transistor>(element);
-                        element = std::make_shared<Transistor>(linePos);
-                        
-                        break;
-                    case ElementType::ELEM_SOURCE:
-                        element = std::dynamic_pointer_cast<Source>(element);
-                        element = std::make_shared<Source>(linePos);
-                       
-                        break;
-                    case ElementType::ELEM_BATTERY:
-                        element = std::dynamic_pointer_cast<Battery>(element);
-                        element = std::make_shared<Battery>(linePos);
-                        
-                        break;
-                    default:
-                        throw OperationFailed("Failed to create new element!");
-                }
-                circuit.addElementToCircuit(element);
+                circuit->createAndAddElem(tempType, linePos); 
             }     
         }
     }
@@ -259,32 +227,11 @@
         }
     }
 
-    void Sim::selectElement()
-    {
-        olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY()};
-        std::pair<olc::vi2d, olc::vi2d> linePos;
-        olc::vf2d screenPos;
-        std::vector<std::shared_ptr<CircuitElement>> elements = circuit.getElements();
-        for(long unsigned int i = 0; i < elements.size(); i++)
-        {
-            olc::vf2d pos1 = (*elements[i]).getPosition().first;
-            olc::vf2d pos2 = (*elements[i]).getPosition().second;
-            WorldToScreen(pos1, linePos.first.x, linePos.first.y);
-            WorldToScreen(pos2, linePos.second.x, linePos.second.y);
-            screenPos.x = (linePos.first.x + linePos.second.x) / 2;
-            screenPos.y = (linePos.first.y + linePos.second.y) / 2;
-            if((pow(abs(mousePos.x - (float)screenPos.x), 2) + pow(abs(mousePos.y - (float)screenPos.y), 2)) < scale * scale / 8)
-            {
-                DrawLine(linePos.first.x, linePos.first.y, linePos.second.x, linePos.second.y, olc::YELLOW);
-            }
-        } 
-    }
-
     void Sim::drawDeleteMenu()
     {
         if(removeMenuActive)
         {   
-            selectElement();
+            circuit->selectElement(this, scale);
 
             FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::BLACK);
             DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::WHITE);
@@ -300,7 +247,7 @@
     {
         if(modifyMenuActive)
         {
-            selectElement();
+            circuit->selectElement(this, scale);
 
             FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::BLACK);
             DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::WHITE);
@@ -464,12 +411,13 @@
     // cppcheck-suppress unusedFunction
     [[maybe_unused]] bool Sim::OnUserCreate()
     {
+        circuit = new Circuit();
+
         worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
         worldOffset.y = (float)(-GetScreenSize().y / 2) / scale;
 
         mainMenuActive = true;
         resetTempCoord();
-
         return true;
     }
 
@@ -495,7 +443,7 @@
             addElement = false; 
         }
 
-        circuit.drawCircuit(this); 
+        circuit->drawCircuit(this); 
 
         drawAddMenu();
         drawModifyMenu();
@@ -504,8 +452,5 @@
         drawMainMenu();
         drawEditMenu();
                 
-        
-
         return true;
     }
-

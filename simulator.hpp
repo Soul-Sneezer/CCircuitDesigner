@@ -30,7 +30,7 @@ class Sim : public olc::PixelGameEngine
         ElementType tempType = ElementType::ELEM_UNASSIGNED;
         olc::vf2d tempPos;
 
-        Circuit circuit;
+        Circuit* circuit;
 
         void resetOffset();
 

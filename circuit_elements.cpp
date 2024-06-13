@@ -1,5 +1,7 @@
 #include "circuit_elements.hpp"
 
+olc::Sprite* CircuitElement::sprite;
+
         void swap(CircuitElement& first, CircuitElement& second) noexcept
         {
             using std::swap;
@@ -56,6 +58,7 @@
             this->in = NULL;
             this->out = NULL;
             this->temperature = 273;
+            //this->allocSprite("./sprites/placeholder.png");
         }
 
         CircuitElement::CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
@@ -71,6 +74,7 @@
             this->out = out;
 
             this->temperature = temperature;
+            this->allocSprite("./sprites/placeholder.png");
         }
 
         CircuitElement::CircuitElement(const CircuitElement& element)
@@ -112,17 +116,17 @@
         {
         }
 
-        void CircuitElement::allocSprite(olc::Sprite*& sprite, const char* path)
+        void CircuitElement::allocSprite(const char* path)
         {
             try{
-                    sprite = new olc::Sprite(path);
-                    if(sprite == nullptr)
+                    this->sprite = new olc::Sprite(path);
+                    if(this->sprite == nullptr)
                         throw SpriteAllocFailed("Failed to alloc sprite!");
 
             }
             catch (SpriteAllocFailed const &)
             {
-                sprite = new olc::Sprite("./sprites/placeholder.png");
+                this->sprite = new olc::Sprite("./sprites/placeholder.png");
             }
         }
 
@@ -214,6 +218,7 @@
         {
             this->threshold = 0;
             this->thresholdVoltage = 0;
+            //this->allocSprite("./sprites/transistor.png");
         }
 
         Transistor::Transistor(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
@@ -232,6 +237,7 @@
             this->thresholdVoltage = thresholdVoltage;
 
             this->temperature = temperature;
+            this->allocSprite("./sprites/transistor.png");
         }
 
         Transistor::Transistor(const Transistor& transistor) : CircuitElement(transistor)
@@ -295,6 +301,7 @@
         {
             this->resistance = 0;
             this->powerDissipation = 0;
+        //    this->allocSprite("./sprites/resistor.png");
         }
 
         Resistor::Resistor(std::pair<olc::vf2d, olc::vf2d> pos,\
@@ -313,6 +320,7 @@
             this->powerDissipation = powerDissipation;
 
             this->temperature = temperature;
+            this->allocSprite("./sprites/resistor.png");
         }
 
         Resistor::Resistor(const Resistor& r) : CircuitElement(r) 
@@ -506,6 +514,7 @@
 
         Source::Source()
         {
+        //    this->allocSprite("./sprites/source.png");
         }
 
         Source::Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage, int32_t power, \
@@ -521,6 +530,7 @@
             this->out = out;
 
             this->temperature = temperature;
+            this->allocSprite("./sprites/source.png");
         }
 
         Source::Source(const Source& s) : CircuitElement(s) 
@@ -576,6 +586,7 @@
         Battery::Battery()
         {
             this->capacity = 0;
+            //this->allocSprite("./sprites/battery.png");
         }
 
         Battery::Battery(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
@@ -592,6 +603,7 @@
 
             this->capacity = capacity;
             this->temperature = temperature;
+            this->allocSprite("./sprites/battery.png");
         }
 
         Battery::Battery(const Battery& b) : CircuitElement(b)

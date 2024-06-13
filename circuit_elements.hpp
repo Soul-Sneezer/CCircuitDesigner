@@ -33,7 +33,7 @@ class CircuitElement
 
     protected:
         std::pair<olc::vf2d, olc::vf2d> position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
-        
+        static olc::Sprite* sprite; 
         int32_t voltage;
         int32_t power;
         uint32_t temperature; // useless for now
@@ -41,8 +41,9 @@ class CircuitElement
         CircuitElement* in; // prev element
         CircuitElement* out; // next element
     
-        void allocSprite(olc::Sprite*& sprite, const char* path);
     public:
+        void allocSprite(const char* path);
+
         CircuitElement();
         explicit CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power = 0, \
                 CircuitElement* in = NULL, CircuitElement* out = NULL, \
@@ -60,6 +61,8 @@ class CircuitElement
       
         static olc::vf2d getWorldOffset() { return worldOffset(); };
         static float getWorldScale() { return worldScale(); };
+        static olc::Sprite* getSprite() { return sprite; };
+
         static void setWorldScale(const float scale)
         {
             worldScale() = scale;
@@ -106,7 +109,6 @@ class Transistor : public CircuitElement
     private:
         friend void swap(Transistor& first, Transistor& second) noexcept;
 
-        static olc::Sprite* sprite;
         int32_t thresholdVoltage;
         int32_t threshold;
     public:
@@ -118,8 +120,6 @@ class Transistor : public CircuitElement
         Transistor(Transistor&& transistor);
         ~Transistor();
         
-        static olc::Sprite* getSprite() { return sprite; };
-
         int32_t getThreshold() const; 
         int32_t getThresholdVoltage() const; 
 
@@ -135,8 +135,6 @@ class Resistor : public CircuitElement
     private:
         friend void swap(Resistor& first, Resistor& second) noexcept;
 
-        static olc::Sprite* sprite;
-
         int32_t resistance;
         int32_t powerDissipation;
     public:
@@ -148,8 +146,6 @@ class Resistor : public CircuitElement
         Resistor(Resistor&& r);
         virtual ~Resistor();
         
-        static olc::Sprite* getSprite() { return sprite; };
-
         int32_t getResistance() const;
         int32_t getPowerDissipation() const; 
 
@@ -212,8 +208,6 @@ class Source : public CircuitElement
 {
     private:
         friend void swap(Source& first, Source& second) noexcept;
-
-        static olc::Sprite* sprite;
     public:
         Source();
         explicit Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage = 0, int32_t power = 0, \
@@ -223,8 +217,6 @@ class Source : public CircuitElement
         Source(Source&& s);
         ~Source();
         
-        static olc::Sprite* getSprite() { return sprite; };
-
         Source& operator=(const Source& s);
         Source& operator=(Source&& s);
         friend std::ostream& operator<<(std::ostream& os, const Source& s); 
@@ -238,7 +230,6 @@ class Battery : public CircuitElement
     private:
         friend void swap(Battery& first, Battery& second) noexcept;
 
-        static olc::Sprite* sprite;
         uint32_t capacity;
     public:
         Battery();
@@ -248,8 +239,6 @@ class Battery : public CircuitElement
         Battery(const Battery& b);
         Battery(Battery&& b);
         ~Battery();
-
-        static olc::Sprite* getSprite() { return sprite; };
 
         int32_t getCapacity() const; 
 
