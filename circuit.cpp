@@ -106,6 +106,8 @@
 
     int32_t Circuit::getVoltageIn() const{ return this->voltageIn; };
     int32_t Circuit::getVoltageOut() const{ return this->voltageOut; };
+
+    // cppcheck-suppress unusedFunction
     std::vector<std::shared_ptr<CircuitElement>>& Circuit::getElements() { return this->elements; };
     Circuit& Circuit::operator=(const Circuit& circuit)
     {
