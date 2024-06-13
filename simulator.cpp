@@ -412,6 +412,8 @@
     // cppcheck-suppress unusedFunction
     [[maybe_unused]] bool Sim::OnUserCreate()
     {
+        allocSprites();
+
         worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
         worldOffset.y = (float)(-GetScreenSize().y / 2) / scale;
 

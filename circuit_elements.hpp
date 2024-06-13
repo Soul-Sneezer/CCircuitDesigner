@@ -15,6 +15,8 @@ enum class ElementType
     ELEM_BATTERY
 }; 
 
+void allocSprites();
+
 class CircuitElement
 {
     private:
@@ -42,7 +44,7 @@ class CircuitElement
         CircuitElement* out; // next element
     
     public:
-        void allocSprite(const char* path);
+        friend void allocSprites();
 
         CircuitElement();
         explicit CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power = 0, \
