@@ -23,23 +23,20 @@ int main()
     transistor.getThresholdVoltage();
 
     Sim sim;
-    try{
-        if(sim.Construct(1280, 720, 1, 1))
-            sim.Start();
+
+    std::vector<std::pair<int, int>> resolutions = { {1280, 720}, {840, 480} };
+
+    // simulator::Start()
+    for(auto resolution : resolutions)
+        if(sim.Construct(resolution.first, resolution.second, 1, 1))
+                break;
         else
-            throw StartupFailed("Failed to start simulation! Trying at a lower resolution.");
-    }
-    catch(StartupFailed const &)
+            throw StartupFailed("Failed to start application! Trying a lower resolution.");
+    
+    try {
+        sim.Start();
+    } catch(StartupFailed&)
     {
-        // try starting the sim at a lower resolution
-        try{if(sim.Construct(640, 480, 1, 1))
-            sim.Start();
-        else
-            throw StartupFailed("Failed to start simulation! Closing program.");
-        }
-        catch(StartupFailed const &)
-        {
-            return 0;
-        }
+        return 0;
     }
 }

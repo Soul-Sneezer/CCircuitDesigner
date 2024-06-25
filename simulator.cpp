@@ -123,7 +123,8 @@
 
             if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
             {
-                circuit->createAndAddElem(tempType, linePos); 
+                std::shared_ptr<CircuitElement> elem = factory->makeElement(tempType, linePos);
+                circuit->addElem(elem);
             }     
         }
     }
@@ -405,7 +406,6 @@
 
     Sim::Sim()
     {
-        circuit = new Circuit();
         sAppName = "Circuit Simulator";
     }
 
@@ -413,12 +413,15 @@
     [[maybe_unused]] bool Sim::OnUserCreate()
     {
         allocSprites();
+        circuit = std::make_shared<Circuit>();
+        factory = std::make_shared<Factory>();
 
         worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
         worldOffset.y = (float)(-GetScreenSize().y / 2) / scale;
 
         mainMenuActive = true;
         resetTempCoord();
+
         return true;
     }
 

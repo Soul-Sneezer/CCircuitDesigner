@@ -12,8 +12,7 @@ class Circuit
         void drawElement(std::shared_ptr<CircuitElement> element, olc::PixelGameEngine *pge);
     public:
         void selectElement(olc::PixelGameEngine* pge, float scale);
-        void addElementToCircuit(std::shared_ptr<CircuitElement>& element);
-        void createAndAddElem(ElementType type, std::pair<olc::vf2d, olc::vf2d> linePos);
+        void addElem(std::shared_ptr<CircuitElement>& element);
         Circuit();
         Circuit(const Circuit& circuit);
         ~Circuit();
@@ -21,7 +20,7 @@ class Circuit
         int32_t getVoltageIn() const;
         int32_t getVoltageOut() const;
         std::vector<std::shared_ptr<CircuitElement>>& getElements(); 
-        Circuit& operator=(const Circuit& circuit);
+        Circuit& operator=(const Circuit circuit);
 
         void run();
         void drawCircuit(olc::PixelGameEngine *pge);

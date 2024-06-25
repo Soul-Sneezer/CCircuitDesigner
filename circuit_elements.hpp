@@ -35,35 +35,37 @@ class CircuitElement
 
     protected:
         std::pair<olc::vf2d, olc::vf2d> position = std::make_pair<olc::vf2d, olc::vf2d>({0, 0}, {0, 0});
-        static olc::Sprite* sprite; 
+        static std::shared_ptr<olc::Sprite> sprite; 
         int32_t voltage;
         int32_t power;
         uint32_t temperature; // useless for now
 
-        CircuitElement* in; // prev element
-        CircuitElement* out; // next element
+        std::shared_ptr<CircuitElement> in; // prev element
+        std::shared_ptr<CircuitElement> out; // next element
     
     public:
         friend void allocSprites();
 
         CircuitElement();
         explicit CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power = 0, \
-                CircuitElement* in = NULL, CircuitElement* out = NULL, \
+                std::shared_ptr<CircuitElement> in = nullptr, std::shared_ptr<CircuitElement> out = nullptr, \
                 const uint32_t temperature = 273);
         CircuitElement(const CircuitElement& element);
         CircuitElement(CircuitElement&& element);
         virtual ~CircuitElement() = 0;
 
+        virtual std::shared_ptr<CircuitElement> clone() = 0;
+
         std::pair<olc::vf2d, olc::vf2d> getPosition() const; 
         int32_t getVoltage() const; 
         int32_t getPower() const; 
         int32_t getTemperature() const; 
-        CircuitElement* getIn() const; 
-        CircuitElement* getOut() const;
+        std::shared_ptr<CircuitElement> getIn() const; 
+        std::shared_ptr<CircuitElement> getOut() const;
       
         static olc::vf2d getWorldOffset() { return worldOffset(); };
         static float getWorldScale() { return worldScale(); };
-        static olc::Sprite* getSprite() { return sprite; };
+        static std::shared_ptr<olc::Sprite> getSprite() { return sprite; };
 
         static void setWorldScale(const float scale)
         {
@@ -80,7 +82,6 @@ class CircuitElement
 
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
 
-        CircuitElement* toBaseClass();
         virtual void drawYourself(olc::PixelGameEngine *pge) = 0;
 };
 
@@ -116,12 +117,13 @@ class Transistor : public CircuitElement
     public:
         Transistor(); 
         explicit Transistor(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage = 0, const int32_t power = 0, \
-                CircuitElement* in = NULL, CircuitElement* out = NULL,\
+                std::shared_ptr<CircuitElement> in = nullptr, std::shared_ptr<CircuitElement> out = nullptr,\
                 const int32_t threshold = 0, const int32_t thresholdVoltage = 0, const uint32_t temperature = 273);
         Transistor(const Transistor& transistor);
         Transistor(Transistor&& transistor);
         ~Transistor();
         
+        std::shared_ptr<CircuitElement> clone() override;
         int32_t getThreshold() const; 
         int32_t getThresholdVoltage() const; 
 
@@ -142,12 +144,13 @@ class Resistor : public CircuitElement
     public:
         Resistor();
         explicit Resistor(std::pair<olc::vf2d, olc::vf2d> pos,\
-                const int32_t voltage = 0, const int32_t power = 0, CircuitElement* in = NULL, CircuitElement* out = NULL, \
+                const int32_t voltage = 0, const int32_t power = 0, std::shared_ptr<CircuitElement> in = nullptr, std::shared_ptr<CircuitElement> out = nullptr, \
                 const int32_t resistance = 0, const int32_t powerDissipation = 0, const uint32_t temperature = 273);
         Resistor(const Resistor& r);
         Resistor(Resistor&& r);
         virtual ~Resistor();
-        
+       
+        std::shared_ptr<CircuitElement> clone() override;
         int32_t getResistance() const;
         int32_t getPowerDissipation() const; 
 
@@ -188,12 +191,13 @@ class Cable : public CircuitElement
         Cable();
         explicit Cable(std::pair<olc::vf2d, olc::vf2d> pos, \
                 const int32_t voltage = 0, const int32_t power = 0, \
-                CircuitElement* in = NULL,CircuitElement* out = NULL, \
-                const int32_t resistance = 0, const bool reverse = false,                 const uint32_t temperature = 273);
+                std::shared_ptr<CircuitElement> in = nullptr, std::shared_ptr<CircuitElement> out = nullptr, \
+                const int32_t resistance = 0, const bool reverse = false, const uint32_t temperature = 273);
         Cable(const Cable& c);
         Cable(Cable&& c);
         ~Cable();
 
+        std::shared_ptr<CircuitElement> clone() override;
         int32_t getResistance() const; 
         Switch getSwitch() const; 
         bool getFlowDirection() const; 
@@ -213,12 +217,13 @@ class Source : public CircuitElement
     public:
         Source();
         explicit Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage = 0, int32_t power = 0, \
-                CircuitElement* in = NULL, CircuitElement* out = NULL,\
+                std::shared_ptr<CircuitElement> in = nullptr, std::shared_ptr<CircuitElement> out = nullptr,\
                 uint32_t temperature = 273);
         Source(const Source& s);
         Source(Source&& s);
         ~Source();
-        
+       
+        std::shared_ptr<CircuitElement> clone() override;
         Source& operator=(const Source& s);
         Source& operator=(Source&& s);
         friend std::ostream& operator<<(std::ostream& os, const Source& s); 
@@ -236,12 +241,13 @@ class Battery : public CircuitElement
     public:
         Battery();
         explicit Battery(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage = 0, const int32_t power = 0, \
-                CircuitElement* in = NULL, CircuitElement* out = NULL, \
+                std::shared_ptr<CircuitElement> in = nullptr, std::shared_ptr<CircuitElement> out = nullptr, \
                 const uint32_t capacity = 0, const uint32_t temperature = 273);
         Battery(const Battery& b);
         Battery(Battery&& b);
         ~Battery();
 
+        std::shared_ptr<CircuitElement> clone() override;
         int32_t getCapacity() const; 
 
         Battery& operator=(const Battery& b);

@@ -4,6 +4,7 @@
 #include <olcPixelGameEngine.h>
 #include "circuit_elements.hpp"
 #include "circuit.hpp"
+#include "circuit_factory.hpp"
 #include "debug.hpp"
 
 class Sim : public olc::PixelGameEngine
@@ -30,7 +31,8 @@ class Sim : public olc::PixelGameEngine
         ElementType tempType = ElementType::ELEM_UNASSIGNED;
         olc::vf2d tempPos;
 
-        Circuit* circuit;
+        std::shared_ptr<Circuit> circuit;
+        std::shared_ptr<Factory> factory;
 
         void resetOffset();
 

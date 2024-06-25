@@ -1,47 +1,47 @@
 #include "circuit_elements.hpp"
 
-olc::Sprite* CircuitElement::sprite;
+std::shared_ptr<olc::Sprite> CircuitElement::sprite;
 
 void allocSprites()
 {
     try{
-        Transistor::sprite = new olc::Sprite("./sprites/transistor.png");
+        Transistor::sprite = std::make_shared<olc::Sprite>("./sprites/transistor.png");
         if(Transistor::sprite == nullptr)
             throw SpriteAllocFailed("Failed to alloc transistor sprite!");
     }
     catch (SpriteAllocFailed const &)
     {
-        Transistor::sprite = new olc::Sprite("./sprites/placeholder.png");
+        Transistor::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
     }
 
     try{
-        Resistor::sprite = new olc::Sprite("./sprites/resistor.png");
+        Resistor::sprite = std::make_shared<olc::Sprite>("./sprites/resistor.png");
         if(Resistor::sprite == nullptr)
             throw SpriteAllocFailed("Failed to alloc resistor sprite!");
     }
     catch (SpriteAllocFailed const &)
     {
-        Resistor::sprite = new olc::Sprite("./sprites/placeholder.png");
+        Resistor::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
     }
 
     try{
-        Source::sprite = new olc::Sprite("./sprites/source.png");
+        Source::sprite = std::make_shared<olc::Sprite>("./sprites/source.png");
         if(Source::sprite == nullptr)
             throw SpriteAllocFailed("Failed to alloc source sprite!");
     }
     catch (SpriteAllocFailed const &)
     {
-        Source::sprite = new olc::Sprite("./sprites/placeholder.png");
+        Source::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
     }
 
     try{
-        Battery::sprite = new olc::Sprite("./sprites/transistor.png");
+        Battery::sprite = std::make_shared<olc::Sprite>("./sprites/transistor.png");
         if(Battery::sprite == nullptr)
             throw SpriteAllocFailed("Failed to alloc battery sprite!");
     }
     catch (SpriteAllocFailed const &)
     {
-        Battery::sprite = new olc::Sprite("./sprites/placeholder.png");
+        Battery::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
     }
 }
 
@@ -105,7 +105,7 @@ CircuitElement::CircuitElement()
 }
 
 CircuitElement::CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
-        CircuitElement* in, CircuitElement* out, \
+        std::shared_ptr<CircuitElement> in, std::shared_ptr<CircuitElement> out, \
         const uint32_t temperature)
 {
     this->position = pos;
@@ -158,12 +158,37 @@ CircuitElement::~CircuitElement()
 {
 }
 
+std::shared_ptr<CircuitElement> Transistor::clone()
+{
+    return std::make_shared<Transistor>(*this);
+}
+
+std::shared_ptr<CircuitElement> Resistor::clone()
+{
+    return std::make_shared<Resistor>(*this);
+}
+
+std::shared_ptr<CircuitElement> Source::clone()
+{
+    return std::make_shared<Source>(*this);
+}
+
+std::shared_ptr<CircuitElement> Cable::clone()
+{
+    return std::make_shared<Cable>(*this);
+}
+
+std::shared_ptr<CircuitElement> Battery::clone()
+{
+    return std::make_shared<Battery>(*this);
+}
+
 std::pair<olc::vf2d, olc::vf2d> CircuitElement::getPosition() const { return this->position; }
 int32_t CircuitElement::getVoltage() const { return this->voltage; }
 int32_t CircuitElement::getPower() const { return this->power; }
 int32_t CircuitElement::getTemperature() const { return this->temperature; }
-CircuitElement* CircuitElement::getIn() const { return this->in; }
-CircuitElement* CircuitElement::getOut() const { return this->out; }
+std::shared_ptr<CircuitElement> CircuitElement::getIn() const { return this->in; }
+std::shared_ptr<CircuitElement> CircuitElement::getOut() const { return this->out; }
 
 std::ostream& operator<<(std::ostream& os, const CircuitElement& el) 
 {
@@ -249,7 +274,7 @@ Transistor::Transistor()
 }
 
 Transistor::Transistor(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
-        CircuitElement* in, CircuitElement* out,\
+        std::shared_ptr<CircuitElement> in, std::shared_ptr<CircuitElement> out,\
         const int32_t threshold, const int32_t thresholdVoltage, const uint32_t temperature)
 {
     this->position = pos;
@@ -330,7 +355,7 @@ Resistor::Resistor()
 }
 
 Resistor::Resistor(std::pair<olc::vf2d, olc::vf2d> pos,\
-        const int32_t voltage, const int32_t power, CircuitElement* in, CircuitElement* out, \
+        const int32_t voltage, const int32_t power, std::shared_ptr<CircuitElement> in, std::shared_ptr<CircuitElement> out, \
         const int32_t resistance, const int32_t powerDissipation , const uint32_t temperature)
 {
     this->position = pos;
@@ -460,7 +485,7 @@ Cable::Cable()
 
 Cable::Cable(std::pair<olc::vf2d, olc::vf2d> pos, \
         const int32_t voltage, const int32_t power, \
-        CircuitElement* in, CircuitElement* out, \
+        std::shared_ptr<CircuitElement> in, std::shared_ptr<CircuitElement> out, \
         const int32_t resistance, const bool reverse, const uint32_t temperature)
 {
     this->position = pos;
@@ -541,7 +566,7 @@ Source::Source()
 }
 
 Source::Source(std::pair<olc::vf2d, olc::vf2d> pos, int32_t voltage, int32_t power, \
-        CircuitElement* in, CircuitElement* out,\
+        std::shared_ptr<CircuitElement> in, std::shared_ptr<CircuitElement> out,\
         uint32_t temperature)
 {
     this->position = pos;
@@ -611,7 +636,7 @@ Battery::Battery()
 }
 
 Battery::Battery(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
-        CircuitElement* in, CircuitElement* out, \
+        std::shared_ptr<CircuitElement> in, std::shared_ptr<CircuitElement> out, \
         const uint32_t capacity, const uint32_t temperature)
 {
     this->position = pos;

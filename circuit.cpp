@@ -23,38 +23,6 @@
         } 
     }
 
-    void Circuit::createAndAddElem(ElementType type, std::pair<olc::vf2d, olc::vf2d> linePos)
-    {
-        std::shared_ptr<CircuitElement> element;
-        switch(type)
-        {
-            case ElementType::ELEM_CABLE:
-                element = std::dynamic_pointer_cast<Cable>(element);
-                element = std::make_shared<Cable>(linePos);
-                break;
-            case ElementType::ELEM_RESISTOR:
-                element = std::dynamic_pointer_cast<Resistor>(element);
-                element = std::make_shared<Resistor>(linePos);
-                break;
-            case ElementType::ELEM_TRANSISTOR:
-                element = std::dynamic_pointer_cast<Transistor>(element);
-                element = std::make_shared<Transistor>(linePos);
-                break;
-            case ElementType::ELEM_SOURCE:
-                element = std::dynamic_pointer_cast<Source>(element);
-                element = std::make_shared<Source>(linePos);
-                break;
-            case ElementType::ELEM_BATTERY:
-                element = std::dynamic_pointer_cast<Battery>(element);
-                element = std::make_shared<Battery>(linePos);
-                break;
-            default:
-                throw OperationFailed("Failed to create new element!");
-        }
-
-        addElementToCircuit(element);
-    }
-
     void Circuit::drawElement(std::shared_ptr<CircuitElement> element, olc::PixelGameEngine *pge)
     {
         element->drawYourself(pge);
@@ -76,7 +44,7 @@
         swap(first.voltageOut, second.voltageOut);
     }
 
-    void Circuit::addElementToCircuit(std::shared_ptr<CircuitElement>& element)
+    void Circuit::addElem(std::shared_ptr<CircuitElement>& element)
     {
         elements.push_back(element);
     }
@@ -90,7 +58,9 @@
     {
         this->voltageIn = circuit.voltageIn;
         this->voltageOut = circuit.voltageOut;
-        this->elements = circuit.elements;
+        
+        for (const auto& element : circuit.elements)
+            this->elements.push_back((std::shared_ptr<CircuitElement>)element->clone());
     }
 
     Circuit::~Circuit()
@@ -109,11 +79,12 @@
 
     // cppcheck-suppress unusedFunction
     std::vector<std::shared_ptr<CircuitElement>>& Circuit::getElements() { return this->elements; };
-    Circuit& Circuit::operator=(const Circuit& circuit)
+
+    Circuit& Circuit::operator=(Circuit circuit)
     {
         this->voltageIn = circuit.voltageIn;
         this->voltageOut = circuit.voltageOut;
-        this->elements = circuit.elements;
+        swap(*this, circuit); 
 
         return *this;
     }

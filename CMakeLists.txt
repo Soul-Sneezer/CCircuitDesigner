@@ -132,6 +132,8 @@ endif()
 add_executable(${PROJECT_NAME} main.cpp
     circuit_elements.cpp
     circuit.cpp
+    circuit_factory.cpp
+    debug.cpp
     simulator.cpp
     generated/src/Helper.cpp)
 
