@@ -134,7 +134,10 @@ add_executable(${PROJECT_NAME} main.cpp
     circuit.cpp
     circuit_factory.cpp
     debug.cpp
+    menu.cpp
     simulator.cpp
+    #command.cpp
+    #sprite.cpp
     generated/src/Helper.cpp)
 
 ###############################################################################

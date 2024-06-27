@@ -22,8 +22,8 @@ std::shared_ptr<CircuitElement> Factory::makeElement(const ElementType type, con
             break;
         default:
             throw OperationFailed("Failed to create new element!");
-            return nullptr;
     }
+
     return element;
 }
 

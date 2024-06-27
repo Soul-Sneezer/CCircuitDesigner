@@ -5,24 +5,6 @@
         menuOffset = {0,0};
     }
 
-    void Sim::pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action, const uint32_t fontSize = 1)
-    {
-        DrawString(pos.x + menuOffset.x                , pos.y + menuOffset.y , "Press ", olc::WHITE, fontSize);
-        DrawString(pos.x + menuOffset.x + 48 * fontSize, pos.y + menuOffset.y , key,      olc::GREEN, fontSize);
-        DrawString(pos.x + menuOffset.x + (48 + 8 * key.size()) * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, fontSize);
-        DrawString(pos.x + menuOffset.x + (80 + 8 * key.size()) * fontSize, pos.y + menuOffset.y , action,   olc::WHITE, fontSize);
-    }
-    void Sim::pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action, const uint32_t fontSize = 1)
-    {
-        DrawString(pos.x + menuOffset.x                 , pos.y + menuOffset.y , "Press ", olc::WHITE, fontSize);
-        DrawString(pos.x + menuOffset.x + 48  * fontSize, pos.y + menuOffset.y , key1,     olc::GREEN, fontSize);
-        DrawString(pos.x + menuOffset.x + (48 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , ",",      olc::WHITE, fontSize);
-        DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , key2,      olc::GREEN, fontSize);
-        DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size() + 8 * key2.size())  * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, fontSize);
-        DrawString(pos.x + menuOffset.x + (88 + 8 * key1.size() + 8 * key2.size()) * fontSize, pos.y + menuOffset.y , action,   olc::WHITE, fontSize);
-
-    }
-
     void Sim::resetTempCoord()
     {
         tempPos.x = GetScreenSize().x / 2;
@@ -129,132 +111,91 @@
         }
     }
 
-    void Sim::drawMainMenu()
+    void Sim::addMenuToMenus(std::shared_ptr<Menu> menu)
     {
-        if(mainMenuActive)
-        {
-            FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
-            DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
-            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "CCircuit Designer - Commands", olc::WHITE, 2);
-            pressEntry({70, 90}, "ESC", "to open/close this window");
-            pressEntry({70, 110}, "X", "to close program");
-            pressEntry({70, 130}, "Q", "open edit menu");
-            pressEntry({70, 150}, "R", "start/stop simulation");
-            pressEntry({70, 170}, "SHIFT", "W", "move window up");
-            pressEntry({70, 180}, "SHIFT", "S", "move window down");
-            pressEntry({70, 190}, "SHIFT", "A", "move window left");
-            pressEntry({70, 200}, "SHIFT", "D", "move window right");
-        }
+        this->menus.push_back(std::make_pair(menu, false));
     }
 
-    void Sim::drawEditMenu()
+    void Sim::createMenus()
     {
-        if(editMenuActive)
-        {
-            FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
-            DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
-            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Edit circuit", olc::WHITE, 2);
-            pressEntry({70,  90}, "Q", "open/close this window");
-            pressEntry({70, 110}, "1","add elements to circuit");
-            pressEntry({70, 130}, "2","remove elements from circuit");
-            pressEntry({70, 150}, "3","edit elements in circuit");
-            if(GetKey(olc::K1).bPressed)
-            {
-                addMenuActive = true;
-                editMenuActive = false;
-                removeMenuActive = false;
-                modifyMenuActive = false;
-            }
-            if(GetKey(olc::K2).bPressed)
-            {
-                removeMenuActive = true;
-                editMenuActive = false;
-                modifyMenuActive = false;
-                addMenuActive = false;
-            }
-            if(GetKey(olc::K3).bPressed)
-            {
-                modifyMenuActive = true;
-                editMenuActive = false;
-                addMenuActive = false;
-                removeMenuActive = false;
-            }
-        }
+        createMainMenu();
+        createEditMenu();
+        createModifyMenu();
+        createAddMenu();
+        createRemoveMenu();
     }
 
-    void Sim::drawAddMenu()
+    std::shared_ptr<MenuContent> toMenuContent(std::shared_ptr<PressEntry> content)
     {
-        if(addMenuActive)
-        {
-            FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::BLACK);
-            DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 200, olc::WHITE);
-            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Add element to circuit", olc::WHITE, 2);
-            pressEntry({70,  90}, "Q", "go back to edit menu");
-            pressEntry({70, 110}, "1", "add cable");
-            pressEntry({70, 130}, "2", "add resistor");
-            pressEntry({70, 150}, "3", "add transistor");
-            pressEntry({70, 170}, "4", "add source");
-            pressEntry({70, 190}, "5", "add battery");
-            if(GetKey(olc::K1).bPressed)
-            {
-                addElement = true;
-                tempType = ElementType::ELEM_CABLE;
-                resetTempCoord();
-            }
-            else if(GetKey(olc::K2).bPressed)
-            {
-                addElement = true;
-                tempType = ElementType::ELEM_RESISTOR;
-                resetTempCoord();
-            }
-            else if(GetKey(olc::K3).bPressed)
-            {
-                addElement = true;
-                tempType = ElementType::ELEM_TRANSISTOR;
-                resetTempCoord();
-            }
-            else if(GetKey(olc::K4).bPressed)
-            {
-                addElement = true;
-                tempType = ElementType::ELEM_SOURCE;
-                resetTempCoord();
-            }
-            else if(GetKey(olc::K5).bPressed)
-            {
-                addElement = true;
-                tempType = ElementType::ELEM_BATTERY;
-                resetTempCoord();
-            }
-        }
+        return dynamic_pointer_cast<MenuContent>(content);
     }
 
-    void Sim::drawDeleteMenu()
+    void Sim::createMainMenu()
     {
-        if(removeMenuActive)
-        {   
-            circuit->selectElement(this, scale);
+        std::shared_ptr<Menu> mainMenu = std::make_shared<Menu>(50, 50, 500, 200);
+        
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 90, "ESC", "open/close this window", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 110, "X", "close program", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 130, "Q", "open edit menu", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 150, "R", "start/stop simulation", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 170, "SHIFT", "W", "move window up", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 180, "SHIFT", "S", "move window down", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 190, "SHIFT", "A", "move window left", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 200, "SHIFT", "D", "move window right", 1)));
 
-            FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::BLACK);
-            DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::WHITE);
-            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Delete element from circuit", olc::WHITE, 2);
-            pressEntry({70,  90}, "Q", "go back to edit menu");
-            DrawString(70 + menuOffset.x, 110 + menuOffset.y, "Select element to delete", olc::WHITE);
-
-        }
-  
+        addMenuToMenus(mainMenu);
     }
 
-    void Sim::drawModifyMenu()
+    void Sim::createEditMenu()
     {
-        if(modifyMenuActive)
-        {
-            circuit->selectElement(this, scale);
+        std::shared_ptr<Menu> editMenu = std::make_shared<Menu>(50, 50, 500, 200);
 
-            FillRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::BLACK);
-            DrawRect(50 + menuOffset.x, 50 + menuOffset.y, 500, 80, olc::WHITE);
-            DrawString(70 + menuOffset.x, 70 + menuOffset.y, "Modify circuit elements", olc::WHITE, 2);
-            pressEntry({70,  90}, "Q", "go back to edit menu");
-            DrawString(70 + menuOffset.x, 110 + menuOffset.y, "Select element to modify", olc::WHITE);
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70,  90, "Q", "open/close this window", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 110, "1","add elements to circuit", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 130, "2","remove elements from circuit", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 150, "3","edit elements in circuit", 1)));
+    
+        addMenuToMenus(editMenu);
+    }
+
+    void Sim::createModifyMenu()
+    {
+        std::shared_ptr<Menu> modifyMenu = std::make_shared<Menu>(50, 50, 500, 80);
+
+        modifyMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70,  90, "Q", "go back to edit menu", 1)));
+    
+        addMenuToMenus(modifyMenu);
+    }
+
+    void Sim::createAddMenu()
+    {
+        std::shared_ptr<Menu> addMenu = std::make_shared<Menu>(50, 50, 500, 200);
+
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70,  90, "Q", "go back to edit menu", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 110, "1", "add cable", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 130, "2", "add resistor", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 150, "3", "add transistor", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 170, "4", "add source", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 190, "5", "add battery", 1)));
+    
+        addMenuToMenus(addMenu);
+    }
+
+    void Sim::createRemoveMenu()
+    {
+        std::shared_ptr<Menu> removeMenu = std::make_shared<Menu>(50, 50, 500, 80);
+
+        removeMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70,  90, "Q", "go back to edit menu", 1)));
+    
+        addMenuToMenus(removeMenu);
+    }
+
+    void Sim::drawMenus()
+    {
+        for(auto menu : menus)
+        {
+            if(menu.second)
+                (menu.first)->drawYourself(this);
         }
     }
 
@@ -421,6 +362,7 @@
 
         mainMenuActive = true;
         resetTempCoord();
+        createMenus();
 
         return true;
     }
@@ -449,12 +391,7 @@
 
         circuit->drawCircuit(this); 
 
-        drawAddMenu();
-        drawModifyMenu();
-        drawDeleteMenu();
+        drawMenus();
 
-        drawMainMenu();
-        drawEditMenu();
-                
         return true;
     }

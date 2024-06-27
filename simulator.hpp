@@ -6,17 +6,29 @@
 #include "circuit.hpp"
 #include "circuit_factory.hpp"
 #include "debug.hpp"
+#include "menu.hpp"
 
 class Sim : public olc::PixelGameEngine
 {
     private:
+        std::vector<std::pair<std::shared_ptr<Menu>, bool>> menus;
         bool exit = false;
 
         const int radius = 4;
+
+        Menu mainMenu;
         bool mainMenuActive = false;
+
+        Menu editMenu;
         bool editMenuActive = false;
+
+        Menu removeMenu;
         bool removeMenuActive = false;
+
+        Menu addMenu;
         bool addMenuActive = false;
+
+        Menu modifyMenu;
         bool modifyMenuActive = false;
         bool addElement = false;
 
@@ -35,20 +47,22 @@ class Sim : public olc::PixelGameEngine
         std::shared_ptr<Factory> factory;
 
         void resetOffset();
-
-        void pressEntry(const olc::vi2d pos, const std::string& key, const std::string& action, const uint32_t fontSize);
-        void pressEntry(const olc::vi2d pos, const std::string& key1, const std::string& key2, const std::string& action, const uint32_t fontSize);
-
         void resetTempCoord();
+
+        void createMenus();
+        void createMainMenu();
+        void createEditMenu();
+        void createModifyMenu();
+        void createRemoveMenu();
+        void createAddMenu();
+
+        void drawMenus();
 
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
         void ScreenToWorld(int screenX, int screenY, olc::vf2d& v);
 
         std::pair<olc::vf2d, olc::vf2d> addLine();
         void addElem();
-        void drawMainMenu();
-        void drawEditMenu();
-        void drawAddMenu();
 
         void selectElement();
         void drawDeleteMenu();
@@ -56,6 +70,7 @@ class Sim : public olc::PixelGameEngine
 
         void drawGrid();
 
+        void addMenuToMenus(std::shared_ptr<Menu> menu);
         void mouseControls();
         void keyboardControls();
     public:
