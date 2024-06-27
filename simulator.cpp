@@ -82,14 +82,15 @@
 
     void Sim::addElem()
     {
-        if(addElement)
-        {
+        //if(addElement)
+        //{
+/*
             editMenuActive = false;
             mainMenuActive = false;
             addMenuActive = false;
             removeMenuActive = false;
             modifyMenuActive = false;
-
+*/
             olc::vf2d worldPos;
             std::pair<olc::vf2d, olc::vf2d> linePos;
             olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
@@ -108,7 +109,7 @@
                 std::shared_ptr<CircuitElement> elem = factory->makeElement(tempType, linePos);
                 circuit->addElem(elem);
             }     
-        }
+        //}
     }
 
     void Sim::addMenuToMenus(std::shared_ptr<Menu> menu)
@@ -232,6 +233,7 @@
 
     void Sim::keyboardControls()
     {
+        /*
         if(GetKey(olc::ESCAPE).bPressed)
         {
             if(!addElement)
@@ -250,6 +252,7 @@
             addMenuActive = false;
             resetOffset();
         }
+        */
 
         if(GetKey(olc::X).bPressed)
             exit = true;
@@ -360,7 +363,7 @@
         worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
         worldOffset.y = (float)(-GetScreenSize().y / 2) / scale;
 
-        mainMenuActive = true;
+        //mainMenuActive = true;
         resetTempCoord();
         createMenus();
 
@@ -386,7 +389,7 @@
         } // couldn't add a new element for whatever reason
         catch (OperationFailed const &)
         {
-            addElement = false; 
+   //         addElement = false; 
         }
 
         circuit->drawCircuit(this); 

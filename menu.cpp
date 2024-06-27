@@ -65,33 +65,33 @@ PressEntry::~PressEntry()
 {
 }
 
-void PressEntry::pressEntry(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset, const std::string& key, const std::string& action, const uint32_t fontSize)
+void PressEntry::pressEntry1(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset)
 {
-    pge->DrawString(pos.x + menuOffset.x                , pos.y + menuOffset.y , "Press ", olc::WHITE, fontSize);
-    pge->DrawString(pos.x + menuOffset.x + 48 * fontSize, pos.y + menuOffset.y , key,      olc::GREEN, fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (48 + 8 * key.size()) * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (80 + 8 * key.size()) * fontSize, pos.y + menuOffset.y , action,   olc::WHITE, fontSize);
+    pge->DrawString(pos.x + menuOffset.x                , pos.y + menuOffset.y , "Press ", olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + menuOffset.x + 48 * fontSize, pos.y + menuOffset.y , this->key1,      olc::GREEN, this->fontSize);
+    pge->DrawString(pos.x + menuOffset.x + (48 + 8 * key1.size()) * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + menuOffset.x + (80 + 8 * key1.size()) * fontSize, pos.y + menuOffset.y , this->action,   olc::WHITE, this->fontSize);
 }
 
-void PressEntry::pressEntry(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset, const std::string& key1, const std::string& key2, const std::string& action, const uint32_t fontSize)
+void PressEntry::pressEntry2(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset)
 {
-    pge->DrawString(pos.x + menuOffset.x                 , pos.y + menuOffset.y , "Press ", olc::WHITE, fontSize);
-    pge->DrawString(pos.x + menuOffset.x + 48  * fontSize, pos.y + menuOffset.y , key1,     olc::GREEN, fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (48 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , ",",      olc::WHITE, fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , key2,      olc::GREEN, fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size() + 8 * key2.size())  * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (88 + 8 * key1.size() + 8 * key2.size()) * fontSize, pos.y + menuOffset.y , action,   olc::WHITE, fontSize);
+    pge->DrawString(pos.x + menuOffset.x                 , pos.y + menuOffset.y , "Press ", olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + menuOffset.x + 48  * fontSize, pos.y + menuOffset.y , this->key1,     olc::GREEN, this->fontSize);
+    pge->DrawString(pos.x + menuOffset.x + (48 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , ",",      olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , this->key2,      olc::GREEN, this->fontSize);
+    pge->DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size() + 8 * key2.size())  * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + menuOffset.x + (88 + 8 * key1.size() + 8 * key2.size()) * fontSize, pos.y + menuOffset.y , this->action,   olc::WHITE, this->fontSize);
 }
 
 void PressEntry::drawYourself(olc::PixelGameEngine* pge, const olc::vi2d menuOffset)
 {
     if(key2.size() == 0)
     {
-        pressEntry(pge, {this->posX, this->posY}, menuOffset, key1, action, fontSize);
+        pressEntry1(pge, {this->posX, this->posY}, menuOffset);
     }
     else
     {
-        pressEntry(pge, {this->posX, this->posY}, menuOffset, key1, key2, action, fontSize);
+        pressEntry2(pge, {this->posX, this->posY}, menuOffset);
     }
 }
 
