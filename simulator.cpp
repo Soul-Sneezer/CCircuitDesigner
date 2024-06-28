@@ -1,11 +1,6 @@
 #include "simulator.hpp"
 
 // cppcheck-suppress unusedFunction
-    void Sim::resetOffset()
-    {
-        menuOffset = {0,0};
-    }
-
     void Sim::resetTempCoord()
     {
         tempPos.x = GetScreenSize().x / 2;
@@ -73,6 +68,7 @@
         }
         else
         {
+2024 
             DrawLine(coordX1, coordY2, coordX2, coordY2, olc::WHITE);
             worldPos1.y = worldPos2.y;
         }
@@ -83,34 +79,24 @@
 
     void Sim::addElem()
     {
-        //if(addElement)
-        //{
-/*
-            editMenuActive = false;
-            mainMenuActive = false;
-            addMenuActive = false;
-            removeMenuActive = false;
-            modifyMenuActive = false;
-*/
-            olc::vf2d worldPos;
-            std::pair<olc::vf2d, olc::vf2d> linePos;
-            olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
-            ScreenToWorld((int)mousePos.x, (int)mousePos.y, worldPos);
+        olc::vf2d worldPos;
+        std::pair<olc::vf2d, olc::vf2d> linePos;
+        olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+        ScreenToWorld((int)mousePos.x, (int)mousePos.y, worldPos);
 
-            worldPos.x = floorf(worldPos.x + gridInc / 2);
-            worldPos.y = floorf(worldPos.y + gridInc / 2);
-           
-            int nx, ny;
-            WorldToScreen(worldPos, nx, ny);
-            FillCircle(nx , ny, radius / std::min(2, (int)scale));
-            linePos = addLine();
+        worldPos.x = floorf(worldPos.x + gridInc / 2);
+        worldPos.y = floorf(worldPos.y + gridInc / 2);
+       
+        int nx, ny;
+        WorldToScreen(worldPos, nx, ny);
+        FillCircle(nx , ny, radius / std::min(2, (int)scale));
+        linePos = addLine();
 
-            if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
-            {
-                std::shared_ptr<CircuitElement> elem = factory->makeElement(tempType, linePos);
-                circuit->addElem(elem);
-            }     
-        //}
+        if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
+        {
+            std::shared_ptr<CircuitElement> elem = factory->makeElement(tempType, linePos);
+            circuit->addElem(elem);
+        }     
     }
 
     void Sim::addMenuToMenus(std::shared_ptr<Menu> menu)
@@ -125,6 +111,13 @@
         createModifyMenu();
         createAddMenu();
         createRemoveMenu();
+
+        menus[0].second = true;
+    }
+
+    std::shared_ptr<MenuContent> toMenuContent(std::shared_ptr<Text> content)
+    {
+        return dynamic_pointer_cast<MenuContent>(content);
     }
 
     std::shared_ptr<MenuContent> toMenuContent(std::shared_ptr<PressEntry> content)
@@ -135,15 +128,16 @@
     void Sim::createMainMenu()
     {
         std::shared_ptr<Menu> mainMenu = std::make_shared<Menu>(50, 50, 500, 200);
-        
-        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 90, "ESC", "open/close this window", 1)));
-        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 110, "X", "close program", 1)));
-        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 130, "Q", "open edit menu", 1)));
-        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 150, "R", "start/stop simulation", 1)));
-        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 170, "SHIFT", "W", "move window up", 1)));
-        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 180, "SHIFT", "S", "move window down", 1)));
-        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 190, "SHIFT", "A", "move window left", 1)));
-        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 200, "SHIFT", "D", "move window right", 1)));
+       
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<Text>(10, 10, "CCircuit Designer - Commands", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 30, "ESC", "open/close this window", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 50, "X", "close program", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 70, "Q", "open edit menu", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 90, "R", "start/stop simulation", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 110, "SHIFT", "W", "move window up", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 130, "SHIFT", "S", "move window down", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 150, "SHIFT", "A", "move window left", 1)));
+        mainMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 170, "SHIFT", "D", "move window right", 1)));
 
         addMenuToMenus(mainMenu);
     }
@@ -151,11 +145,11 @@
     void Sim::createEditMenu()
     {
         std::shared_ptr<Menu> editMenu = std::make_shared<Menu>(50, 50, 500, 200);
-
-        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70,  90, "Q", "open/close this window", 1)));
-        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 110, "1","add elements to circuit", 1)));
-        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 130, "2","remove elements from circuit", 1)));
-        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 150, "3","edit elements in circuit", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<Text>(10, 10, "Edit circuit", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20,  30, "Q", "open/close this window", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 50, "1","add elements to circuit", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 70, "2","remove elements from circuit", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 90, "3","edit elements in circuit", 1)));
     
         addMenuToMenus(editMenu);
     }
@@ -164,7 +158,8 @@
     {
         std::shared_ptr<Menu> modifyMenu = std::make_shared<Menu>(50, 50, 500, 80);
 
-        modifyMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70,  90, "Q", "go back to edit menu", 1)));
+        modifyMenu->addContentToMenu(toMenuContent(std::make_shared<Text>(10, 10, "Modify circuit", 1)));
+        modifyMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20,  30, "Q", "go back to edit menu", 1)));
     
         addMenuToMenus(modifyMenu);
     }
@@ -173,12 +168,13 @@
     {
         std::shared_ptr<Menu> addMenu = std::make_shared<Menu>(50, 50, 500, 200);
 
-        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70,  90, "Q", "go back to edit menu", 1)));
-        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 110, "1", "add cable", 1)));
-        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 130, "2", "add resistor", 1)));
-        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 150, "3", "add transistor", 1)));
-        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 170, "4", "add source", 1)));
-        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70, 190, "5", "add battery", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<Text>(10, 10, "Add element to circuit", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20,  30, "Q", "go back to edit menu", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 50, "1", "add cable", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 70, "2", "add resistor", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 90, "3", "add transistor", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 110, "4", "add source", 1)));
+        addMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 130, "5", "add battery", 1)));
     
         addMenuToMenus(addMenu);
     }
@@ -186,8 +182,9 @@
     void Sim::createRemoveMenu()
     {
         std::shared_ptr<Menu> removeMenu = std::make_shared<Menu>(50, 50, 500, 80);
-
-        removeMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(70,  90, "Q", "go back to edit menu", 1)));
+        
+        removeMenu->addContentToMenu(toMenuContent(std::make_shared<Text>(10, 10, "Remove element from circuit", 1)));
+        removeMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20,  30, "Q", "go back to edit menu", 1)));
     
         addMenuToMenus(removeMenu);
     }
@@ -232,123 +229,6 @@
         }
     }
 
-    void Sim::keyboardControls()
-    {
-        /*
-        if(GetKey(olc::ESCAPE).bPressed)
-        {
-            if(!addElement)
-                mainMenuActive = !mainMenuActive;
-            
-            editMenuActive = false;
-            addMenuActive = false;
-            addElement = false;
-            resetOffset(); 
-        }
-
-        if(GetKey(olc::Q).bPressed)
-        {
-            editMenuActive = !editMenuActive;
-            mainMenuActive = false;
-            addMenuActive = false;
-            resetOffset();
-        }
-        */
-
-        if(GetKey(olc::X).bPressed)
-            exit = true;
-       
-        if(GetKey(olc::W).bHeld)
-        {
-            worldOffset.y -= 1.0f / scale;
-        }
-
-        if(GetKey(olc::A).bHeld)
-        {
-            worldOffset.x -= 1.0f / scale;
-        }
-
-        if(GetKey(olc::S).bHeld)
-        {
-            worldOffset.y += 1.0f / scale;
-        }
-
-        if(GetKey(olc::D).bHeld)
-        {
-            worldOffset.x += 1.0f / scale;
-        }
-
-        if(GetKey(olc::SHIFT).bHeld && GetKey(olc::W).bHeld) // move window up
-            menuOffset.y-=(int)(std::sqrt(scale));
-        if(GetKey(olc::SHIFT).bHeld && GetKey(olc::S).bHeld) // move window down
-            menuOffset.y+=(int)(std::sqrt(scale));
-        if(GetKey(olc::SHIFT).bHeld && GetKey(olc::A).bHeld) // move window right
-            menuOffset.x-=(int)(std::sqrt(scale));
-        if(GetKey(olc::SHIFT).bHeld && GetKey(olc::D).bHeld) // move window left
-            menuOffset.x+=(int)(std::sqrt(scale));
-
-        olc::vf2d mousePosBZoom;
-        olc::vf2d mousePosAZoom;
-        ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosBZoom);
-        
-        if(GetKey(olc::MINUS).bHeld)
-        {
-            if(scale > 10.0f)
-                scale *= 0.99f;
-            else
-                scale = 10.0f;
-        }
-
-        if(GetKey(olc::EQUALS).bHeld)
-        {
-            if(scale < 100.0f)
-                scale *= 1.01f;
-            else
-                scale = 100.0f;
-        }
-        
-        ScreenToWorld((int)tempPos.x, (int)tempPos.y, mousePosAZoom);
-        worldOffset += (mousePosBZoom - mousePosAZoom);
-    }
-
-    void Sim::mouseControls()
-    {
-        olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
-
-        if(GetMouse(1).bPressed)
-        {
-            startPan = mousePos;
-        }
-
-        if(GetMouse(1).bHeld)
-        {
-            worldOffset -= (mousePos - startPan) / scale; 
-            startPan = mousePos;
-        }
-
-        olc::vf2d mousePosBZoom;
-        ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosBZoom);
-
-        if(GetMouseWheel() > 0)
-        {
-            if(scale < 100.0f)
-                scale *= 1.1f;
-            else
-                scale = 100.0f;
-        }
-        if(GetMouseWheel() < 0)
-        {
-            if(scale > 10.0f)
-                scale *= 0.9f;
-            else
-                scale = 10.0f;
-        }
-        olc::vf2d mousePosAZoom;
-        ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosAZoom);
-        worldOffset += (mousePosBZoom - mousePosAZoom);
-
-    }
-
     Sim::Sim()
     {
         sAppName = "Circuit Simulator";
@@ -378,9 +258,6 @@
             return false;
         Clear(olc::BLACK);
 
-        mouseControls();
-        keyboardControls();
-        
         CircuitElement::setWorldOffset(worldOffset);
         CircuitElement::setWorldScale(scale);
 

@@ -46,6 +46,7 @@ public:
     explicit PressEntry(int posX, int posY, std::string key1, std::string key2, std::string action, uint32_t fontSize);
     explicit PressEntry(int posX, int posY, std::string key, std::string action, uint32_t fontSize);
     ~PressEntry();
+        olc::vi2d menuOffset = {0, 0};
 
     void drawYourself(olc::PixelGameEngine* pge, olc::vi2d menuOffset) override;
 };
@@ -66,7 +67,7 @@ public:
     ~Menu();
 
     void moveMenu(int deltaX, int deltaY);
-
+    void resetPos();
     void addContentToMenu(std::shared_ptr<MenuContent> content);
     void drawYourself(olc::PixelGameEngine* pge);
 };

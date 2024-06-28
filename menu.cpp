@@ -107,6 +107,12 @@ void Menu::moveMenu(const int deltaX, const int deltaY)
     this->posY += deltaY;
 }
 
+void Menu::resetPos()
+{
+    this->posX = 0;
+    this->posY = 0;
+}
+
 void Menu::addContentToMenu(std::shared_ptr<MenuContent> content)
 {
     contents.push_back(content);

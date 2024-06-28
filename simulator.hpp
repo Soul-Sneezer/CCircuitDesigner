@@ -7,6 +7,7 @@
 #include "circuit_factory.hpp"
 #include "debug.hpp"
 #include "menu.hpp"
+#include "command.hpp"
 
 class Sim : public olc::PixelGameEngine
 {
@@ -16,7 +17,6 @@ class Sim : public olc::PixelGameEngine
 
         const int radius = 4;
 
-        olc::vi2d menuOffset = {0, 0};
         olc::vf2d worldOffset = {0.0f, 0.0f};
 
         float scale = 8.0f;
