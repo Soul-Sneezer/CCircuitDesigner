@@ -1,6 +1,6 @@
 #include "circuit_elements.hpp"
 
-std::shared_ptr<olc::Sprite> CircuitElement::sprite;
+std::shared_ptr<olc::Sprite> CircuitElement::sprite = nullptr;
 
 void allocSprites()
 {
