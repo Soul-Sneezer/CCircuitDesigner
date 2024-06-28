@@ -22,7 +22,7 @@ Text::Text()
     this->fontSize = 1;
 }
 
-Text::Text(int posX, int posY, std::string str, uint32_t fontSize) : MenuContent(posX, posY) 
+Text::Text(int posX, int posY, const std::string str, uint32_t fontSize) : MenuContent(posX, posY) 
 {
     this->str = str;
     this->fontSize = fontSize;
@@ -32,7 +32,7 @@ Text::~Text()
 {
 }
 
-PressEntry::PressEntry(int posX, int posY, std::string key, std::string action, uint32_t fontSize) : MenuContent(posX, posY)
+PressEntry::PressEntry(int posX, int posY, const std::string key, const std::string action, uint32_t fontSize) : MenuContent(posX, posY)
 {
     this->posX = posX;
     this->posY = posY;
@@ -42,7 +42,7 @@ PressEntry::PressEntry(int posX, int posY, std::string key, std::string action, 
     this->fontSize = fontSize;
 }
 
-PressEntry::PressEntry(int posX, int posY, std::string key1, std::string key2, std::string action, uint32_t fontSize) : MenuContent(posX, posY)
+PressEntry::PressEntry(int posX, int posY, const std::string key1, const std::string key2, const std::string action, uint32_t fontSize) : MenuContent(posX, posY)
 {
     this->posX = posX;
     this->posY = posY;
@@ -100,6 +100,7 @@ void Text::drawYourself(olc::PixelGameEngine* pge, const olc::vi2d menuOffset)
     pge->DrawString(this->posX + menuOffset.x, this->posY + menuOffset.y, this->str, olc::WHITE, fontSize);
 }
 
+// cppcheck-suppress unusedFunction
 void Menu::moveMenu(const int deltaX, const int deltaY)
 {
     this->posX += deltaX;

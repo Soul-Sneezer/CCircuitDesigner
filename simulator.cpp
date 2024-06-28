@@ -1,5 +1,6 @@
 #include "simulator.hpp"
 
+// cppcheck-suppress unusedFunction
     void Sim::resetOffset()
     {
         menuOffset = {0,0};

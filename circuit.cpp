@@ -1,4 +1,6 @@
 #include "circuit.hpp"
+
+// cppcheck-suppress unusedFunction
     void Circuit::selectElement(olc::PixelGameEngine* pge, float scale)
     {
         olc::vf2d mousePos = {(float)pge->GetMouseX(), (float)pge->GetMouseY()};
