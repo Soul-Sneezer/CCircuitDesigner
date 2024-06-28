@@ -16,22 +16,6 @@ class Sim : public olc::PixelGameEngine
 
         const int radius = 4;
 
-        Menu mainMenu;
-        bool mainMenuActive = false;
-
-        Menu editMenu;
-        bool editMenuActive = false;
-
-        Menu removeMenu;
-        bool removeMenuActive = false;
-
-        Menu addMenu;
-        bool addMenuActive = false;
-
-        Menu modifyMenu;
-        bool modifyMenuActive = false;
-        bool addElement = false;
-
         olc::vi2d menuOffset = {0, 0};
         olc::vf2d worldOffset = {0.0f, 0.0f};
 

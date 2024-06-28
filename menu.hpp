@@ -39,8 +39,8 @@ private:
     std::string action;
     uint32_t fontSize;
 
-    void pressEntry(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset, const std::string& key, const std::string& action, const uint32_t fontSize = 1);
-    void pressEntry(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset, const std::string& key1, const std::string& key2, const std::string& action, const uint32_t fontSize = 1);
+    void pressEntry1(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset);
+    void pressEntry2(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset);
 public:
     PressEntry();
     explicit PressEntry(int posX, int posY, std::string key1, std::string key2, std::string action, uint32_t fontSize);
