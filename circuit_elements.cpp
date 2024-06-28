@@ -1,12 +1,14 @@
 #include "circuit_elements.hpp"
+#include <filesystem>
 
-std::shared_ptr<olc::Sprite> CircuitElement::sprite = nullptr;
+std::shared_ptr<olc::Sprite> CircuitElement::sprite;
 
 void allocSprites()
 {
     try{
-        Transistor::sprite = std::make_shared<olc::Sprite>("./sprites/transistor.png");
-        if(Transistor::sprite == nullptr)
+        if(std::filesystem::exists("./sprites/transistor.png"))
+            Transistor::sprite = std::make_shared<olc::Sprite>("./sprites/transistor.png");
+        else    
             throw SpriteAllocFailed("Failed to alloc transistor sprite!");
     }
     catch (SpriteAllocFailed const &)
@@ -15,8 +17,9 @@ void allocSprites()
     }
 
     try{
-        Resistor::sprite = std::make_shared<olc::Sprite>("./sprites/resistor.png");
-        if(Resistor::sprite == nullptr)
+        if(std::filesystem::exists("./sprites/resistor.png"))
+            Resistor::sprite = std::make_shared<olc::Sprite>("./sprites/resistor.png");
+        else
             throw SpriteAllocFailed("Failed to alloc resistor sprite!");
     }
     catch (SpriteAllocFailed const &)
@@ -25,8 +28,9 @@ void allocSprites()
     }
 
     try{
-        Source::sprite = std::make_shared<olc::Sprite>("./sprites/source.png");
-        if(Source::sprite == nullptr)
+        if(std::filesystem::exists("./sprites/source.png"))
+            Source::sprite = std::make_shared<olc::Sprite>("./sprites/source.png");
+        else
             throw SpriteAllocFailed("Failed to alloc source sprite!");
     }
     catch (SpriteAllocFailed const &)
@@ -35,8 +39,9 @@ void allocSprites()
     }
 
     try{
-        Battery::sprite = std::make_shared<olc::Sprite>("./sprites/transistor.png");
-        if(Battery::sprite == nullptr)
+        if(std::filesystem::exists("./sprites/battery.png"))
+            Battery::sprite = std::make_shared<olc::Sprite>("./sprites/battery.png");
+        else   
             throw SpriteAllocFailed("Failed to alloc battery sprite!");
     }
     catch (SpriteAllocFailed const &)

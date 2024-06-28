@@ -20,7 +20,7 @@ class Circuit
         int32_t getVoltageIn() const;
         int32_t getVoltageOut() const;
         std::vector<std::shared_ptr<CircuitElement>>& getElements(); 
-        Circuit& operator=(const Circuit circuit);
+        Circuit& operator=(Circuit& circuit);
 
         void run();
         void drawCircuit(olc::PixelGameEngine *pge);

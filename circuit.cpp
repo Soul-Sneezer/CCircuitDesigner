@@ -82,7 +82,7 @@
     // cppcheck-suppress unusedFunction
     std::vector<std::shared_ptr<CircuitElement>>& Circuit::getElements() { return this->elements; };
 
-    Circuit& Circuit::operator=(Circuit circuit)
+    Circuit& Circuit::operator=(Circuit& circuit)
     {
         this->voltageIn = circuit.voltageIn;
         this->voltageOut = circuit.voltageOut;

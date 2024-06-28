@@ -24,16 +24,9 @@ int main()
 
     Sim sim;
 
-    std::vector<std::pair<int, int>> resolutions = { {1280, 720}, {840, 480} };
+    if(!sim.Construct(1280, 720, 1, 1))
+        throw StartupFailed("Failed to start application! Trying a lower resolution.");
 
-    // simulator::Start()
-    for(auto resolution : resolutions)
-    {
-        if(sim.Construct(resolution.first, resolution.second, 1, 1) == olc::rcode::OK)
-                break;
-        else
-            throw StartupFailed("Failed to start application! Trying a lower resolution.");
-    }
 
     try {
         sim.Start();
