@@ -29,7 +29,7 @@ int main()
     // simulator::Start()
     for(auto resolution : resolutions)
     {
-        if(sim.Construct(resolution.first, resolution.second, 1, 1))
+        if(sim.Construct(resolution.first, resolution.second, 1, 1) == olc::rcode::OK)
                 break;
         else
             throw StartupFailed("Failed to start application! Trying a lower resolution.");
