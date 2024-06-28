@@ -14,6 +14,7 @@ class Sim : public olc::PixelGameEngine
     private:
         std::vector<std::pair<std::shared_ptr<Menu>, bool>> menus;
         bool exit = false;
+        bool addElement = false;
 
         const int radius = 4;
 

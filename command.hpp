@@ -14,6 +14,15 @@ class Command
         virtual void undo() = 0;
 };
 
+class QuitCommand : public Command
+{
+    std::shared_ptr<Sim> sim;
+public:
+    QuitCommand(std::shared_ptr<Sim> sim);
+
+    void execute() override;
+};
+
 class MoveMenuCommand : public Command
 {
 private:
@@ -24,7 +33,6 @@ public:
     MoveMenuCommand(std::shared_ptr<Menu> menu, int x, int y);
     
     void execute() override;
-    void undo() override;
 };
 
 class ZoomCommand : public Command
@@ -35,39 +43,56 @@ private:
     int scale;
 public:
     ZoomCommand(std::shared_ptr<Sim> sim, float value)
-    {
-        this->sim = sim;
-        this->scaleBefore = sim->scale;
-        this->scale = value;
-    }
 
     void execute() override;
     void undo() override;
 };
 
+class SwitchMenuCommand : public Command
+{
+private:
+    std::shared_ptr<Sim> sim;
+public:
+    SwitchMenu(std::shared_ptr<Sim> sim, int menuIndex1, int menuIndex2);
+
+    void execute() override;
+};
+
+class SelectElemCommand : public Command
+{
+    private:
+        std::shared_ptr<Sim> sim;
+        ElementType type;
+    public:
+        SelectElemCommand(std::shared_ptr<Sim> sim, ElementType type);
+
+        void execute() override;
+}
+
 class InputHandler
 {
     private:
-        
+        std::shared_ptr<Sim> sim;
+
         std::unordered_map<char, std::shared_ptr<Command>> keyMapping; // for remapping the keys;
-        std::shared_ptr<Command> buttonW;
-        std::shared_ptr<Command> buttonA;
-        std::shared_ptr<Command> buttonS;
-        std::shared_ptr<Command> buttonD;
-        std::shared_ptr<Command> buttonE;
-        std::shared_ptr<Command> buttonR;
-        std::shared_ptr<Command> buttonX;
-        std::shared_ptr<Command> button1;
-        std::shared_ptr<Command> button2;
-        std::shared_ptr<Command> button3;
-        std::shared_ptr<Command> button4;
-        std::shared_ptr<Command> button5;
-        std::shared_ptr<Command> button6;
-        std::shared_ptr<Command> buttonEqual;
-        std::shared_ptr<Command> buttonMinus;
-        bool isPressed(char);
+        std::shared_ptr<Command> buttonW = nullptr;
+        std::shared_ptr<Command> buttonA = nullptr;
+        std::shared_ptr<Command> buttonS = nullptr;
+        std::shared_ptr<Command> buttonD = nullptr;
+        std::shared_ptr<Command> buttonE = nullptr;
+        std::shared_ptr<Command> buttonR = nullptr;
+        std::shared_ptr<Command> buttonX = nullptr;
+        std::shared_ptr<Command> button1 = nullptr;
+        std::shared_ptr<Command> button2 = nullptr;
+        std::shared_ptr<Command> button3 = nullptr;
+        std::shared_ptr<Command> button4 = nullptr;
+        std::shared_ptr<Command> button5 = nullptr;
+        std::shared_ptr<Command> button6 = nullptr;
+        std::shared_ptr<Command> buttonEqual = nullptr;
+        std::shared_ptr<Command> buttonMinus = nullptr;
+        bool isPressed(char c);
     public:
-        InputHandler();
+        InputHandler(std::shared_ptr<Sim> sim);
         ~InputHandler();
 
         std::shared_ptr<Command> handleInput();

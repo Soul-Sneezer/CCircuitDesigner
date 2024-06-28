@@ -85,28 +85,6 @@ class CircuitElement
         virtual void drawYourself(olc::PixelGameEngine *pge) = 0;
 };
 
-class CableNode : public CircuitElement // work in progress
-{
-    private:
-        std::vector<std::shared_ptr<CircuitElement>> inputs;
-        std::vector<std::shared_ptr<CircuitElement>> outputs;
-    public:
-        CableNode();   
-        explicit CableNode(std::pair<olc::vf2d, olc::vf2d> pos);
-        CableNode(const CableNode& node); 
-        CableNode(CableNode&& node);
-        ~CableNode();
-
-        std::vector<std::shared_ptr<CircuitElement>> getInputs() const; 
-        std::vector<std::shared_ptr<CircuitElement>> getOutputs() const;
-
-        CableNode& operator=(const CableNode& element);
-        CableNode& operator=(CableNode&& element);
-        friend std::ostream& operator<<(std::ostream& os, const CableNode& element); 
-
-        void drawYourself(olc::PixelGameEngine *pge) override;
-};
-
 class Transistor : public CircuitElement
 {
     private:
@@ -177,6 +155,29 @@ class Switch
         void deactivate();
         void openSwitch();
         void closeSwitch();
+};
+
+class CableNode 
+{
+    private:
+        std::vector<std::shared_ptr<CircuitElement>> inputs;
+        std::vector<std::shared_ptr<CircuitElement>> outputs;
+    public:
+        CableNode();   
+        explicit CableNode(std::pair<olc::vf2d, olc::vf2d> pos);
+        CableNode(const CableNode& node); 
+        CableNode(CableNode&& node);
+        ~CableNode();
+
+        std::vector<std::shared_ptr<CircuitElement>> getInputs() const; 
+        std::vector<std::shared_ptr<CircuitElement>> getOutputs() const;
+
+        CableNode& operator=(const CableNode& element);
+        CableNode& operator=(CableNode&& element);
+        friend std::ostream& operator<<(std::ostream& os, const CableNode& element); 
+
+        void addElementToInputs(std::shared_ptr<CircuitElement> elem);
+        void addElementToOutputs(std::shared_ptr<CircuitElement> elem);
 };
 
 class Cable : public CircuitElement

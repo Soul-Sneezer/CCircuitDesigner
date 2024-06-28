@@ -99,6 +99,11 @@ void swap(Battery& first, Battery& second) noexcept
     swap(first.capacity, second.capacity);
 }
 
+void swap(CableNode& first, CableNode& second) noexcept
+{
+    using std::swap;
+}
+
 CircuitElement::CircuitElement()
 {
     this->voltage = 0;
@@ -216,8 +221,9 @@ CableNode::CableNode(std::pair<olc::vf2d, olc::vf2d> pos)
     this->position = pos;
 }
 
-CableNode::CableNode(const CableNode& node) : CircuitElement(node)
+CableNode::CableNode(const CableNode& node) 
 {
+    this->position = node.position;
     this->inputs = node.inputs;
     this->outputs = node.outputs;
 }
@@ -246,13 +252,6 @@ CableNode& CableNode::operator=(const CableNode& element)
     this->inputs = element.getInputs();
     this->outputs = element.getOutputs();
     
-    this->position = element.getPosition();
-    this->voltage = element.getVoltage();
-    this->power = element.getPower();
-    this->in = element.getIn();
-    this->out = element.getOut();
-    this->temperature = element.getTemperature();
-
     return *this;
 }
 
@@ -264,12 +263,12 @@ CableNode& CableNode::operator=(CableNode&& element)
 
 }
 
-void CableNode::drawYourself(olc::PixelGameEngine *pge) 
+void addElementToInputs(std::shared_ptr<CircuitElement> elem)
 {
-    int coordX1, coordX2, coordY1, coordY2;
-    WorldToScreen(this->position.first, coordX1, coordY1);
-    WorldToScreen(this->position.second, coordX2, coordY2);
-    pge->DrawLine(coordX1, coordY1, coordX2, coordY2, olc::WHITE);
+}
+
+void addElementToOutputs(std::shared_ptr<CircuitElement> elem)
+{
 }
 
 Transistor::Transistor() 

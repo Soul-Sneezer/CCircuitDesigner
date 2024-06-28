@@ -79,24 +79,27 @@
 
     void Sim::addElem()
     {
-        olc::vf2d worldPos;
-        std::pair<olc::vf2d, olc::vf2d> linePos;
-        olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
-        ScreenToWorld((int)mousePos.x, (int)mousePos.y, worldPos);
-
-        worldPos.x = floorf(worldPos.x + gridInc / 2);
-        worldPos.y = floorf(worldPos.y + gridInc / 2);
-       
-        int nx, ny;
-        WorldToScreen(worldPos, nx, ny);
-        FillCircle(nx , ny, radius / std::min(2, (int)scale));
-        linePos = addLine();
-
-        if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
+        if(addElement)
         {
-            std::shared_ptr<CircuitElement> elem = factory->makeElement(tempType, linePos);
-            circuit->addElem(elem);
-        }     
+            olc::vf2d worldPos;
+            std::pair<olc::vf2d, olc::vf2d> linePos;
+            olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+            ScreenToWorld((int)mousePos.x, (int)mousePos.y, worldPos);
+
+            worldPos.x = floorf(worldPos.x + gridInc / 2);
+            worldPos.y = floorf(worldPos.y + gridInc / 2);
+           
+            int nx, ny;
+            WorldToScreen(worldPos, nx, ny);
+            FillCircle(nx , ny, radius / std::min(2, (int)scale));
+            linePos = addLine();
+
+            if(GetKey(olc::ENTER).bPressed || GetMouse(0).bPressed) // add element to circuit
+            {
+                std::shared_ptr<CircuitElement> elem = factory->makeElement(tempType, linePos);
+                circuit->addElem(elem);
+            }     
+        }
     }
 
     void Sim::addMenuToMenus(std::shared_ptr<Menu> menu)
@@ -149,7 +152,7 @@
         editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20,  30, "Q", "open/close this window", 1)));
         editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 50, "1","add elements to circuit", 1)));
         editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 70, "2","remove elements from circuit", 1)));
-        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 90, "3","edit elements in circuit", 1)));
+        editMenu->addContentToMenu(toMenuContent(std::make_shared<PressEntry>(20, 90, "3","modify elements in circuit", 1)));
     
         addMenuToMenus(editMenu);
     }
@@ -229,6 +232,44 @@
         }
     }
 
+    void Sim::mouseControls()
+    {
+        olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+
+        if(GetMouse(1).bPressed)
+        {
+            startPan = mousePos;
+        }
+
+        if(GetMouse(1).bHeld)
+        {
+            worldOffset -= (mousePos - startPan) / scale; 
+            startPan = mousePos;
+        }
+
+        olc::vf2d mousePosBZoom;
+        ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosBZoom);
+
+        if(GetMouseWheel() > 0)
+        {
+            if(scale < 100.0f)
+                scale *= 1.1f;
+            else
+                scale = 100.0f;
+        }
+        if(GetMouseWheel() < 0)
+        {
+            if(scale > 10.0f)
+                scale *= 0.9f;
+            else
+                scale = 10.0f;
+        }
+        olc::vf2d mousePosAZoom;
+        ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosAZoom);
+        worldOffset += (mousePosBZoom - mousePosAZoom);
+
+    }
+    
     Sim::Sim()
     {
         sAppName = "Circuit Simulator";
@@ -243,6 +284,8 @@
 
         worldOffset.x = (float)(-GetScreenSize().x / 2) / scale;
         worldOffset.y = (float)(-GetScreenSize().y / 2) / scale;
+
+        mouseControls(); 
 
         //mainMenuActive = true;
         resetTempCoord();
@@ -262,12 +305,13 @@
         CircuitElement::setWorldScale(scale);
 
         drawGrid();
+        
         try{
             addElem();
-        } // couldn't add a new element for whatever reason
+        } 
         catch (OperationFailed const &)
         {
-   //         addElement = false; 
+            addElement = false; 
         }
 
         circuit->drawCircuit(this); 
