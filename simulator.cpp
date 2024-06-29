@@ -20,6 +20,7 @@
             return this->menus;
         }
 
+// cppcheck-suppress unusedFunction
         ElementType Sim::getTempType()
         {
             return this->tempType;
