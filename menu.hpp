@@ -66,6 +66,9 @@ public:
     explicit Menu(int posX, int posY, unsigned short windowSizeX, unsigned short windowSizeY);
     ~Menu();
 
+    int getPosX();
+    int getPosY();
+
     void moveMenu(int deltaX, int deltaY);
     void resetPos();
     void addContentToMenu(std::shared_ptr<MenuContent> content);

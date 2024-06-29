@@ -60,6 +60,11 @@ class Sim : public olc::PixelGameEngine
     public:
         Sim();
 
+        float getScale();
+        void setScale(float scale);
+        std::vector<std::pair<std::shared_ptr<Menu>, bool>> getMenus();
+        ElementType getTempType();
+        void setTempType(ElementType type);
         // cppcheck-suppress unusedFunction
         [[maybe_unused]] bool OnUserCreate() override;
         // cppcheck-suppress unusedFunction

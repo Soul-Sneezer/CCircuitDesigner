@@ -1,12 +1,5 @@
 #include "command.hpp"
 
-Command* InputHandler::handleInput()
-{
-    if (isPressed()) execute();
-
-    return NULL;
-}
-
 Command::Command(std::shared_ptr<Sim> sim)
 {
     this->sim = sim;
@@ -20,38 +13,41 @@ MoveMenuCommand::MoveMenuCommand(std::shared_ptr<Sim> sim, int x, int y) : Comma
 
 void MoveMenuCommand::execute()
 {
-    for(auto menu : menus)
+
+    for(auto menu : sim->getMenus())
     {
         if(menu.second)
         {
-            menu.first->moveMenu(x - menu.first->posX, y - menu.first->posY);
+            menu.first->moveMenu(x - menu.first->getPosX(), y - menu.first->getPosY());
             return;
         }
     }
 }
 
-SwitchMenuCommand::SwitchMenuCommand()
+SwitchMenuCommand::SwitchMenuCommand(std::shared_ptr<Sim> sim, int menuIndex1, int menuIndex2) : Command(sim)
 {
+    this->menuIndex1 = menuIndex1;
+    this->menuIndex2 = menuIndex2;
 }
 
 void SwitchMenuCommand::execute()
 {
 }
 
-ZoomCommand::ZoomCommand(std::shared_ptr<Sim> sim, int value) : Command(sim)
+ZoomCommand::ZoomCommand(std::shared_ptr<Sim> sim, float value) : Command(sim)
 {
-    this->scaleBefore = sim->scale;
+    this->scaleBefore = sim->getScale();
     this->scale = value;
 }
 
 void ZoomCommand::execute()
 {
-    sim->scale *= this->scale;
+    sim->setScale(sim->getScale() * this->scale);
 }
 
 void ZoomCommand::undo()
 {
-    sim->scale = this->scaleBefore;
+    sim->setScale(this->scaleBefore);
 }
 
 QuitCommand::QuitCommand(std::shared_ptr<Sim> sim) : Command(sim)
@@ -62,7 +58,7 @@ void QuitCommand::execute()
 {
 }
 
-bool Menu::isPressed(olc::Key c)
+bool InputHandler::isPressed(olc::Key c)
 {
     return sim->GetKey(c).bHeld;
 }
@@ -74,15 +70,26 @@ SelectElemCommand::SelectElemCommand(std::shared_ptr<Sim> sim, ElementType type)
 
 void SelectElemCommand::execute()
 {
-    sim->tempType = this->type;
+    sim->setTempType(this->type);
+}
+
+RunSimulationCommand::RunSimulationCommand(std::shared_ptr<Sim> sim) : Command(sim)
+{
+}
+
+void RunSimulationCommand::execute()
+{
 }
 
 InputHandler::InputHandler(std::shared_ptr<Sim> sim)
 {
     this->sim = sim;
     
-    
-    buttonE = make_shared<SwitchMenuCommand>(sim);
+    for(long unsigned int i = 0; i < (sim->getMenus()).size(); i++)
+    {
+        if((sim->getMenus())[i].second)
+            buttonE = make_shared<SwitchMenuCommand>(sim,i,1);
+    }
     buttonR = make_shared<RunSimulationCommand>(sim);
     buttonX = make_shared<QuitCommand>(sim);
 
@@ -108,7 +115,7 @@ InputHandler::InputHandler(std::shared_ptr<Sim> sim)
 
 std::shared_ptr<Command> InputHandler::handleInput()
 {
-    if(sim->menus[0].second)// main menu activated
+    if((sim->getMenus())[0].second)// main menu activated
     {
         button1 = nullptr;
         button2 = nullptr;
@@ -116,15 +123,15 @@ std::shared_ptr<Command> InputHandler::handleInput()
         button4 = nullptr;
         button5 = nullptr;
     }
-    else if(sim->menus[1].second) // edit menu activated
+    else if((sim->getMenus())[1].second) // edit menu activated
     {
-        button1 = std::make_shared<SwitchMenu>(sim, 1, 3);
-        button2 = std::make_shared<SwitchMenu>(sim, 1, 4);
-        button3 = std::make_shared<SwitchMenu>(sim, 1, 2);
+        button1 = std::make_shared<SwitchMenuCommand>(sim, 1, 3);
+        button2 = std::make_shared<SwitchMenuCommand>(sim, 1, 4);
+        button3 = std::make_shared<SwitchMenuCommand>(sim, 1, 2);
         button4 = nullptr;
         button5 = nullptr;
     }
-    else if(sim->menus[2].second) // modify menu activated
+    else if((sim->getMenus())[2].second) // modify menu activated
     {
         button1 = nullptr;
         button2 = nullptr;
@@ -132,7 +139,7 @@ std::shared_ptr<Command> InputHandler::handleInput()
         button4 = nullptr;
         button5 = nullptr; 
     }
-    else if(sim->menus[3].second) // add menu activated
+    else if((sim->getMenus())[3].second) // add menu activated
     {
         button1 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_CABLE);
         button2 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_RESISTOR);
@@ -140,7 +147,7 @@ std::shared_ptr<Command> InputHandler::handleInput()
         button4 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_SOURCE);
         button5 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_BATTERY);
     }
-    else if(sim->menus[4].second) // delete menu activated
+    else if((sim->getMenus())[4].second) // delete menu activated
     {   
         button1 = nullptr;
         button2 = nullptr;
@@ -165,11 +172,13 @@ std::shared_ptr<Command> InputHandler::handleInput()
 
     if(isPressed(olc::ESCAPE)) // cannot remap ESC
     {
-        for(auto entry : sim->menus)
+        for(auto entry : sim->getMenus())
         {
             entry.second = false;
         }
 
-        sim->menus[0].second = true;
+        (sim->getMenus())[0].second = true;
     }
+
+    return NULL;
 }

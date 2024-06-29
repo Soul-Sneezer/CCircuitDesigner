@@ -1,5 +1,15 @@
 #include "menu.hpp"
 
+int Menu::getPosX()
+{
+    return this->posX;
+}
+
+int Menu::getPosY()
+{
+    return this->posY;
+}
+
 MenuContent::MenuContent()
 {
     this->posX = 0;

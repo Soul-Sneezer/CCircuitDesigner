@@ -1,5 +1,31 @@
 #include "simulator.hpp"
 
+        float Sim::getScale()
+        {
+            return this->scale;
+        }
+
+        void Sim::setScale(const float scale)
+        {
+            this->scale = scale;
+        }
+
+        std::vector<std::pair<std::shared_ptr<Menu>, bool>> Sim::getMenus()
+        {
+            return this->menus;
+        }
+
+        ElementType Sim::getTempType()
+        {
+            return this->tempType;
+        }
+
+        void Sim::setTempType(const ElementType type)
+        {
+            this->tempType = type;
+        }
+
+
 // cppcheck-suppress unusedFunction
     void Sim::resetTempCoord()
     {
