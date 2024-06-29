@@ -7,7 +7,6 @@
 #include "circuit_factory.hpp"
 #include "debug.hpp"
 #include "menu.hpp"
-#include "command.hpp"
 
 class Sim : public olc::PixelGameEngine
 {

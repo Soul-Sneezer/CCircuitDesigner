@@ -3,51 +3,26 @@
 
 std::shared_ptr<olc::Sprite> CircuitElement::sprite;
 
-void allocSprites()
+template<typename T> void allocSprite(const char* path)
 {
     try{
-        if(std::filesystem::exists("./sprites/transistor.png"))
-            Transistor::sprite = std::make_shared<olc::Sprite>("./sprites/transistor.png");
+        if(std::filesystem::exists(path))
+            T::sprite = std::make_shared<olc::Sprite>(path);
         else    
-            throw SpriteAllocFailed("Failed to alloc transistor sprite!");
+            throw SpriteAllocFailed("Failed to alloc sprite!");
     }
     catch (SpriteAllocFailed const &)
     {
-        Transistor::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
+        T::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
     }
+}
 
-    try{
-        if(std::filesystem::exists("./sprites/resistor.png"))
-            Resistor::sprite = std::make_shared<olc::Sprite>("./sprites/resistor.png");
-        else
-            throw SpriteAllocFailed("Failed to alloc resistor sprite!");
-    }
-    catch (SpriteAllocFailed const &)
-    {
-        Resistor::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
-    }
-
-    try{
-        if(std::filesystem::exists("./sprites/source.png"))
-            Source::sprite = std::make_shared<olc::Sprite>("./sprites/source.png");
-        else
-            throw SpriteAllocFailed("Failed to alloc source sprite!");
-    }
-    catch (SpriteAllocFailed const &)
-    {
-        Source::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
-    }
-
-    try{
-        if(std::filesystem::exists("./sprites/battery.png"))
-            Battery::sprite = std::make_shared<olc::Sprite>("./sprites/battery.png");
-        else   
-            throw SpriteAllocFailed("Failed to alloc battery sprite!");
-    }
-    catch (SpriteAllocFailed const &)
-    {
-        Battery::sprite = std::make_shared<olc::Sprite>("./sprites/placeholder.png");
-    }
+void allocSprites()
+{
+    allocSprite<Transistor>("./sprites/transistor.png");
+    allocSprite<Resistor>("./sprites/resistor.png");
+    allocSprite<Source>("./sprites/source.png");
+    allocSprite<Battery>("./sprites/battery.png");
 }
 
 void swap(CircuitElement& first, CircuitElement& second) noexcept
@@ -102,6 +77,8 @@ void swap(Battery& first, Battery& second) noexcept
 void swap(CableNode& first, CableNode& second) noexcept
 {
     using std::swap;
+    swap(first.inputs, second.inputs);
+    swap(first.outputs, second.outputs);
 }
 
 CircuitElement::CircuitElement()
@@ -111,7 +88,6 @@ CircuitElement::CircuitElement()
     this->in = NULL;
     this->out = NULL;
     this->temperature = 273;
-    //this->allocSprite("./sprites/placeholder.png");
 }
 
 CircuitElement::CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power, \
@@ -216,14 +192,8 @@ CableNode::CableNode()
 {
 }
 
-CableNode::CableNode(std::pair<olc::vf2d, olc::vf2d> pos)
-{
-    this->position = pos;
-}
-
 CableNode::CableNode(const CableNode& node) 
 {
-    this->position = node.position;
     this->inputs = node.inputs;
     this->outputs = node.outputs;
 }
@@ -249,9 +219,16 @@ std::vector<std::shared_ptr<CircuitElement>> CableNode::getOutputs() const { ret
 
 CableNode& CableNode::operator=(const CableNode& element) 
 {
-    this->inputs = element.getInputs();
-    this->outputs = element.getOutputs();
-    
+    for(auto input : element.getInputs())
+    {
+        this->inputs.push_back(input->clone());
+    }
+
+    for(auto output : element.getOutputs())
+    {
+        this->outputs.push_back(output->clone());
+    }
+
     return *this;
 }
 
@@ -263,12 +240,14 @@ CableNode& CableNode::operator=(CableNode&& element)
 
 }
 
-void addElementToInputs(std::shared_ptr<CircuitElement> elem)
+void CableNode::addElementToInputs(std::shared_ptr<CircuitElement> elem)
 {
+    inputs.push_back(elem);
 }
 
-void addElementToOutputs(std::shared_ptr<CircuitElement> elem)
+void CableNode::addElementToOutputs(std::shared_ptr<CircuitElement> elem)
 {
+    outputs.push_back(elem);
 }
 
 Transistor::Transistor() 

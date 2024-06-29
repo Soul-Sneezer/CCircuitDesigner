@@ -16,6 +16,7 @@ enum class ElementType
 }; 
 
 void allocSprites();
+template<typename T> void allocSprite(const char* path);
 
 class CircuitElement
 {
@@ -44,7 +45,7 @@ class CircuitElement
         std::shared_ptr<CircuitElement> out; // next element
     
     public:
-        friend void allocSprites();
+        template<typename T> friend void allocSprite(const char* path);
 
         CircuitElement();
         explicit CircuitElement(std::pair<olc::vf2d, olc::vf2d> pos, const int32_t voltage, const int32_t power = 0, \
@@ -160,11 +161,12 @@ class Switch
 class CableNode 
 {
     private:
+        friend void swap(CableNode& first, CableNode& second) noexcept;
+
         std::vector<std::shared_ptr<CircuitElement>> inputs;
         std::vector<std::shared_ptr<CircuitElement>> outputs;
     public:
         CableNode();   
-        explicit CableNode(std::pair<olc::vf2d, olc::vf2d> pos);
         CableNode(const CableNode& node); 
         CableNode(CableNode&& node);
         ~CableNode();

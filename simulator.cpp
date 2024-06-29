@@ -68,7 +68,6 @@
         }
         else
         {
-2024 
             DrawLine(coordX1, coordY2, coordX2, coordY2, olc::WHITE);
             worldPos1.y = worldPos2.y;
         }

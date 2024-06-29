@@ -7,18 +7,27 @@ Command* InputHandler::handleInput()
     return NULL;
 }
 
-MoveMenuCommand::MoveMenuCommand(std::shared_ptr<Menu> menu, int x, int y)
+Command::Command(std::shared_ptr<Sim> sim)
 {
-    this->xBefore = menu->posX;
-    this->yBefore = menu->posY;
-    this->menu = menu;
+    this->sim = sim;
+}
+
+MoveMenuCommand::MoveMenuCommand(std::shared_ptr<Sim> sim, int x, int y) : Command(sim)
+{
     this->x = x;
     this->y = y;
 }
 
 void MoveMenuCommand::execute()
 {
-    menu->moveMenu(x - xBefore, y - yBefore);
+    for(auto menu : menus)
+    {
+        if(menu.second)
+        {
+            menu.first->moveMenu(x - menu.first->posX, y - menu.first->posY);
+            return;
+        }
+    }
 }
 
 SwitchMenuCommand::SwitchMenuCommand()
@@ -29,38 +38,37 @@ void SwitchMenuCommand::execute()
 {
 }
 
-ZoomCommand::ZoomCommand(std::shared_ptr<Sim> sim, int value)
+ZoomCommand::ZoomCommand(std::shared_ptr<Sim> sim, int value) : Command(sim)
 {
-    this->sim = sim;
     this->scaleBefore = sim->scale;
     this->scale = value;
 }
 
 void ZoomCommand::execute()
 {
+    sim->scale *= this->scale;
 }
 
 void ZoomCommand::undo()
 {
+    sim->scale = this->scaleBefore;
 }
 
-QuitCommand::QuitCommand(std::shared_ptr<Sim> sim)
+QuitCommand::QuitCommand(std::shared_ptr<Sim> sim) : Command(sim)
 {
-    this->sim = sim;
 }
 
 void QuitCommand::execute()
 {
 }
 
-bool Menu::isPressed(char c)
+bool Menu::isPressed(olc::Key c)
 {
-
+    return sim->GetKey(c).bHeld;
 }
 
-SelectElemCommand::SelectElemCommand(std::shared_ptr<Sim> sim, ElementType type)
+SelectElemCommand::SelectElemCommand(std::shared_ptr<Sim> sim, ElementType type) : Command(sim)
 {
-    this->sim = sim;
     this->type = type;
 }
 
@@ -72,12 +80,8 @@ void SelectElemCommand::execute()
 InputHandler::InputHandler(std::shared_ptr<Sim> sim)
 {
     this->sim = sim;
-
-    buttonW = make_shared<MoveMenuCommand>(sim, 0, -1);
-    buttonA = make_shared<MoveMenuCommand>(sim, 0, -1);
-    buttonS = make_shared<MoveMenuCommand>(sim, 0,  1);
-    buttonD = make_shared<MoveMenuCommand>(sim, 0,  1);
-
+    
+    
     buttonE = make_shared<SwitchMenuCommand>(sim);
     buttonR = make_shared<RunSimulationCommand>(sim);
     buttonX = make_shared<QuitCommand>(sim);
@@ -86,74 +90,86 @@ InputHandler::InputHandler(std::shared_ptr<Sim> sim)
     buttonMinus = make_shared<ZoomCommand>(sim, 0.999f);
     
     // default key bindings
-    keyMapping['w'] = buttonW;
-    keyMapping['a'] = buttonA;
-    keyMapping['s'] = buttonS;
-    keyMapping['d'] = buttonD;
-    keyMapping['e'] = buttonE;
-    keyMapping['r'] = buttonR;
-    keyMapping['x'] = buttonX;
-    keyMapping['1'] = button1;
-    keyMapping['2'] = button2;
-    keyMapping['3'] = button3;
-    keyMapping['4'] = button4;
-    keyMapping['5'] = button5;
-    keyMapping['6'] = button6;
-    keyMapping['='] = buttonEqual;
-    keyMapping['-'] = buttonMinus;
+    keyMapping[olc::W] = buttonW;
+    keyMapping[olc::A] = buttonA;
+    keyMapping[olc::S] = buttonS;
+    keyMapping[olc::D] = buttonD;
+    keyMapping[olc::E] = buttonE;
+    keyMapping[olc::R] = buttonR;
+    keyMapping[olc::X] = buttonX;
+    keyMapping[olc::K1] = button1;
+    keyMapping[olc::K2] = button2;
+    keyMapping[olc::K3] = button3;
+    keyMapping[olc::K4] = button4;
+    keyMapping[olc::K5] = button5;
+    keyMapping[olc::EQUALS] = buttonEqual;
+    keyMapping[olc::MINUS] = buttonMinus;
 }
 
-std::shared_ptr<Command> handleInput()
+std::shared_ptr<Command> InputHandler::handleInput()
 {
-    if(sim->menus[0].first == true) // main menu activated
-    {
-    }
-    else if(sim->menus[1].first == true) // edit menu activated
-    {
-        button1 = std::make_shared<SwitchMenu>(sim, 1, 3);
-        button2 = std::make_shared<SwitchMenu>(sim, 1, 4);
-        button3 = std::make_shared<SwitchMenu>(sim, 1, 2);
-    }
-    else if(sim->menus[2].first) // modify menu activated
-    {
-        button1 = std::make_shared<>;
-        button2 = std::make_shared<>;
-        button3 = std::make_shared<>;
-        button4 = std::make_shared<>;
-        button5 = std::make_shared<>;
-        button6 = std::make_shared<>;
-    }
-    else if(sim->menus[3].first) // add menu activated
-    {
-        button1 = std::make_shared<>;
-        button2 = std::make_shared<>;
-        button3 = std::make_shared<>;
-        button4 = std::make_shared<>;
-        button5 = std::make_shared<>;
-        button6 = std::make_shared<>;
-    }
-    else if(sim->menus[4].first) // delete menu activated
-    {
-        button1 = std::make_shared<>;
-        button2 = std::make_shared<>;
-        button3 = std::make_shared<>;
-        button4 = std::make_shared<>;
-        button5 = std::make_shared<>;
-        button6 = std::make_shared<>;
-    }
-    else // no menu is active
+    if(sim->menus[0].second)// main menu activated
     {
         button1 = nullptr;
         button2 = nullptr;
         button3 = nullptr;
         button4 = nullptr;
         button5 = nullptr;
-        button6 = nullptr;
+    }
+    else if(sim->menus[1].second) // edit menu activated
+    {
+        button1 = std::make_shared<SwitchMenu>(sim, 1, 3);
+        button2 = std::make_shared<SwitchMenu>(sim, 1, 4);
+        button3 = std::make_shared<SwitchMenu>(sim, 1, 2);
+        button4 = nullptr;
+        button5 = nullptr;
+    }
+    else if(sim->menus[2].second) // modify menu activated
+    {
+        button1 = nullptr;
+        button2 = nullptr;
+        button3 = nullptr;
+        button4 = nullptr;
+        button5 = nullptr; 
+    }
+    else if(sim->menus[3].second) // add menu activated
+    {
+        button1 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_CABLE);
+        button2 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_RESISTOR);
+        button3 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_TRANSISTOR);
+        button4 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_SOURCE);
+        button5 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_BATTERY);
+    }
+    else if(sim->menus[4].second) // delete menu activated
+    {   
+        button1 = nullptr;
+        button2 = nullptr;
+        button3 = nullptr;
+        button4 = nullptr;
+        button5 = nullptr; 
+    }
+    else // no menu is active
+    {   
+        button1 = nullptr;
+        button2 = nullptr;
+        button3 = nullptr;
+        button4 = nullptr;
+        button5 = nullptr;
     }
 
     for(auto entry : keyMapping)
     {
         if(isPressed(entry.first))
             if(entry.second != nullptr) return entry.second;
+    }
+
+    if(isPressed(olc::ESCAPE)) // cannot remap ESC
+    {
+        for(auto entry : sim->menus)
+        {
+            entry.second = false;
+        }
+
+        sim->menus[0].second = true;
     }
 }

@@ -6,22 +6,6 @@
 
 int main() 
 {
-    Cable cable;
-    Switch circuit_switch = cable.getSwitch();
-    circuit_switch.activate();
-    circuit_switch.deactivate();
-    circuit_switch.isActive();
-    circuit_switch.isOpen();
-    circuit_switch.openSwitch();
-    circuit_switch.closeSwitch();
-    Circuit circuit;
-    circuit.run();
-
-
-    Transistor transistor;
-    transistor.getThreshold();
-    transistor.getThresholdVoltage();
-
     Sim sim;
 
     if(!sim.Construct(1280, 720, 1, 1))
