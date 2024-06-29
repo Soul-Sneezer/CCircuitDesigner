@@ -75,39 +75,39 @@ PressEntry::~PressEntry()
 {
 }
 
-void PressEntry::pressEntry1(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset)
+void PressEntry::pressEntry1(olc::PixelGameEngine* pge, const olc::vi2d pos, olc::vi2d offset)
 {
-    pge->DrawString(pos.x + menuOffset.x                , pos.y + menuOffset.y , "Press ", olc::WHITE, this->fontSize);
-    pge->DrawString(pos.x + menuOffset.x + 48 * fontSize, pos.y + menuOffset.y , this->key1,      olc::GREEN, this->fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (48 + 8 * key1.size()) * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, this->fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (80 + 8 * key1.size()) * fontSize, pos.y + menuOffset.y , this->action,   olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + offset.x                , pos.y + offset.y , "Press ", olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + offset.x + 48 * fontSize, pos.y + offset.y , this->key1,      olc::GREEN, this->fontSize);
+    pge->DrawString(pos.x + offset.x + (48 + 8 * key1.size()) * fontSize, pos.y + offset.y , " to ",   olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + offset.x + (80 + 8 * key1.size()) * fontSize, pos.y + offset.y , this->action,   olc::WHITE, this->fontSize);
 }
 
-void PressEntry::pressEntry2(olc::PixelGameEngine* pge, const olc::vi2d pos, const olc::vi2d menuOffset)
+void PressEntry::pressEntry2(olc::PixelGameEngine* pge, const olc::vi2d pos, olc::vi2d offset)
 {
-    pge->DrawString(pos.x + menuOffset.x                 , pos.y + menuOffset.y , "Press ", olc::WHITE, this->fontSize);
-    pge->DrawString(pos.x + menuOffset.x + 48  * fontSize, pos.y + menuOffset.y , this->key1,     olc::GREEN, this->fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (48 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , ",",      olc::WHITE, this->fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size())  * fontSize, pos.y + menuOffset.y , this->key2,      olc::GREEN, this->fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (56 + 8 * key1.size() + 8 * key2.size())  * fontSize, pos.y + menuOffset.y , " to ",   olc::WHITE, this->fontSize);
-    pge->DrawString(pos.x + menuOffset.x + (88 + 8 * key1.size() + 8 * key2.size()) * fontSize, pos.y + menuOffset.y , this->action,   olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + offset.x                 , pos.y + offset.y , "Press ", olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + offset.x + 48  * fontSize, pos.y + offset.y , this->key1,     olc::GREEN, this->fontSize);
+    pge->DrawString(pos.x + offset.x + (48 + 8 * key1.size())  * fontSize, pos.y + offset.y , ",",      olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + offset.x + (56 + 8 * key1.size())  * fontSize, pos.y + offset.y , this->key2,      olc::GREEN, this->fontSize);
+    pge->DrawString(pos.x + offset.x + (56 + 8 * key1.size() + 8 * key2.size())  * fontSize, pos.y + offset.y , " to ",   olc::WHITE, this->fontSize);
+    pge->DrawString(pos.x + offset.x + (88 + 8 * key1.size() + 8 * key2.size()) * fontSize, pos.y + offset.y , this->action,   olc::WHITE, this->fontSize);
 }
 
-void PressEntry::drawYourself(olc::PixelGameEngine* pge, const olc::vi2d menuOffset)
+void PressEntry::drawYourself(olc::PixelGameEngine* pge, const olc::vi2d offset)
 {
     if(key2.size() == 0)
     {
-        pressEntry1(pge, {this->posX, this->posY}, menuOffset);
+        pressEntry1(pge, {this->posX, this->posY}, offset);
     }
     else
     {
-        pressEntry2(pge, {this->posX, this->posY}, menuOffset);
+        pressEntry2(pge, {this->posX, this->posY}, offset);
     }
 }
 
-void Text::drawYourself(olc::PixelGameEngine* pge, const olc::vi2d menuOffset)
+void Text::drawYourself(olc::PixelGameEngine* pge, const olc::vi2d offset)
 {
-    pge->DrawString(this->posX + menuOffset.x, this->posY + menuOffset.y, this->str, olc::WHITE, fontSize);
+    pge->DrawString(this->posX + offset.x, this->posY + offset.y, this->str, olc::WHITE, fontSize);
 }
 
 // cppcheck-suppress unusedFunction
@@ -116,7 +116,7 @@ void Menu::moveMenu(const int deltaX, const int deltaY)
     this->posX += deltaX;
     this->posY += deltaY;
 }
-
+// cppcheck-suppress unusedFunction
 void Menu::resetPos()
 {
     this->posX = 0;

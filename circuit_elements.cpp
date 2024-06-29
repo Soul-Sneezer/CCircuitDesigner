@@ -239,12 +239,12 @@ CableNode& CableNode::operator=(CableNode&& element)
     return *this;
 
 }
-
+// cppcheck-suppress unusedFunction
 void CableNode::addElementToInputs(std::shared_ptr<CircuitElement> elem)
 {
     inputs.push_back(elem);
 }
-
+// cppcheck-suppress unusedFunction
 void CableNode::addElementToOutputs(std::shared_ptr<CircuitElement> elem)
 {
     outputs.push_back(elem);
@@ -429,32 +429,32 @@ Switch::Switch(const Switch& s)
 Switch::~Switch()
 {
 }
-
+// cppcheck-suppress unusedFunction
 bool Switch::isOpen()
 {
     return open;
 }
-
+// cppcheck-suppress unusedFunction
 bool Switch::isActive()
 {
     return active;
 }
-
+// cppcheck-suppress unusedFunction
 void Switch::activate()
 {
     this->active = true;
 }
-
+// cppcheck-suppress unusedFunction
 void Switch::deactivate()
 {
     this->active = false;
 }
-
+// cppcheck-suppress unusedFunction
 void Switch::openSwitch()
 {
     this->open = true;
 }
-
+// cppcheck-suppress unusedFunction
 void Switch::closeSwitch()
 {
     this->open = false;
@@ -508,6 +508,7 @@ std::ostream& operator<<(std::ostream& os, const Cable& c)
 }
 
 int32_t Cable::getResistance() const { return this->resistance; }
+// cppcheck-suppress unusedFunction
 Switch Cable::getSwitch() const { return this->circuitSwitch; }
 bool Cable::getFlowDirection() const { return this->reverse; }
 

@@ -60,8 +60,10 @@ class Sim : public olc::PixelGameEngine
     public:
         Sim();
 
+        std::shared_ptr<Circuit> getCircuit();
+
         float getScale();
-        void setScale(float scale);
+        void setScale(float newValue);
         std::vector<std::pair<std::shared_ptr<Menu>, bool>> getMenus();
         ElementType getTempType();
         void setTempType(ElementType type);

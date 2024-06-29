@@ -10,7 +10,7 @@ MoveMenuCommand::MoveMenuCommand(std::shared_ptr<Sim> sim, int x, int y) : Comma
     this->x = x;
     this->y = y;
 }
-
+// cppcheck-suppress unusedFunction
 void MoveMenuCommand::execute()
 {
 
@@ -44,7 +44,7 @@ void ZoomCommand::execute()
 {
     sim->setScale(sim->getScale() * this->scale);
 }
-
+// cppcheck-suppress unusedFunction
 void ZoomCommand::undo()
 {
     sim->setScale(this->scaleBefore);
@@ -79,6 +79,7 @@ RunSimulationCommand::RunSimulationCommand(std::shared_ptr<Sim> sim) : Command(s
 
 void RunSimulationCommand::execute()
 {
+    this->sim->getCircuit()->run();
 }
 
 InputHandler::InputHandler(std::shared_ptr<Sim> sim)
@@ -112,7 +113,7 @@ InputHandler::InputHandler(std::shared_ptr<Sim> sim)
     keyMapping[olc::EQUALS] = buttonEqual;
     keyMapping[olc::MINUS] = buttonMinus;
 }
-
+// cppcheck-suppress unusedFunction
 std::shared_ptr<Command> InputHandler::handleInput()
 {
     if((sim->getMenus())[0].second)// main menu activated

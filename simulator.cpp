@@ -1,13 +1,18 @@
 #include "simulator.hpp"
 
+        std::shared_ptr<Circuit> Sim::getCircuit()
+        {
+            return this->circuit;
+        }
+
         float Sim::getScale()
         {
             return this->scale;
         }
 
-        void Sim::setScale(const float scale)
+        void Sim::setScale(const float newValue)
         {
-            this->scale = scale;
+            this->scale = newValue;
         }
 
         std::vector<std::pair<std::shared_ptr<Menu>, bool>> Sim::getMenus()
