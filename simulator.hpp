@@ -8,31 +8,27 @@
 #include "debug.hpp"
 #include "menu.hpp"
 
-class Sim : public olc::PixelGameEngine
+class Sim
 {
     private:
-        std::vector<std::pair<std::shared_ptr<Menu>, bool>> menus;
-        bool exit = false;
-        bool addElement = false;
-
-        const int radius = 4;
-
         olc::vf2d worldOffset = {0.0f, 0.0f};
-
-        float scale = 8.0f;
-        float gridInc = 1.0f;
-
-        olc::vf2d startPan;
-
-        ElementType tempType = ElementType::ELEM_UNASSIGNED;
-        olc::vf2d tempPos;
+        const float gridInc = 1.0f;
 
         std::shared_ptr<Circuit> circuit;
         std::shared_ptr<Factory> factory;
 
-        void resetOffset();
-        void resetTempCoord();
+        std::vector<std::pair<std::shared_ptr<Menu>, bool>> menus;
+        bool addElement = false;
 
+        const float radius = 4.0f;
+        float scale = 8.0f;
+        
+        bool exit = false;
+        olc::vf2d startPan;
+
+        ElementType tempType = ElementType::ELEM_UNASSIGNED;
+        olc::vf2d tempPos;
+        
         void createMenus();
         void createMainMenu();
         void createEditMenu();
@@ -40,24 +36,11 @@ class Sim : public olc::PixelGameEngine
         void createRemoveMenu();
         void createAddMenu();
 
-        void drawMenus();
+        void addMenuToMenus(std::shared_ptr<Menu> menu);
 
         void WorldToScreen(const olc::vf2d& v, int& screenX, int& screenY);
         void ScreenToWorld(int screenX, int screenY, olc::vf2d& v);
-
-        std::pair<olc::vf2d, olc::vf2d> addLine();
-        void addElem();
-
-        void selectElement();
-        void drawDeleteMenu();
-        void drawModifyMenu();
-
-        void drawGrid();
-
-        void addMenuToMenus(std::shared_ptr<Menu> menu);
-        void mouseControls();
-        void keyboardControls();
-    public:
+public:
         Sim();
 
         std::shared_ptr<Circuit> getCircuit();
@@ -67,10 +50,19 @@ class Sim : public olc::PixelGameEngine
         std::vector<std::pair<std::shared_ptr<Menu>, bool>> getMenus();
         ElementType getTempType();
         void setTempType(ElementType type);
-        // cppcheck-suppress unusedFunction
-        [[maybe_unused]] bool OnUserCreate() override;
-        // cppcheck-suppress unusedFunction
-        [[maybe_unused]] bool OnUserUpdate([[maybe_unused]] float fElapsedTime) override;
+        bool getExitStatus();
+        olc::vf2d getTempPos();
+        olc::vi2d getWorldOffset();
+
+        void initializeWorldOffset(olc::PixelGameEngine* pge);
+        void resetTempCoord(olc::PixelGameEngine* pge);
+
+        void setAddElementFalse();
+        void drawMenus(olc::PixelGameEngine* pge);
+        std::pair<olc::vf2d, olc::vf2d> addLine(olc::PixelGameEngine* pge);
+        void addElem(olc::PixelGameEngine* pge);
+        void drawGrid(olc::PixelGameEngine* pge);
+        void drawCircuit(olc::PixelGameEngine* pge);
 };
 
 #endif

@@ -8,20 +8,18 @@
 
 class Command
 {
-protected:
-    std::shared_ptr<Sim> sim;
 public:
-    explicit Command(std::shared_ptr<Sim> sim);
+    explicit Command();
     virtual ~Command() {}
-    virtual void execute() = 0;
+    virtual void execute(Sim* sim) = 0;
 };
 
 class QuitCommand : public Command
 {   
 public:
-    explicit QuitCommand(std::shared_ptr<Sim> sim);
+    explicit QuitCommand();
 
-    void execute() override;
+    void execute(Sim* sim) override;
 };
 
 class MoveMenuCommand : public Command
@@ -29,21 +27,19 @@ class MoveMenuCommand : public Command
 private:
     int x, y;
 public:
-    explicit MoveMenuCommand(std::shared_ptr<Sim> sim, int x, int y);
+    explicit MoveMenuCommand(int x, int y);
     
-    void execute() override;
+    void execute(Sim* sim) override;
 };
 
 class ZoomCommand : public Command
 {
 private:
-    int scaleBefore;
     int scale;
 public:
-    explicit ZoomCommand(std::shared_ptr<Sim> sim, float value);
+    explicit ZoomCommand(float value);
 
-    void execute() override;
-    void undo();
+    void execute(Sim* sim) override;
 };
 
 class SwitchMenuCommand : public Command
@@ -51,9 +47,9 @@ class SwitchMenuCommand : public Command
 private:
     int menuIndex1, menuIndex2;
 public:
-    explicit SwitchMenuCommand(std::shared_ptr<Sim> sim, int menuIndex1, int menuIndex2);
+    explicit SwitchMenuCommand(int menuIndex1, int menuIndex2);
 
-    void execute() override;
+    void execute(Sim* sim) override;
 };
 
 class SelectElemCommand : public Command
@@ -61,24 +57,22 @@ class SelectElemCommand : public Command
 private:
     ElementType type;
 public:
-    explicit SelectElemCommand(std::shared_ptr<Sim> sim, ElementType type);
+    explicit SelectElemCommand(ElementType type);
 
-    void execute() override;
+    void execute(Sim* sim) override;
 };
 
 class RunSimulationCommand : public Command
 {
 public:
-    explicit RunSimulationCommand(std::shared_ptr<Sim> sim);
+    explicit RunSimulationCommand();
 
-    void execute() override;
+    void execute(Sim* sim) override;
 };
 
 class InputHandler
 {
 private:
-    std::shared_ptr<Sim> sim;
-
     std::unordered_map<olc::Key, std::shared_ptr<Command>> keyMapping; // for remapping the keys;
     std::shared_ptr<Command> buttonW = nullptr;
     std::shared_ptr<Command> buttonA = nullptr;
@@ -94,12 +88,11 @@ private:
     std::shared_ptr<Command> button5 = nullptr;
     std::shared_ptr<Command> buttonEqual = nullptr;
     std::shared_ptr<Command> buttonMinus = nullptr;
-    bool isPressed(olc::Key c);
 public:
-    explicit InputHandler(std::shared_ptr<Sim> sim);
+    InputHandler();
     ~InputHandler();
 
-    std::shared_ptr<Command> handleInput();
+    std::shared_ptr<Command> handleInput(Sim* sim, olc::PixelGameEngine* pge);
 };
 
 #endif

@@ -1,17 +1,12 @@
 #include "command.hpp"
 
-Command::Command(std::shared_ptr<Sim> sim)
-{
-    this->sim = sim;
-}
-
-MoveMenuCommand::MoveMenuCommand(std::shared_ptr<Sim> sim, int x, int y) : Command(sim)
+MoveMenuCommand::MoveMenuCommand(int x, int y) 
 {
     this->x = x;
     this->y = y;
 }
 // cppcheck-suppress unusedFunction
-void MoveMenuCommand::execute()
+void MoveMenuCommand::execute(Sim* sim)
 {
 
     for(auto menu : sim->getMenus())
@@ -24,80 +19,53 @@ void MoveMenuCommand::execute()
     }
 }
 
-SwitchMenuCommand::SwitchMenuCommand(std::shared_ptr<Sim> sim, int menuIndex1, int menuIndex2) : Command(sim)
+SwitchMenuCommand::SwitchMenuCommand(int menuIndex1, int menuIndex2) 
 {
     this->menuIndex1 = menuIndex1;
     this->menuIndex2 = menuIndex2;
 }
 
-void SwitchMenuCommand::execute()
+void SwitchMenuCommand::execute(Sim* sim)
 {
 }
 
-ZoomCommand::ZoomCommand(std::shared_ptr<Sim> sim, float value) : Command(sim)
+ZoomCommand::ZoomCommand(float value) 
 {
-    this->scaleBefore = sim->getScale();
     this->scale = value;
 }
 
-void ZoomCommand::execute()
+void ZoomCommand::execute(Sim* sim)
 {
     sim->setScale(sim->getScale() * this->scale);
 }
-// cppcheck-suppress unusedFunction
-void ZoomCommand::undo()
-{
-    sim->setScale(this->scaleBefore);
-}
 
-QuitCommand::QuitCommand(std::shared_ptr<Sim> sim) : Command(sim)
+void QuitCommand::execute(Sim* sim)
 {
 }
 
-void QuitCommand::execute()
-{
-}
-
-bool InputHandler::isPressed(olc::Key c)
-{
-    return sim->GetKey(c).bHeld;
-}
-
-SelectElemCommand::SelectElemCommand(std::shared_ptr<Sim> sim, ElementType type) : Command(sim)
+SelectElemCommand::SelectElemCommand(ElementType type) 
 {
     this->type = type;
 }
 
-void SelectElemCommand::execute()
+void SelectElemCommand::execute(Sim* sim)
 {
     sim->setTempType(this->type);
 }
 
-RunSimulationCommand::RunSimulationCommand(std::shared_ptr<Sim> sim) : Command(sim)
+void RunSimulationCommand::execute(Sim* sim)
 {
+    sim->getCircuit()->run();
 }
 
-void RunSimulationCommand::execute()
+InputHandler::InputHandler()
 {
-    this->sim->getCircuit()->run();
-}
+    buttonR = std::make_shared<RunSimulationCommand>();
+    buttonX = std::make_shared<QuitCommand>();
 
-InputHandler::InputHandler(std::shared_ptr<Sim> sim)
-{
-    this->sim = sim;
-    
-    for(long unsigned int i = 0; i < (sim->getMenus()).size(); i++)
-    {
-        if((sim->getMenus())[i].second)
-            buttonE = make_shared<SwitchMenuCommand>(sim,i,1);
-    }
-    buttonR = make_shared<RunSimulationCommand>(sim);
-    buttonX = make_shared<QuitCommand>(sim);
+    buttonEqual = std::make_shared<ZoomCommand>(1.001f);
+    buttonMinus = std::make_shared<ZoomCommand>(0.999f);
 
-    buttonEqual = make_shared<ZoomCommand>(sim, 1.001f);
-    buttonMinus = make_shared<ZoomCommand>(sim, 0.999f);
-    
-    // default key bindings
     keyMapping[olc::W] = buttonW;
     keyMapping[olc::A] = buttonA;
     keyMapping[olc::S] = buttonS;
@@ -114,8 +82,15 @@ InputHandler::InputHandler(std::shared_ptr<Sim> sim)
     keyMapping[olc::MINUS] = buttonMinus;
 }
 // cppcheck-suppress unusedFunction
-std::shared_ptr<Command> InputHandler::handleInput()
+std::shared_ptr<Command> InputHandler::handleInput(Sim* sim, olc::PixelGameEngine* pge)
 {
+
+    for(long unsigned int i = 0; i < (sim->getMenus()).size(); i++)
+    {
+        if((sim->getMenus())[i].second)
+            buttonE = std::make_shared<SwitchMenuCommand>(i,1);
+    }
+    
     if((sim->getMenus())[0].second)// main menu activated
     {
         button1 = nullptr;
@@ -126,9 +101,9 @@ std::shared_ptr<Command> InputHandler::handleInput()
     }
     else if((sim->getMenus())[1].second) // edit menu activated
     {
-        button1 = std::make_shared<SwitchMenuCommand>(sim, 1, 3);
-        button2 = std::make_shared<SwitchMenuCommand>(sim, 1, 4);
-        button3 = std::make_shared<SwitchMenuCommand>(sim, 1, 2);
+        button1 = std::make_shared<SwitchMenuCommand>(1, 3);
+        button2 = std::make_shared<SwitchMenuCommand>(1, 4);
+        button3 = std::make_shared<SwitchMenuCommand>(1, 2);
         button4 = nullptr;
         button5 = nullptr;
     }
@@ -142,11 +117,11 @@ std::shared_ptr<Command> InputHandler::handleInput()
     }
     else if((sim->getMenus())[3].second) // add menu activated
     {
-        button1 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_CABLE);
-        button2 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_RESISTOR);
-        button3 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_TRANSISTOR);
-        button4 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_SOURCE);
-        button5 = std::make_shared<SelectElemCommand>(sim, ElementType::ELEM_BATTERY);
+        button1 = std::make_shared<SelectElemCommand>(ElementType::ELEM_CABLE);
+        button2 = std::make_shared<SelectElemCommand>(ElementType::ELEM_RESISTOR);
+        button3 = std::make_shared<SelectElemCommand>(ElementType::ELEM_TRANSISTOR);
+        button4 = std::make_shared<SelectElemCommand>(ElementType::ELEM_SOURCE);
+        button5 = std::make_shared<SelectElemCommand>(ElementType::ELEM_BATTERY);
     }
     else if((sim->getMenus())[4].second) // delete menu activated
     {   
@@ -167,19 +142,63 @@ std::shared_ptr<Command> InputHandler::handleInput()
 
     for(auto entry : keyMapping)
     {
-        if(isPressed(entry.first))
+        if(pge->GetKey(entry.first).bPressed)
             if(entry.second != nullptr) return entry.second;
     }
 
-    if(isPressed(olc::ESCAPE)) // cannot remap ESC
+    if(pge->GetKey(olc::ESCAPE).bPressed) // cannot remap ESC
     {
         for(auto entry : sim->getMenus())
         {
             entry.second = false;
         }
 
-        (sim->getMenus())[0].second = true;
+        (sim->getMenus())[0].second = !(sim->getMenus())[0].second;
     }
 
     return NULL;
 }
+
+InputHandler::~InputHandler()
+{
+}
+
+/*
+void Engine::mouseControls()
+{
+    olc::vf2d mousePos = {(float)GetMouseX(), (float)GetMouseY() };
+
+    if(GetMouse(1).bPressed)
+    {
+        startPan = mousePos;
+    }
+
+    if(GetMouse(1).bHeld)
+    {
+        worldOffset -= (mousePos - startPan) / sim->getScale(); 
+        startPan = mousePos;
+    }
+
+    olc::vf2d mousePosBZoom;
+    ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosBZoom);
+
+    if(GetMouseWheel() > 0)
+    {
+        if(sim->getScale() < 100.0f)
+            sim->setScale(sim->getScale() * 1.1f);
+        else
+            sim->setScale(100.0f);
+    }
+    if(GetMouseWheel() < 0)
+    {
+        if(sim->getScale() > 10.0f)
+            sim->setScale(sim->getScale() * 0.9f);
+        else
+            sim->setScale(10.0f);
+    }
+    olc::vf2d mousePosAZoom;
+    ScreenToWorld((int)mousePos.x, (int)mousePos.y, mousePosAZoom);
+    worldOffset += (mousePosBZoom - mousePosAZoom);
+
+}
+*/
